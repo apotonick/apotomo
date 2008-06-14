@@ -1,0 +1,89 @@
+= Apotomo
+
+Apotomo is a stateful widget component framework for Rails.
+
+This software package is developed using the Engines plugin. To find out more about how to use engines in general, go to http://rails-engines.rubyforge.org for general documentation about the Engines mechanism.
+
+== Installation
+
+1. Create your Rails application, set up your databases, grab the Engines plugin and the Apotomo, and install them.
+
+2. Install the Apotomo into your vendor/plugins directory
+
+3. Modify your Engines.start call in config/environment.rb
+
+    Engines.start :apotomo # or :apotomo
+
+4. Edit your application.rb file so it looks something like the following:
+
+    class ApplicationController < ActionController::Base
+      include Apotomo
+    end
+
+5. Edit your application_helper.rb file:
+
+    module ApplicationHelper
+      include Apotomo
+    end
+
+6. Perform any configuration you might need. You'll probably want to set these values in environment.rb (before the call to Engines.start):
+
+    module Apotomo
+      config :some_option, "some_value"
+    end
+
+7. Initialize the database tables. You can either use the engine migrations by calling:
+
+    rake engine_migrate
+
+  to move all engines to their latest versions, or
+
+    rake engine_migrate ENGINE=apotomo
+
+  to migrate only this engine.
+
+8. The Apotomo provides a default stylesheet and a small javascript helper file, so you'll probably want to include the former and almost certainly the latter in your application's layout. Add the following lines:
+
+      <%= engine_stylesheet "apotomo_engine" %>
+      <%= engine_javascript "apotomo_engine" %>
+
+== Configuration
+
+A number of configuration parameters are available to allow to you control
+how the data is stored, should you be unhappy with the defaults. These are
+outlined below. 
+
+  module Apotomo
+    config :some_option, "some_value"
+  end
+
+=== Configuration Options
++some_option+:: This option will set some_value 
+
+== Usage
+How to use this engine
+
+== License
+Copyright (c) 2007,2008 Nick Sutterer <nick@tesbo.com>
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
