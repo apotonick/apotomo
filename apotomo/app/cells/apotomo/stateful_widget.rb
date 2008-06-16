@@ -100,7 +100,9 @@ class Apotomo::StatefulWidget < Cell::Base
   #   - in init context (*)
   # the is_f5_fixme flag is needed for context propagation when children are rendered.
   # this is a part i don't like.
-
+  
+  # Central entry point for starting the FSM, executing state methods and rendering 
+  # state views.
   def invoke(state="_")
     puts "\ninvoke on #{name}"
     
@@ -135,20 +137,27 @@ class Apotomo::StatefulWidget < Cell::Base
     puts "                                    ...#{state}"    
     
     
-    ###@ jump_to_state(state)
-    self.last_state=(state)
+    ###@ self.last_state=(state)
     
     render_content_for_state(state)    
   end
   
   ### DISCUSS: #rename to render_widget_for_state?
     def render_content_for_state(state)
-      @content    = []
-      @cell_views = {}
+      @content        = []
+      @cell_views     = {}
+      @@current_cell  = self
       
-      content = render_state(state) # dispatch to the actual method, render view.
+      #content = render_state(state) # dispatch to the actual method, render view.
+      content = ""
       
-      return frame_content(content)
+      while (state != content)
+        state = catch(:state_jump) do
+          content = render_state(state)
+        end
+      end
+      
+      frame_content(content)
     end
   
   
@@ -165,11 +174,12 @@ class Apotomo::StatefulWidget < Cell::Base
   end 
   
   
-  def old_render_state(state)
+  def render_state(state)
       @cell = self
       state = state.to_s
       self.state_name = state
-
+      self.last_state = state
+      
       content = dispatch_state(state)
 
       #if content.class == String
@@ -179,32 +189,16 @@ class Apotomo::StatefulWidget < Cell::Base
     end
   
   
-  def render_state(state)
-    #self.last_state = state.to_sym
-    content = ""
-    s = catch(:state_jump) do
-      content = old_render_state(state)
-    end
-    
-    #if s.kind_of? Symbol
-    unless s == content
-      puts "STATE JUMP! to #{s}"
-      content = render_state(s)
-    end
-    
-    return content
-  end
-  
-  # "force" state machine to go to state and forget about the past.
-  ### DISCUSS: do we really forget?
+  # Force the FSM to go into state "state", regardless whether it's a valid 
+  # transition or not.
   def jump_to_state(state)
-    self.last_state = state.to_sym
+    puts "STATE JUMP! to #{state}"
+    
     throw :state_jump, state
   end
   
   
   def dispatch_state(state)    
-    ### FIXME:
     #@last_state = state.to_sym
     
     
@@ -216,7 +210,7 @@ class Apotomo::StatefulWidget < Cell::Base
     
     freeze
 
-    @@current_cell = self
+    ###@ @@current_cell = self
     content
   end
   
@@ -230,7 +224,8 @@ class Apotomo::StatefulWidget < Cell::Base
     
   def render_children
     children_to_render.each do |cell|
-      puts cell
+      #puts cell
+      ### FIXME: call to state_name here SUCKS:
       child_state = decide_child_state_for(cell, state_name.to_sym)
       
       puts "    #{cell.name} -> #{child_state}"

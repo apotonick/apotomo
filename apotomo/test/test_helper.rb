@@ -17,7 +17,8 @@ module Apotomo::EmptyModule
   def setup
     super
     @controller = ApotomoUnitTestController.new
-    @controller.params = {}
+    @controller.params  = {}
+    
     
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
@@ -29,7 +30,8 @@ module Apotomo::UnitTestCase
   def setup
     super ### FIXME: if omitted, the fixtures don't get inserted.
     @controller = ApotomoUnitTestController.new
-    @controller.params = {}
+    @controller.params  = {}
+    @controller.session = {}
     
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new

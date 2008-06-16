@@ -37,8 +37,23 @@ module Apotomo::Transitions
     transitions.fetch(last_state, []).first
   end
   
+  
+  # When the app is reloaded ("F5") by the user, every widget needs to go back to
+  # a start state. This methods finds out this start state depending on the current
+  # state of the widget.
+  # Default is the first elem in start_states.
+  # If you need to explicitly define a start state, put it into the transition_map.
+  #
+  # Example:
+  # 
+  # def transition_map
+  #   { :current_state => [:_some_other_state, :_another_state, :amazing_start_state]
+  #   }
+  # end
+  #
+  # start_state_for_state(:current_state)
+  #   => :amazing_start_state
   def start_state_for_state(state)
-    #s= (@start_states & transitions.fetch(state, [])).first
     s= (@start_states & transitions.fetch(state, [])).first || default_start_state
     puts "start_state: #{s}"
     return s

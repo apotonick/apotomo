@@ -47,11 +47,13 @@ module Apotomo
         end
       end
       
-      puts "looking up callback for #{event.type}: #{event.source_id}"
+      puts "looking up callback for #{event.type}: #{event.source_id} [#{name}]"
       local_handlers = evt_table.event_handlers_for(event.type, event.source_id)
       
       #puts evt_table.size
       
+      ### DISCUSS: we always bubble up, if handlers are found or not.
+      ###   should we have a stop-assignment ("veto")?
       if isRoot?
         process_handlers(handlers)
         return

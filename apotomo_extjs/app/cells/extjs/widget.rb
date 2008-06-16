@@ -1,10 +1,6 @@
 module Extjs
   class Widget < Apotomo::JavaScriptWidget
     
-    #self.class_eval do
-    #alias_method :render_children, :render_children_old
-    #end
-    
     def extjs_class; "Ext.Window"; end
 
 
@@ -21,7 +17,6 @@ module Extjs
 
     def render_as_function
 
-      #render_children_content ### FIXME: prevent a second render_children in #dispatch_state.
       render_children_content
       
       #puts "childs:"
@@ -44,7 +39,7 @@ module Extjs
       
       freeze
 
-      @@current_cell = self
+      #@@current_cell = self
       content
     end
     
@@ -64,8 +59,7 @@ module Extjs
       @cell_views.each do |cell_name, c|
         if c.kind_of? JavaScriptSource
           @config[:items] ||= []
-          ### FIXME: derive JavaScriptSource from this:
-          @config[:items] << str2js(c)
+          @config[:items] << c
         else
           @config[:html] ||= ""
           @config[:html] += c
@@ -82,7 +76,8 @@ module Extjs
     end
     
     def str2js(str)
-      ActiveSupport::JSON::Variable.new(str.to_s)
+      JavaScriptSource.new(str.to_s)
+      #ActiveSupport::JSON::Variable.new(str.to_s)
     end
 
     # this method is never called in an Ext widget, since all output is generated before.

@@ -35,6 +35,7 @@
     # the Tab  widget never renders its children directly, they're retrieved 
     # on-demand via RemoteComponent currently.
     def render_children_content
+      @last_invocation_state = "*" if @is_f5_fixme  ### FIXME! pass "*" as arg!!!
     end
     
     
@@ -44,24 +45,22 @@
     
     
     def _load
+      @is_f5_fixme = true if @last_invocation_state == "*"
       render_children
-      puts "items:"
+      @last_invocation_state = nil
+      
+      #puts "items:"
       #puts @cell_views.inspect
       
       content = []
       @cell_views.each do |cell_name, c|
-        if c.kind_of? JavaScriptSource  ### FIXME: JavaScriptSource should be derived from the ActiveSupport::JSON thing.
-          content << str2js(c)
+        if c.kind_of? JavaScriptSource
+          content << c
         end
+        ### TODO: what about non-extjs :html content?
       end
             
-      return render :json => content
-      
-      config_js ### FIXME: we don't need all of that method.
-      puts @config[:items].inspect
-      
-      render :js => @config[:items]
-      ### TODO: what about non-extjs :html content?
+      render :json => content
     end
   end
 end

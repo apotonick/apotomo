@@ -2,6 +2,16 @@
 
 Apotomo is a stateful widget component framework for Rails.
 
+---------------------------------------------------------------------------
+Please note that the API might be subject to change until a stable release!
+---------------------------------------------------------------------------
+
+If you're interested in new versions of Apotomo, or if you have questions, proposals
+or just want to chat a bit, join our mailing list at .... ### FIXME.
+
+Cheers!
+
+
 This software package is developed using the Engines plugin. To find out more about how to use engines in general, go to http://rails-engines.rubyforge.org for general documentation about the Engines mechanism.
 
 == Installation
@@ -64,7 +74,7 @@ outlined below.
 How to use this engine
 
 == License
-Copyright (c) 2007,2008 Nick Sutterer <nick@tesbo.com>
+Copyright (c) 2007, 2008 Nick Sutterer <nick@tesbo.com>
 
 The MIT License
 
