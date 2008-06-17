@@ -17,7 +17,7 @@ class TreePanelTest < Test::Unit::TestCase
     
     c = c.to_s
     
-    assert_match /\(function\(\)\{ el = new Ext\.tree\.TreePanel/, c
+    assert_match /\(function\(\)\{ var el = new Ext\.tree\.TreePanel/, c
     assert_match /listeners: \{click:/, c
     assert_match /loader: new /, c
     assert_match /id: "my_tree_panel"/, c

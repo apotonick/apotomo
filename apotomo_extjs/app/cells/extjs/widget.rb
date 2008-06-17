@@ -22,7 +22,7 @@ module Extjs
       #puts "childs:"
       #puts @cell_views.inspect
 
-      render :js => "(function(){ el = #{render_constructor} #{append_to_constructor} return el; })()"
+      render :js => "(function(){ var el = #{render_constructor} #{append_to_constructor} return el; })()"
     end
     
     

@@ -34,7 +34,7 @@ class ExtJSWidgetTest < Test::Unit::TestCase
     c = c.to_s
     
     assert_match /html: "<div/, c
-    assert_match /items: \[\(function\(\)\{ el = new Ext\.Panel/, c
+    assert_match /items: \[\(function\(\)\{ var el = new Ext\.Panel/, c
     assert_no_match /\.render\(/, c
   end
 end

@@ -17,7 +17,7 @@ class TabPanelTest < Test::Unit::TestCase
     
     c = c.to_s
     
-    assert_match /\(function\(\)\{ el = new Ext\.TabPanel/, c
+    assert_match /\(function\(\)\{ var el = new Ext\.TabPanel/, c
   end
   
   
@@ -30,7 +30,7 @@ class TabPanelTest < Test::Unit::TestCase
     puts c
     
     # assure the constructor is just a js hash:
-    assert_match /\(function\(\)\{ el = \{\w+: /, c
+    assert_match /\(function\(\)\{ var el = \{\w+: /, c
     assert_match re('id: "my_tab_1"'), c
     assert_match re('title: "Tab 1"'), c
     assert_match /\};\s+return/, c
@@ -58,7 +58,7 @@ class TabPanelTest < Test::Unit::TestCase
     puts c = w.invoke
     c = c.to_s
     
-    assert_match /\(function\(\)\{ el = new Ext\.TabPanel/, c
+    assert_match /\(function\(\)\{ var el = new Ext\.TabPanel/, c
   end
 end
 

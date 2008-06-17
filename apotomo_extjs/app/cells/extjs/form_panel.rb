@@ -73,10 +73,11 @@ class Extjs::FormPanel < Extjs::Panel
   
   # javascript generation -------------------------------------
   
+  ### TODO: move this into the JS config hash, and let ExtJS do the JS generation.
   def append_to_constructor
-    ### DISCUSS: right now, clicking "Cancel" (re-)loads form data for testing purposes.
+    ### DISCUSS: right now, clicking "Load" (re-)loads form data for testing purposes.
     "
-loader = (function(fp) {
+var loader = (function(fp) {
     fp.getForm().load(
     {
       url: '#{load_url}',
@@ -87,16 +88,14 @@ loader = (function(fp) {
     /*fp.removeListener('show', fp.loader);*/
 });
 el.addListener('show', loader);
-formi = el;
 el.addButton('Save', function(){
-  formi.getForm().submit({
+  el.getForm().submit({
       url: '#{save_url}', 
       waitMsg: 'Saving...', waitTitle: 'Please have patience'});
   });  
   
-  formpanel = el;       
-  el.addButton('Cancel', function(){
-    loader(formpanel);
+  el.addButton('Load', function(){
+    loader(el);
   });  
 "
   end

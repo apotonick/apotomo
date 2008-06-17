@@ -2,11 +2,24 @@ ApotomoExtjs
 ============
 
 Apotomo is a stateful widget component framework for Rails.
-This is the ExtJS widgets package.
+
+This is the ExtJS widgets package. It introduces ruby widgets that behave like
+ExtJS widgets after rendering. They route browser events to Apotomo's event-system, 
+so basically JS events can be processed within a familiar Ruby/Rails surroundings.
+
+
 
 Please note that the API might be subject to change until a stable release!
 
+I would never claim that Apotomo's ExtJS widgets have clean, good JavaScript code, as 
+neither my JavaScript knowledge nor my ExtJS experience are noteworthy.
+If you fix errors or add generic functionality, please send me your patches, since the
+project depends on the help from you JS gurus.
+
+
 Cheers!
+
+
 
 
 == License
