@@ -6,6 +6,7 @@
 
 class Apotomo::StatefulWidget < Cell::Base
   attr_reader :last_state
+  attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
   
   include TreeNode
   include Apotomo::EventAware   ### TODO: set a "see also" link in the docs.
@@ -17,9 +18,10 @@ class Apotomo::StatefulWidget < Cell::Base
   # Constructor which needs a unique id for the widget and one or multiple start states.
   # start_state may be a symbol or an array of symbols.
   def initialize(controller, id, start_states=:widget_content, opts={})
-    @controller   = controller
+    #@controller   = controller
+    super(controller, id, opts)
     @cell_name    = @name  = id
-    @opts         = opts
+    #@opts         = opts
     @start_states = start_states.kind_of?(Array) ? start_states : [start_states]
 
     @child_params = {}  ### DISCUSS: child params are deleted once per request right now. what if we are called twice and need a clean hash? do we need that?
@@ -37,7 +39,7 @@ class Apotomo::StatefulWidget < Cell::Base
   def freeze
     session[name.to_s] = freezer = {}
     
-    (self.instance_variables - ivars_to_ignore).each do |var|
+    (self.instance_variables - ivars_to_forget).each do |var|
       freezer[var.to_s] =  instance_variable_get(var)
     end
     
@@ -59,9 +61,14 @@ class Apotomo::StatefulWidget < Cell::Base
   
   # Defines the instance vars that should <em>not</em> survive between requests, 
   # which means they're not frozen in Apotomo::StatefulWidget#freeze.
+  def ivars_to_forget
+    ivars_to_ignore + ['@content', '@cell_views']
+  end
+  
+  # Defines the instance vars which should <em>not</em> be copied to the view.
   def ivars_to_ignore
     super + ['@children', '@parent', '@childrenHash', '@cell', '@opts', '@state_view',
-    '@is_f5_fixme',
+    '@is_f5_fixme'
     ]
   end
   

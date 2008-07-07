@@ -20,10 +20,13 @@ class ApotomoController < ApplicationController
       processed_handlers.each do |handler|
         ### DISCUSS: i don't like that switch, but moving this behaviour into the
         ###   actual handler is too complicated, as we just need replace and exec.
-        if handler.content.class == String
-          page.replace handler.widget_id, handler.content
+        content = handler.content
+        next unless content ### DISCUSS: move this decision into processed_handlers#each.
+        
+        if content.class == String
+          page.replace handler.widget_id, content
         else
-          page << handler.content
+          page << content
         end
       end
 
