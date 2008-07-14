@@ -10,7 +10,7 @@ module Apotomo
       puts "EventHandler: invoking #{target.name}##{state}"
       @content = target.invoke(state)
       
-      target.trigger(:onWidget)
+      target.trigger(:afterInvoke)
       
       self
     end
