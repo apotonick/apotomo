@@ -29,6 +29,6 @@ module Apotomo
   end
 end
 
-Engines.current.version = Apotomo::VERSION
+#Engines.current.version = Apotomo::VERSION
 
 Dependencies.load_paths << RAILS_ROOT+"/app/apotomo"

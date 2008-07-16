@@ -1,9 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper') # the default rails helper
 
 
+### FIXME: why did i introduce that?
 # set up the fixtures location
-Test::Unit::TestCase.fixture_path = File.dirname(__FILE__)  + "/fixtures/"
-$LOAD_PATH.unshift(Test::Unit::TestCase.fixture_path)
+#Test::Unit::TestCase.fixture_path = File.dirname(__FILE__)  + "/fixtures/"
+#$LOAD_PATH.unshift(Test::Unit::TestCase.fixture_path)
 
 
 
@@ -26,6 +27,8 @@ module Apotomo::EmptyModule
 end
 
 module Apotomo::UnitTestCase
+  
+  attr_accessor :controller
   
   def setup
     super ### FIXME: if omitted, the fixtures don't get inserted.

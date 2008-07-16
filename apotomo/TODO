@@ -1,0 +1,14 @@
+Testing
+-------
+- something like #assert_event, so we can check if a certain event was triggered
+- announce #last_state as stable test method
+
+State Machine
+-------------
+- better debug-output for transitions
+- make #transition_map friendly, maybe some more sophisticated DSL
+
+Parameter
+---------
+- introduce #my_param or something similar so widgets can only access parameters really 
+  addressed to them. or let #param do this per default.
