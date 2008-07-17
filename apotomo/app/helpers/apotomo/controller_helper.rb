@@ -11,7 +11,7 @@ module Apotomo
     ### NOTE: "act_as" because we do not only render but also provide 
     ### defined behaviour.
     def act_as_widget(name, model_tree_class = ::ApplicationWidgetTree)
-      render :text => render_widget_from_model(name, model_tree_class)
+      render :text => render_widget_from_model(name, model_tree_class), :layout => true
     end
     
     # not public:
