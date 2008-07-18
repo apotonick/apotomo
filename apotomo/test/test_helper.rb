@@ -30,6 +30,10 @@ module Apotomo::UnitTestCase
   
   attr_accessor :controller
   
+  # allow people to set up trees within test methods, with shortcuts.
+  include Apotomo::WidgetShortcuts
+  
+  
   def setup
     super ### FIXME: if omitted, the fixtures don't get inserted.
     @controller = ApotomoUnitTestController.new
