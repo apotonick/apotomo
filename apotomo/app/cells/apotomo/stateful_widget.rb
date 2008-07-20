@@ -88,6 +88,10 @@ class Apotomo::StatefulWidget < Cell::Base
     session[name.to_s]
   end
   
+  # Returns true if the widget is currently rendering itself or its children.
+  def hot?
+    @content
+  end
   
   # Explicitly defines the valid state transistions.
   #
@@ -305,86 +309,76 @@ class Apotomo::StatefulWidget < Cell::Base
   
   ### parameter accessing -------------------------------------------------------
   
+  ### DISCUSS: do we really need specific params for specific childs? isn't one
+  ### local param enough?
   def set_child_param(child_name, param, value)
     @child_params[child_name] ||= {}
     @child_params[child_name][param] = value  ### needed for #param.
-    
-    return
-    
-    child = find_by_id(child_name)
-    return unless child
-
-    child.opts[param] = value
   end
   
-  ### DISCUSS: move to Apotomo::Widget ?
+  # sets a persisting param value for _any_ child widget.
+  def set_local_param(param, value)
+    set_child_param(nil, param, value)
+  end
+  
+  # Retrieve the param value for child. This parameter has to be explicitly set 
+  # with #set_child_param prior to this call.
+  def child_param(child_name, param)
+    @child_params[child_name][param] if @child_params.has_key?(child_name)
+  end
+  
+  def local_param(param)
+    child_param(nil, param)
+  end
+  
   ### NOTE: @opts aren't frozen, so this really ensures we get explicitly*
   ### set options from the parent widget.
   ### * explicitly means here: set only for the next invocation.
-  #attr_accessor :opts
   def param(name, cell=self)
-    #puts "param? #{name}"
-    #puts cell.name
-    #puts @child_params
-    #puts
-    
-    ###@ @child_params ||= {}  ### FIXME: move to constructor?
-    #if @opts[name]
-    #  puts "  ... is in @opts"
-    #  return @opts[name]
-    #elsif @child_params.fetch(cell.name){{}}[name]
-    #  puts "  ... is in @child_params"
-    #  return @child_params.fetch(cell.name){{}}[name]
-    #else
-    #  puts "  ... passing request to parent"
-    #  return super(name, cell)
-    #end
-      
-      # if widget is still frozen, get child params from last invocation:
-    unless @last_state
-      ### FIXME: this is called in root every time!
-      #puts "frozen widget: #{name}"
-      #puts self.name
-    @child_params = thaw_child_params || {}
+    # if called outside #invoke, get child params from last invocation:
+    unless hot?
+      @child_params = thaw_child_params || {}
     end
+        
+    ### DISCUSS: 
     
-    
+    # this prevents a parameter forge: if some idiot sends unexpected parameters
+    # in an AJAX request, these are ignored and overwritten by the former, frozen 
+    # parameters.
+      
+    ### opts -> param_for (in both frozen/thawed) -> child_params -> parent?
+    return @opts[name] || param_for(name, cell) || child_param(cell.name, name) || local_param(name) || find_param(name, cell)
+    ### DISCUSS: or is there the danger of providing outdated param data?
+    ### if #param_for in a Domain always returns something != false, there should be no 
+    ### danger
     return @opts[name] || @child_params.fetch(cell.name){{}}[name] || @child_params.fetch(nil){{}}[name] || find_param(name, cell)
   end
+  
   def find_param(name, cell=self)
-      
-      # local lookup, for currently traversed widget
-      value = param_for(name, cell)
-      return value if value
-      ### FIXME: look in state_data of the currently traversed cell?
-      
-      
-      if isRoot?
-        return params[name]
-      end
-      
-      return parent.param(name, cell)
+    if isRoot?
+      return params[name]
     end
+
+    parent.param(name, cell)
+  end
   
   
   # may be overridden.
   def param_for(name, cell)
   end
-    
   
   
-    def find_by_id(widget_id)
-      return find {|node| node.name.to_s == widget_id.to_s}
-    end
-    
-    def address_for_id(widget_id)
-      widget = find_by_id(widget_id) or return nil
-      widget.address
-    end
+  def find_by_id(widget_id)
+    return find {|node| node.name.to_s == widget_id.to_s}
+  end
+  
+  ### DISCUSS: 2BRM.
+  def address_for_id(widget_id)
+    widget = find_by_id(widget_id) or return nil
+    widget.address
+  end
 
-
-
-    def self.current_widget
-      @@current_cell
-    end
+  def self.current_widget
+    @@current_cell
+  end
 end

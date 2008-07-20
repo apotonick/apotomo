@@ -4,6 +4,9 @@ require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 class InterStateTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
+  cattr_accessor :hot_flag
+  
+  
   def setup
     super
     @controller.session = {}
@@ -17,6 +20,23 @@ class InterStateTest < Test::Unit::TestCase
     assert_equal w.last_state, :_three
     assert_selekt c, "#x", "three"
   end
+  
+  def test_last_state
+    w = StateJumpCell.new(@controller, 'x', :four)
+    c = w.invoke
+    assert_equal w.last_state, :four
+  end
+  
+  def test_hot?
+    self.hot_flag = false
+    w = StateJumpCell.new(@controller, 'x', :set_hot)
+    assert ! w.hot? # => false
+    c = w.invoke
+    ### TODO: implement #hot? correct.
+    #assert ! w.hot?
+    assert self.hot_flag  # => true, we're hot.
+  end
+  
 end 
 
 
@@ -40,5 +60,13 @@ class StateJumpCell < Apotomo::StatefulWidget
   
   def _three
     @var = "three"
+  end
+  
+  def four
+  end
+  
+  def set_hot
+    InterStateTest.hot_flag = hot?
+    nil
   end
 end
