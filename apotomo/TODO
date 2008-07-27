@@ -2,6 +2,9 @@ Testing
 -------
 - something like #assert_event, so we can check if a certain event was triggered
 - announce #last_state as stable test method
+- provide something like #assert_transition to test if FSM goes where we want
+- assert_update/assert_execute, to assert which components are updated (e.g. after
+  event chain)
 
 State Machine
 -------------
@@ -12,3 +15,9 @@ Parameter
 ---------
 - introduce #my_param or something similar so widgets can only access parameters really 
   addressed to them. or let #param do this per default.
+
+Persistence
+-----------
+- only save id of ActiveRecords, to avoid big sessions (discuss whether this is necessary)
+- make WidgetTree persistent, so it can be modified dynamically
+- provide a way to attach observers within widgets, not globally in the WidgetTree

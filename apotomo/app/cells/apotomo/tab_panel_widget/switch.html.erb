@@ -1,0 +1,107 @@
+<style type="text/css">
+  ul.ApotomoTabs {
+    border-bottom: 2px solid #9d9d9d;
+    height: 20px;
+    
+    padding: 0 0 0 3;
+  }
+  
+  .ApotomoTabs li {
+	  list-style-type: none;     
+  }
+
+  .tab_left, .tab_right {
+	  width: 12px;
+    float: left;
+    height: 22px;
+    background-repeat: no-repeat;
+  }
+  
+  li.TabActive .tab_left {
+    background-image: url(<%= image_path 'tab_left_active.png', :plugin => 'apotomo' %>);
+  }
+  li.TabActive .tab_right {
+    background-image: url(<%= image_path 'tab_right_active.png', :plugin => 'apotomo' %>);
+  }
+  
+  
+  li.TabActive .tab_middle {
+    float: left;
+    background-image: url(<%= image_path 'tab_middle_active.png', :plugin => 'apotomo' %>);
+    
+    vertical-align: middle;
+    padding-top: 3px;
+    height: 19px;
+  }
+  
+  li.TabInactive .tab_left {
+    background-image: url(<%= image_path 'tab_left_inactive.png', :plugin => 'apotomo' %>);
+  }
+  li.TabInactive .tab_right {
+    background-image: url(<%= image_path 'tab_right_inactive.png', :plugin => 'apotomo' %>);
+  }
+  
+  
+  li.TabInactive .tab_middle {
+    float: left;
+    background-image: url(<%= image_path 'tab_middle_inactive.png', :plugin => 'apotomo' %>);
+    
+    padding-top: 3px;
+    height: 19px;
+  }
+  
+  .ApotomoTabs a, .ApotomoTabs a:visited {
+	  color: #7e7e7e;
+	  font: bold 10pt "Georgia", serif;
+	  text-decoration: none;
+  }
+  
+  .ApotomoTabs a:hover {
+	  color: #942278;
+  }
+</style>
+
+<!-- end stylesheet -->
+
+
+
+
+
+<div class="TabPanel">
+  <%###@ @tab_address.inspect %>
+  <%# @content %>
+
+  <%# @header %>
+  
+  <ul class="ApotomoTabs"> <% 
+    @tabs.each do |tab|      
+      html_opts = {}
+      html_opts[:class] = 'active' if tab.name == @current_child_title
+      html_opts[:title] = tab.title || tab.name
+      if eval(tab.condition) -%>
+        
+        <%
+          tab_class = (tab.name == @current_child_title) ? "TabActive" : "TabInactive"
+        
+        %>
+        
+        <li class="<%= tab_class %>">
+          <div class="tab_left">
+          </div>
+          <span class="tab_middle">
+            <%= link_to tab.name, tab.link, html_opts -%>
+          </span>
+          <div class="tab_right">
+          </div>
+        </li>
+  
+      <% 
+      end 
+    end -%>
+  </ul>
+
+
+  <%= @content.to_s %>
+
+  <%= @footer %>
+</div>
