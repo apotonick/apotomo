@@ -230,8 +230,8 @@ class Apotomo::StatefulWidget < Cell::Base
   end
   
   def children_to_render
-      children
-    end
+    children
+  end
     
   def render_children
     children_to_render.each do |cell|
@@ -287,26 +287,6 @@ class Apotomo::StatefulWidget < Cell::Base
   end
   
   
-  
-  ### addressing ----------------------------------------------------------------
-  
-  def address(way={}, target=self, state=nil)
-    way.merge!( local_address(target, way, state) )
-    
-    return way if isRoot?
-    
-    return parent.address(way, target)
-  end
-  
-  
-  # Is called when this widget lies on the way to the target.
-  # May be overridden, if this widget needs to set way information.
-  # Must return a Hash.
-  def local_address(target, way, state)
-    {}
-  end
-  
-  
   ### parameter accessing -------------------------------------------------------
   
   ### DISCUSS: do we really need specific params for specific childs? isn't one
@@ -339,19 +319,9 @@ class Apotomo::StatefulWidget < Cell::Base
     unless hot?
       @child_params = thaw_child_params || {}
     end
-        
-    ### DISCUSS: 
     
-    # this prevents a parameter forge: if some idiot sends unexpected parameters
-    # in an AJAX request, these are ignored and overwritten by the former, frozen 
-    # parameters.
-      
     ### opts -> param_for (in both frozen/thawed) -> child_params -> parent?
     return @opts[name] || param_for(name, cell) || child_param(cell.name, name) || local_param(name) || find_param(name, cell)
-    ### DISCUSS: or is there the danger of providing outdated param data?
-    ### if #param_for in a Domain always returns something != false, there should be no 
-    ### danger
-    return @opts[name] || @child_params.fetch(cell.name){{}}[name] || @child_params.fetch(nil){{}}[name] || find_param(name, cell)
   end
   
   def find_param(name, cell=self)
@@ -363,10 +333,32 @@ class Apotomo::StatefulWidget < Cell::Base
   end
   
   
-  # may be overridden.
+  # Override this to provide your own parameter value.
+  # If you want to be sure the param-retrieving stops here, always return something 
+  # that does NOT evaluate to false, otherwise the pvf will travel further up.
+  # You have to find out yourself if you want to return a remembered value or look it up
+  # in the request.
   def param_for(name, cell)
   end
   
+  
+  ### addressing/utilities ------------------------------------------------------
+  
+  def address(way={}, target=self, state=nil)
+    way.merge!( local_address(target, way, state) )
+    
+    return way if isRoot?
+    
+    return parent.address(way, target)
+  end
+  
+  
+  # Is called when this widget lies on the way to the target.
+  # May be overridden, if this widget needs to set way information.
+  # Must return a Hash.
+  def local_address(target, way, state)
+    {}
+  end
   
   def find_by_id(widget_id)
     return find {|node| node.name.to_s == widget_id.to_s}

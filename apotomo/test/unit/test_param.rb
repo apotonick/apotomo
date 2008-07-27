@@ -49,14 +49,14 @@ class ParamTest < Test::Unit::TestCase
     w = cell(:param, :set_my_param, 'a')    
     assert_equal w.param(:my_param), 1
     w.invoke
-    assert_equal w.param(:my_param), "cool"
+    assert_equal w.param(:my_param), "set_in_set_local_param"
     
     # simulate request ----------------------------------------
     controller.params = {}
     w = cell(:param, :set_my_param, 'a')
-    assert_equal w.param(:my_param), "cool"
+    assert_equal w.param(:my_param), "set_in_set_local_param"
     w.invoke
-    assert_equal w.param(:my_param), "cool"
+    assert_equal w.param(:my_param), "set_in_set_local_param"
   end
   
   def test_param_from_static_domain
@@ -91,14 +91,37 @@ class ParamTest < Test::Unit::TestCase
     puts "remembering test:"
     assert_equal w.param(:my_param), "1-dynamic"
   end
+  
+  def test_param_finding_order
+    controller.params = {:my_param => "set_globally_in_params"}
+    
+    dmn = cell(:static_domain, :no_state, 'b')
+     dmn << w = cell(:param, :set_my_param, 'a', :my_param => "set_in_opts")
+    
+    # test @opts ----------------------------------------------
+    assert_equal w.param(:my_param), "set_in_opts"
+    # test if @opts still is authorative
+    w.invoke
+    assert_equal w.param(:my_param), "set_in_opts"
+    
+    
+    w = cell(:param, :set_my_param, 'a2')
+    
+    # test stepwise -------------------------------------------
+    assert_equal w.param(:my_param), "set_globally_in_params"
+    w.invoke  # now :my_param is set via set_local_param
+    assert_equal w.param(:my_param), "set_in_set_local_param"
+    
+  end
 end 
 
 
 class ParamCell < Apotomo::StatefulWidget
   def set_my_param
-    set_local_param(:my_param, "cool")
+    set_local_param(:my_param, "set_in_set_local_param")
   end
 end
+
 
 class StaticDomainCell < Apotomo::StatefulWidget
   def param_for(p, cell)
