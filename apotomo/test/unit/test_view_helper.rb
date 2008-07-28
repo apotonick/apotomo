@@ -116,19 +116,34 @@ class ViewHelperTest < Test::Unit::TestCase
   end
 
 
-  def test_address_to_remote_widget
+  def test_address_to_event_for_widget
     Apotomo::StatefulWidget.current_widget = @a
     
     assert_equal Apotomo::StatefulWidget.current_widget, @a
     
-    addr = address_to_remote_widget()
+    addr = address_to_event_for_widget()
     #puts addr.inspect
     assert addr[:source], 'a'
     
-    addr = address_to_remote_widget('b')
+    addr = address_to_event_for_widget('b')
     assert addr[:source], 'b'
     
-    addr = address_to_remote_widget(false, :param_1 => 'one')
+    addr = address_to_event_for_widget(false, :param_1 => 'one')
+    assert addr[:source],  'a'
+    assert addr[:param_1],    'one'
+  end
+  
+  
+  def test_address_to_event
+    Apotomo::StatefulWidget.current_widget = @a
+        
+    addr = address_to_event()
+    assert addr[:source], 'a'
+    
+    addr = address_to_event(:source => 'b')
+    assert addr[:source], 'b'
+    
+    addr = address_to_event(:param_1 => 'one')
     assert addr[:source],  'a'
     assert addr[:param_1],    'one'
   end
