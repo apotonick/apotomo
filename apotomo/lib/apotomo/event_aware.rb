@@ -49,8 +49,10 @@ module Apotomo
       
       puts "looking up callback for #{event.type}: #{event.source_id} [#{name}]"
       local_handlers = evt_table.event_handlers_for(event.type, event.source_id)
+      handlers      += local_handlers
       
-      #puts evt_table.size
+      #puts local_handlers
+      #puts evt_table.source2evt.inspect
       
       ### DISCUSS: we always bubble up, if handlers are found or not.
       ###   should we have a stop-assignment ("veto")?
@@ -59,7 +61,7 @@ module Apotomo
         return
       end
       
-      parent.bubble_handlers_for(event, handlers+local_handlers)
+      parent.bubble_handlers_for(event, handlers)
     end
     
     

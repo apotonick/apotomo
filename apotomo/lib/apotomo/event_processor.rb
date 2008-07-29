@@ -20,6 +20,7 @@ module Apotomo
     
     
     def process_handlers_for_tree(handlers, tree)
+      raise "deprecated"
       #puts already_processed.inspect
       handlers.each do |handler|
         #puts handler.inspect
@@ -32,7 +33,9 @@ module Apotomo
       #puts handlers.inspect
       #  puts
     end
-    def process_handlers_for(handlers, tree, page)
+    
+    
+    def process_handlers_for(handlers, tree, page=nil)
       #puts already_processed.inspect
       handlers.each do |handler|
         #puts handler.inspect
@@ -49,6 +52,7 @@ module Apotomo
     
     
     def process_handler_for_tree(handler, tree)
+      raise "deprecated"
       return if already_processed[handler.widget_id.to_s + "-" + handler.state.to_s]
       puts "processing: "+handler.widget_id.to_s + "-" + handler.state.to_s
       #puts already_processed.inspect
@@ -64,25 +68,13 @@ module Apotomo
 ###@        process_for(:onWidget, handler.widget_id) # "trigger onWidget event".
     end
     
-    def process_handler_for(handler, tree, page)
+    def process_handler_for(handler, tree, page=nil)
       return if already_processed[handler.widget_id.to_s + "-" + handler.state.to_s]
-      puts "processing PAGE handler: "+handler.widget_id.to_s + "-" + handler.state.to_s
-      #puts already_processed.inspect
-      #begin
-        processed = handler.process_for(tree, page)
-      #rescue => e
-        #begin
-        #  #require 'pp'
-        #  #pp e
-        #rescue Exception => e2
-        #  p e2.class
-        #end
-        #puts "Scheisse"
-        #exit
-        #p e
-      #end  
+      puts "processing PAGE handler: #{handler.widget_id}-#{handler.state}"
       
-      already_processed[handler.widget_id.to_s + "-" + handler.state.to_s] = true
+      processed = handler.process_for(tree, page)
+      
+      already_processed["#{handler.widget_id}-#{handler.state}"] = true
       processed_handlers << processed
     end
     
@@ -97,11 +89,14 @@ module Apotomo
     end
     
     def process_queue_for_tree(tree)
+      raise "deprecated"
       process_handlers_for_tree(self.queue, tree)
       return processed_handlers
     end
     
-    def process_queue_for(tree, page)
+    ### DISCUSS: right now, page is not used since widgets shouldn't fiddle around with
+    ###   RJS.
+    def process_queue_for(tree, page=nil)
       process_handlers_for(self.queue, tree, page)
       return processed_handlers
     end
