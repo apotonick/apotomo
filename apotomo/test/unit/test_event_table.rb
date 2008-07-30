@@ -174,6 +174,13 @@ class EventTableTest < Test::Unit::TestCase
   end
   
   
+  def test_processing_with_sourceless_listener
+    tbl = Apotomo::EventTable.new    
+    tbl.monitor(:someEvent, nil, :target_widget_id, :another_state)
+    
+    hs = tbl.event_handlers_for(:someEvent, :unknown_widget)
+    assert_equal 1, hs.size
+  end
   
   
   ### TODO: this test is weak.
@@ -193,6 +200,6 @@ class EventTableTest < Test::Unit::TestCase
     assert_equal evt_processor.queue.size, 1
     #f.evt_table.already_process
   end
-    
+  
   
 end
