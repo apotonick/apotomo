@@ -18,9 +18,12 @@ module Apotomo
       #source, type
     # Returns the address hash to the event controller and the targeted widget.
     # Can be passed to #url_for.
-    def address_to_event(way={})
+    def address_to_event(way={}, action='event')
       target = target_widget_for(way[:source])
-      way.merge({:action => 'event', :controller => 'apotomo', :source => target.name})
+      
+      way.merge({ :action     => action,
+                  :controller => 'apotomo', 
+                  :source => target.name})
     end
     
     
@@ -41,10 +44,23 @@ module Apotomo
     # Creates a form tag to the event controller and the targeted widget.
     # The behaviour of the submit request is discussed in link_to_event.
     # 
+    ### TODO: test me.
     def form_to_event(way={}, html_options={})
+      return form_to_event_via_iframe(way, html_options) if html_options[:multipart]
+      
       addr = address_to_event(way)
       
-      form_remote_tag({:url => addr})
+      form_remote_tag({:url => addr, :html => html_options})
+    end
+    
+    
+    ### TODO: test me. document me!
+    def form_to_event_via_iframe(way={}, html_options={})
+      addr = address_to_event(way, :iframe2event)
+      
+      '<iframe id="'+iframe_id+'" name="'+iframe_id+'" style="width:1px;height:1px;border:0px" src="about:blank"></iframe>'+
+      
+      form_tag(addr, html_options.merge!(:target => iframe_id))
     end
     
     
@@ -71,6 +87,10 @@ module Apotomo
       link_to(title, target.address(way), html_options)
     end
     
+    
+    def iframe_id
+      'apotomo_iframe'
+    end
     
     # explicit _for_widget methods ----------------------------------------------
     

@@ -1,4 +1,3 @@
-### TODO: implement!
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 
@@ -74,6 +73,13 @@ class ViewHelperTest < Test::Unit::TestCase
     l = static_link_to_widget("Static Link", false, :static => true)
     puts l
     assert_no_match /static=/, l
+  end
+  
+  def test_static_link_to_widget_with_controller
+    get :index
+    Apotomo::StatefulWidget.current_widget = @a
+    l = static_link_to_widget("Static Link", false, :controller => 'user')
+    assert_match /\/user/, l
   end
   
   def test_link_to_widget
