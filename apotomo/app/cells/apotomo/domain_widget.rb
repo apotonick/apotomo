@@ -52,8 +52,7 @@ class Apotomo::DomainWidget < Apotomo::StatefulWidget
   ### DISCUSS: should the call to param(s) be first choice 
   ### (request -> user_val -> default)?
   def current_domain_value_for_param(param_name)
-    #puts params[param_name.to_s].inspect
-    #res = user_value_for_param(param_name) || default_value_for_param(param_name)
+    
     res = user_value_for_param(param_name) || params[param_name] || default_value_for_param(param_name)
     
     return res
