@@ -9,6 +9,7 @@ class Apotomo::ChildSwitchWidget < Apotomo::StatefulWidget
     }
   end
   
+  ### DISCUSS: really use a template for state view?
   def switch
     @current_child_id  = find_current_child_id
     #puts "current child:"+@current_child_id.to_s
@@ -32,7 +33,7 @@ class Apotomo::ChildSwitchWidget < Apotomo::StatefulWidget
   
   def find_current_child
     child_id = param(param_name_for_current_child)
-    find_child_for_id(child_id) || @current_child_id || default_child
+    find_child_for_id(child_id) || find_child_for_id(@current_child_id) || default_child
   end
   
   def find_current_child_id
