@@ -21,3 +21,9 @@ Persistence
 - only save id of ActiveRecords, to avoid big sessions (discuss whether this is necessary)
 - make WidgetTree persistent, so it can be modified dynamically
 - provide a way to attach observers within widgets, not globally in the WidgetTree
+
+Events
+------
+- calls to *_to_event should attach a persistent event-handler instead of doing this 
+  on the fly. This fixes a security hole where users can trigger arbitrary events
+  through /apotomo/event.
