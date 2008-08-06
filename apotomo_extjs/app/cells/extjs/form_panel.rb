@@ -60,14 +60,14 @@ class Extjs::FormPanel < Extjs::Panel
   # Return this in #process_data to report valid input to the user and
   # to let him know his data was saved. 
   def valid_answer(data={}) ### TODO: pass data to the form, like :flash.
-    {:result => true}
+    {:success => true}
   end
   
   
   # Return this in #process_data to report invalid input to the user.
   # Add error messages to errors to inform him about his false input.
   def invalid_answer(errors={})
-    {:result => false, :errors => errors}
+    {:success => false, :errors => errors}
   end
   
   
@@ -76,6 +76,20 @@ class Extjs::FormPanel < Extjs::Panel
   ### TODO: move this into the JS config hash, and let ExtJS do the JS generation.
   def append_to_constructor
     ### DISCUSS: right now, clicking "Load" (re-)loads form data for testing purposes.
+    "
+#{loader_js}
+
+el.addButton('Save', function(){
+  el.getForm().submit({
+      url: '#{save_url}', 
+      waitMsg: 'Saving...', waitTitle: 'Please have patience'});
+  });  
+  
+    
+"
+  end
+  
+  def loader_js
     "
 var loader = (function(fp) {
     fp.getForm().load(
@@ -88,15 +102,9 @@ var loader = (function(fp) {
     /*fp.removeListener('show', fp.loader);*/
 });
 el.addListener('show', loader);
-el.addButton('Save', function(){
-  el.getForm().submit({
-      url: '#{save_url}', 
-      waitMsg: 'Saving...', waitTitle: 'Please have patience'});
-  });  
-  
-  el.addButton('Load', function(){
+el.addButton('Load', function(){
     loader(el);
-  });  
+  });
 "
   end
   
