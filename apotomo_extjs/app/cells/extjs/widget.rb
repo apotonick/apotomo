@@ -12,7 +12,9 @@ module Extjs
     end
 
     def init_config
-      @config = {:title => "Apotomo rocks!"}
+      @config = {:title => "Apotomo rocks!", 
+      :id => name,  ### DISCUSS: good?
+      }
     end
 
     def render_as_function
@@ -22,7 +24,7 @@ module Extjs
       #puts "childs:"
       #puts @cell_views.inspect
 
-      render :js => "(function(){ var el = #{render_constructor} #{append_to_constructor} return el; })()"
+      render :js => "(function(){#{prepend_to_constructor} var el = #{render_constructor} #{append_to_constructor} return el; })()"
     end
     
     
@@ -47,6 +49,8 @@ module Extjs
       "new #{extjs_class}(#{config_js});"
     end
     
+    def prepend_to_constructor
+    end
     def append_to_constructor
     end
     
