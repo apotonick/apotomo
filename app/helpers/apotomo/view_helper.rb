@@ -14,10 +14,24 @@ module Apotomo
     
     # public methods ------------------------------------------------------------
     
-    # Options:
-      #source, type
     # Returns the address hash to the event controller and the targeted widget.
+    #
+    # Reserved options for <tt>way</tt>:
+    #   :source   explicitly specifies an event source.
+    #             The default is to take the currently rendered widget as source.
+    #   :type     explicitly specifies the event type.
+    #             The default is :invoke
+    #
+    # Any other option will be directly passed into the address hash and will be 
+    # available via StatefulWidget#param in the widget.
+    #
     # Can be passed to #url_for.
+    # 
+    # Example:
+    #   <%= address_to_event :type => :click, :item_id => 9 %>
+    # will result in an address that triggers a <tt>:click</tt> event from the current
+    # widget and also provides the parameter <tt>:item_id</tt>.
+    
     def address_to_event(way={}, action='event')
       target = target_widget_for(way[:source])
       
@@ -27,13 +41,11 @@ module Apotomo
     end
     
     
-    # Creates a link to the event controller and the targeted widget.
-    # The AJAX request triggered by clicking this link will result in an Apotomo event
-    # with the specified :source and :type, along with arbitrary parameters in way.
-    # Reserved options for way:
-    #   :source
-    #   :type
+    # Creates a link that triggers an event via AJAX.
+    # See #address_to_event for options for <tt>way</tt>
+    #--
     ### TODO: discuss the request cycle behaviour.
+    #--
     def link_to_event(title, way={}, html_options={})
       addr  = address_to_event(way)
       
@@ -41,10 +53,19 @@ module Apotomo
     end
     
     
-    # Creates a form tag to the event controller and the targeted widget.
-    # The behaviour of the submit request is discussed in link_to_event.
+    # Creates a form tag that triggers an event via AJAX when submitted.
+    # See #address_to_event for options for <tt>way</tt>.
+    #
+    # The values of form elements are available via StatefulWidget#param.
     # 
+    # If you want to <b>upload files</b> with this form, set 
+    # <tt>html_options{:multipart => true}</tt>. Apotomo will do the rest to provide 
+    # you with an AJAX form that can upload files.
+    # 
+    # See also #form_to_event_via_iframe.
+    #--
     ### TODO: test me.
+    #--
     def form_to_event(way={}, html_options={})
       return form_to_event_via_iframe(way, html_options) if html_options[:multipart]
       
@@ -54,7 +75,14 @@ module Apotomo
     end
     
     
-    ### TODO: test me. document me!
+    # Creates a form that submits itself via an iFrame and executes the response
+    # in the parent window. This is currently needed to upload files via AJAX.
+    # 
+    # You shouldn't call this directly, better call #form_to_event and set 
+    # <tt>:multipart</tt> to <tt>true</tt>, stay forward-compatible.
+    #--
+    ### TODO: test me.
+    #--
     def form_to_event_via_iframe(way={}, html_options={})
       addr = address_to_event(way, :iframe2event)
       
@@ -64,8 +92,11 @@ module Apotomo
     end
     
     
-    # the standard way to get a link tag referencing a widget in the tree.
-    ### DISCUSS: rename to #link_to_invoke ?
+    # Same as #link_to_event, for people who like to explicity set <tt>:source</tt> via
+    # the <tt>widget_id</tt> parameter.
+    #
+    # If you provide <tt>:static => true</tt> in <tt>way</tt> the call will result in a 
+    # bookmarkable link from #static_link_to_widget.
     def link_to_widget(title, widget_id=false, way={}, html_options={})
       if way[:static]
         return static_link_to_widget(title, widget_id, way, html_options)
@@ -80,6 +111,10 @@ module Apotomo
     
     # Creates a bookmarkable link to a widget. When clicked, the whole application
     # state ("page") is reloaded without AJAX.
+    # 
+    # This allows links that contain enough state information to display even deeply
+    # nested widgets, e.g. a form within a TabWidget that itself is under a
+    # ChildSwitchWidget.
     def static_link_to_widget(title, widget_id=false, way={}, html_options={})
       target = target_widget_for(widget_id)
       way.delete(:static)
@@ -92,36 +127,25 @@ module Apotomo
       'apotomo_iframe'
     end
     
+    
     # explicit _for_widget methods ----------------------------------------------
     
-    # Same as address_to_event, for people who like explicit arguments.
+    
+    # Same as #address_to_event, for people who like to explicity set <tt>:source</tt> via
+    # the <tt>widget_id</tt> parameter.
     def address_to_event_for_widget(widget_id=false, way={})
       way[:source] = widget_id
       address_to_event(way)
     end
-      
-    # Creates a form tag to the event controller and the targeted widget.
-    # The behaviour of the submit request is discussed in link_to_event.
-    # 
-    # Only provide +widget_id+ if you want another source widget for the resulting 
-    # Apotomo event than the current widget rendering the form.
-    ### DISCUSS: deprecate widget_id.
+    
+    
+    # Same as #form_to_event, for people who like to explicity set <tt>:source</tt> via
+    # the <tt>widget_id</tt> parameter.
     def form_to_widget(way={}, widget_id=false, html_options={})
       way[:source] = widget_id
       form_to_event(way, html_options)
     end
     
-    
-    
-    ### TODO: deprecate.
-    def address_to_remote_widget(widget_id=false ,way={})
-      raise "deprecated" 
-      address_to_event_for_widget(widget_id, way)
-    end
-    
    end
-  
-  
 
-  
 end
