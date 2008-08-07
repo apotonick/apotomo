@@ -1,10 +1,6 @@
 ### (c) 2008, Nick Sutterer <nick@tesbo.com>
-
-### TODO: clean up the state data before invoking a start state more than once
-### in one request.
-
-
-class Apotomo::StatefulWidget < Cell::Base
+module Apotomo
+class StatefulWidget < Cell::Base
   attr_reader :last_state
   attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
   
@@ -373,4 +369,6 @@ class Apotomo::StatefulWidget < Cell::Base
   def self.current_widget
     @@current_cell
   end
+end
+
 end
