@@ -89,12 +89,24 @@ class StatefulWidget < Cell::Base
     @content
   end
   
-  # Explicitly defines the valid state transistions.
+  # Explicitly defines the valid state transistions for this widget.
   #
   # Example:
-  # { :start_state_one  => [:some_state, :looping_state],
-  #   :looping_state    => [:looping_state]
-  # }
+  #   def transition_map
+  #     { :start_state_one  => [:some_state, :looping_state],
+  #       :looping_state    => [:looping_state]
+  #     }
+  #   end
+  #
+  # This would create a state machine like
+  #
+  #
+  #                        |---> :some_state
+  #   :start_state_one --->|
+  #                        |---> :looping_state ---
+  #                                         ^     |
+  #                                         |     |
+  #                                         -------
   def transition_map; {}; end
   def transitions
     transition_map
