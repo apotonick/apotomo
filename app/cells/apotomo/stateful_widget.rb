@@ -261,14 +261,16 @@ class StatefulWidget < Cell::Base
   def decide_child_state_for(child, state)
     next_state = "_"
     next_state = "*" if @is_f5_fixme
-    child_states.fetch(state, {})[child.name] || next_state
+    
+    child_state_for(child.name, state) || next_state
     ### DISCUSS: this changes the "child thawing policy" from thaw-by-default to start-over.
     #child_states.fetch(state, {})[child.name]
   end
   
   def child_states; {}; end
   
-  def child_state_for(state, child_name)
+  def child_state_for(child_name, state)
+    child_states.fetch(state, {})[child_name] || child_states.fetch(state, {})[nil]
   end
   
   
