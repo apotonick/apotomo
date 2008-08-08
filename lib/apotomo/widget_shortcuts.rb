@@ -1,6 +1,6 @@
 module Apotomo
-  # provides shortcut methods for instatiating widgets.
-  # the mixin-ed class must have a #controller method.
+  # Provides shortcut methods for creating the widget tree.
+  # The mixin target class must have a #controller method.
   module WidgetShortcuts
     def widget(class_name, id, *args)
       class_name.to_s.classify.constantize.new(controller, id, *args)
@@ -24,6 +24,10 @@ module Apotomo
     
     def tab(id, *args)
       widget('apotomo/tab_widget', id, :widget_content, *args)
+    end
+    
+    def domain(id, *args)
+      widget('apotomo/domain_widget', id, :widget_content, *args)
     end
   end
 end
