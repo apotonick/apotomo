@@ -35,8 +35,9 @@ module Apotomo
     def address_to_event(way={}, action='event')
       target = target_widget_for(way[:source])
       
-      way.merge({ :action     => action,
-                  :controller => 'apotomo', 
+      way.merge({ #:action     => action,
+                  :apotomo_action     => action,
+                  #:controller => 'apotomo', 
                   :source => target.name})
     end
     
