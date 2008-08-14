@@ -1,31 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 
-class ApotomoViewHelperTestCell < Apotomo::Widget
-  helper Apotomo::ViewHelper
-  
-  def self.view_for_state(action_view, state)
-    File.expand_path(File.dirname(__FILE__)) + "/../views/#{state}.haml"
-  end
-  
-  
-  def state_with_address_to_remote_widget
-  end
-end
-
-class ViewHelperModelTree < Apotomo::WidgetTree
-  def draw_model_tree(root)
-    domain('param_domain', 'booze_id' => 1) << root
-      #root << cell(:booze, :info, 'booze_info')
-      #root << cell(:booze, :edit, 'booze_edit', :states => [:update])
-      root << widget_factory.widget("apotomo_view_helper_test_cell", 'test_cell', :state_with_address_to_remote_widget)
-  end
-end
-
-class ApplicationModelTree < ViewHelperModelTree; end;
-
-
-
 class ViewHelperTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   

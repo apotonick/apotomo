@@ -34,13 +34,15 @@ class TabPanelTest < Test::Unit::TestCase
   
   def test_tab_panel_rendering
     get :index
-    @controller.session = {}
-    tree = TestWidgetTree.new(@controller)
     
-    r = tree.draw_tree.root
-    c = r.render_content
-    #puts c
-    assert_selekt c, "div.TabPanel>div#tab_one"
+    tab_panel = tab_panel('my_tab_panel')
+      tab_panel << Apotomo::TabWidget.new(@controller, 'tab_one', :widget_content, 
+        :title => "Tab One")
+    
+    c = tab_panel.render_content
+    puts c
+    #exit
+    assert_selekt c, "div.TabPanel>#tab_one"
   end
   
   
