@@ -93,20 +93,10 @@ module Apotomo
     end
     
     
-    # Same as #link_to_event, for people who like to explicity set <tt>:source</tt> via
-    # the <tt>widget_id</tt> parameter.
-    #
-    # If you provide <tt>:static => true</tt> in <tt>way</tt> the call will result in a 
-    # bookmarkable link from #static_link_to_widget.
+    
+    # Creates a bookmarkable link. See #static_link_to_widget.
     def link_to_widget(title, widget_id=false, way={}, html_options={})
-      if way[:static]
-        return static_link_to_widget(title, widget_id, way, html_options)
-      end
-      
-      
-      way[:source] = widget_id
-      
-      link_to_event(title, way, html_options)
+      static_link_to_widget(title, widget_id, way, html_options)
     end
     
     
@@ -139,13 +129,6 @@ module Apotomo
       address_to_event(way)
     end
     
-    
-    # Same as #form_to_event, for people who like to explicity set <tt>:source</tt> via
-    # the <tt>widget_id</tt> parameter.
-    def form_to_widget(way={}, widget_id=false, html_options={})
-      way[:source] = widget_id
-      form_to_event(way, html_options)
-    end
     
    end
 
