@@ -18,13 +18,19 @@ class ViewHelperTest < Test::Unit::TestCase
     cattr_accessor :current_widget
   end
   
+  class CWidget < Apotomo::StatefulWidget
+    def local_address(*args); {:c_address => :important}; end
+  end
+  
   
   def setup
     super
     
     @a = Apotomo::StatefulWidget.new(@controller, 'a')
     @b = Apotomo::StatefulWidget.new(@controller, 'b')
+    @c = CWidget.new(@controller, 'c')
     @a << @b
+    @a << @c
   end
   
   # test Apotomo::ViewHelper methods --------------------------
@@ -59,11 +65,10 @@ class ViewHelperTest < Test::Unit::TestCase
   
   def test_link_to_widget
     get :index
-    Apotomo::StatefulWidget.current_widget = @b
+    Apotomo::StatefulWidget.current_widget = @c
     l = link_to_widget("Static Link")
-    puts l
     assert_no_match /static=/, l
-    assert_match /source=b/, l
+    assert_match /c_address=important/, l
   end
   
   def test_link_to_event
