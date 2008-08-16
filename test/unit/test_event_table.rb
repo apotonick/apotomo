@@ -19,7 +19,7 @@ end
 class ApplicationWidgetTree < Apotomo::WidgetTree
   
   def draw(root)
-    root.observe(:widget_one, :widget_two, :some_state)
+    root.watch(:onWidget, :widget_one, :widget_two, :some_state)
     
     root << widget('test_widget', :test_widget_id)
     root << widget('test_widget', :target_widget_id)

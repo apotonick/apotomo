@@ -1,4 +1,6 @@
 module Apotomo
+  
+  # Introduces event-processing functions into the StatefulWidget.
   module EventAware
     attr_writer :evt_table
     attr_accessor :evt_processor
@@ -7,21 +9,51 @@ module Apotomo
       @evt_table ||= EventTable.new
     end
     
-    ### NOTE: observer means "look out for onWidget events!".
-    def observe(observed_id, target_id, target_state)
-      evt_table.monitor(:onWidget, observed_id, target_id, target_state)
-    end
     
-    # Attach a listener to some widget. The listener is an Apotomo::EventHandler,
+    # Attach a listener to some widget. The listener is an Apotomo::EventHandler
     # instance, something similar to a callback.
+    # 
+    # The created EventHandler will invoke the state <tt>target_state</tt> on the 
+    # widget named <tt>target_id</tt> if the specified <tt>event_type</tt> event bubbles
+    # to the widget the listener is attached to.
+    #
+    # The <tt>observed_id</tt> argument acts as filter for the event source. The 
+    # EventHandler is only invoked if the event source matches the <tt>observed_id</tt>
+    # widget name.
+    # If omitted, the <tt>observed_id</tt> is the widget the listener is attached to.
+    # You may pass <tt>nil</tt> as id to create a catch-all listener: the handler will
+    # be called regardless to the source of the event.
+    #
+    # Example:
+    #   
+    #   some_widget << cell(:processor, [:wait, :process_click], 'observer')
+    #   some_widget.watch(:click, 'observer', :process_click)
+    #   
+    # This will invoke the state <tt>:process_click</tt> on the widget named
+    # <tt>observer</tt> (which is a child of <tt>some_widget</tt>) if and only if
+    # <tt>some_widget</tt> triggers a <tt>click</tt> event.
+    #   
+    #   user_form = cell(:form, :gui, 'my_form')
+    #     user_form << cell(:form, :text_field, 'username')
+    #     user_form << cell(:form, :text_field, 'email')
+    #     user_form.watch(:change, 'my_form', :_process_events, nil)
+    #
+    # The EventHandler will be called either if the <tt>username</tt> or the 
+    # <tt>email</tt> widget trigger a <tt>change</tt> event, and will invoke the state
+    # <tt>:_process_events</tt> on the widget named <tt>my_form</tt>.
+    
     def watch(event_type, target_id, target_state, observed_id=self.name)      
       evt_table.monitor(event_type, observed_id, target_id, target_state)
     end
     
     
-    # shortcut method for creating an Event and firing it.
+    # Shortcut method for creating an Event with the respective type and 
+    # <tt>source_id</tt> and firing it, so it bubbles up from the triggering widget to
+    # the root widget.
     # 
-    # Example: trigger(:click, 'my_tree_widget')
+    # Example:
+    #   trigger(:click, 'username')
+    
     def trigger(event_type, source_id=self.name)
       puts "triggered #{event_type.inspect} in #{source_id.inspect}"
       
@@ -40,9 +72,10 @@ module Apotomo
     def bubble_handlers_for(event, handlers=[])
       if event.source_id == name
         ### FIXME: let the source widget add this handler:
-        ###   should be added by #link_to_widget or #form_to_widget.
+        ###   should be added by #link_to_event or #form_to_event.
         if event.type == :invoke
           ### FIXME: state should be passed in event.
+          ###   this is a security hole.
           watch(:invoke, event.source_id, params[:state].to_sym)
         end
       end
