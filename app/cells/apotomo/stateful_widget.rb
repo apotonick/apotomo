@@ -2,10 +2,48 @@
 module Apotomo
   # The StatefulWidget is the core component in Apotomo. Any widget is derived from 
   # this class.
-  # A Widget encapsulates a part of the GUI in <em>states</em>. A state has
-  # a <em>state method</em> which keeps the logic, and a corresponding view that is 
-  # rendered after the logic has been executed and the children of the widget have been
-  # invoked.
+  #
+  # === Widgets are mini-controllers
+  # Widgets are derived cells[http://cells.rubyforge.org/rdoc], meaning they basically
+  # look and behave like super-fast mini-controllers known from Rails. State actions in 
+  # a widget are like controller actions - they implement the business logic in a method
+  # and can render a corresponding view.
+  # Instance variables from the widget are passed to the state view, which is
+  # automatically found by convention: view filename and state method usually have the
+  # same name. If you need another view, instruct the widget by calling #state_view.
+  # 
+  # You can plug multiple of these "mini-controllers" into a page, and you can even make
+  # one widget contain others. The modeling currently happens in the WidgetTree.
+  #
+  # === Widgets are state machines
+  # States can be connected to model a workflow. For example, a form widget could have
+  # one state for diplaying an empty form, one state showing the filled-out form 
+  # with messages at invalid fields, and one state showing a success message after the
+  # form had valid input.
+  # 
+  # To send a widget - from outside - into a certain state, you usually #invoke a
+  # state. Start states are defined in #new. Valid transitions are defined in
+  # #transition_map and you can jump to an arbitrary state by calling #jump_to_state
+  # inside a state method.
+  #
+  # When a widget changes its state, it automatically updates the respective part in the
+  # page.
+  # 
+  # === Widgets are stateful
+  # After a state transition a widget restores the last environment it was in. So you
+  # have all the instance variables back that have been there when the state method
+  # finished. You no longer are aware of requests, rather think in a persistent
+  # environment.
+  # 
+  # === Widgets are event-driven
+  # Unlike in traditional rails, widgets are not updated by requests 
+  # directly, but by events. Events usually get triggered by form submits using 
+  # ViewHelper#form_to_event, by clicking links or by real GUI events (as a 
+  # <tt>onChange</tt> event in Javascript which you map to an Apotomo event with 
+  # ViewHelper#address_to_event).
+  # 
+  # Widgets can also fire events internally using EventAware#trigger.
+  # Listeners that handle an event are attached with EventAware#watch.
   
   class StatefulWidget < Cell::Base
     attr_reader :last_state
