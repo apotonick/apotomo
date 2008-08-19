@@ -168,7 +168,8 @@ module Apotomo
     #--
     # Central entry point for starting the FSM, executing state methods and rendering 
     # state views.
-    def invoke(state="_")
+    #def invoke(state="_")
+    def invoke(state=nil)
       puts "\ninvoke on #{name}"
 
       last_state = thaw_last_state
@@ -182,22 +183,23 @@ module Apotomo
       invoke_state(state)
     end
 
-
+    # Initiates the rendering cycle of the widget:
+    # - if <tt>state</tt> isn't a start state, the environment of the widget is restored
+    #   using #thaw.
+    # - find the next valid state (usually this should be the passed <tt>state</tt>).
+    # - executes the respective state method for <tt>state</tt> 
+    #   (per default also named <tt>state</tt>)
+    # - invoke the children
+    # - render the view for the state (per default named after the state method)
     def invoke_state(state=nil)
-      last_state = thaw_last_state  ### DISCUSS: remove @last_state from to-thaw list?
-
-      thaw if state.to_s =~ /^_/  ### DISCUSS: is this... good?
-
       unless start_state?(state)
-        state = find_next_state_for(last_state, state) 
-      end
-
+        thaw
+        state = find_next_state_for(last_state, state)
+      end 
+      
       puts "#{name}: transition: #{last_state} to #{state}"
-      puts "                                    ...#{state}"    
-
-
-      ###@ self.last_state=(state)
-
+      puts "                                    ...#{state}"
+      
       render_content_for_state(state)    
     end
     
