@@ -67,14 +67,13 @@ module Apotomo
     #--
     ### TODO: test me.
     #--
-    def form_to_event(way={}, html_options={})
-      return form_to_event_via_iframe(way, html_options) if html_options[:multipart]
+    def form_to_event(way={}, html_options={}, &block)
+      return form_to_event_via_iframe(way, html_options, &block) if html_options[:multipart]
       
       addr = address_to_event(way)
       
-      form_remote_tag({:url => addr, :html => html_options})
+      form_remote_tag({:url => addr, :html => html_options}, &block)
     end
-    
     
     # Creates a form that submits itself via an iFrame and executes the response
     # in the parent window. This is currently needed to upload files via AJAX.
@@ -84,17 +83,17 @@ module Apotomo
     #--
     ### TODO: test me.
     #--
-    def form_to_event_via_iframe(way={}, html_options={})
+    def form_to_event_via_iframe(way={}, html_options={}, &block)
       addr = address_to_event(way, :iframe2event)
       
       '<iframe id="'+iframe_id+'" name="'+iframe_id+'" style="width:1px;height:1px;border:0px" src="about:blank"></iframe>'+
       
-      form_tag(addr, html_options.merge!(:target => iframe_id))
+      form_tag(addr, html_options.merge!(:target => iframe_id), &block)
     end
     
     
     
-    # Creates a bookmarkable link. See #static_link_to_widget.
+    # Creates a bookmarkable link to a widget. See #static_link_to_widget.
     def link_to_widget(title, widget_id=false, way={}, html_options={})
       static_link_to_widget(title, widget_id, way, html_options)
     end

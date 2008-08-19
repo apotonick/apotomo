@@ -1,11 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper') # the default rails helper
-
-
-### FIXME: why did i introduce that?
-# set up the fixtures location
-#Test::Unit::TestCase.fixture_path = File.dirname(__FILE__)  + "/fixtures/"
-#$LOAD_PATH.unshift(Test::Unit::TestCase.fixture_path)
-
+require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
 
 
 class ApotomoUnitTestController < ApplicationController
@@ -42,6 +35,9 @@ module Apotomo::UnitTestCase
     
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
+    
+    ### FIXME: we need this to initialize the controller.
+    get :index
   end
   
   

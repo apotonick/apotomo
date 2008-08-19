@@ -5,12 +5,19 @@ class ViewHelperTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
   include Apotomo::ViewHelper
-  include ActionView::Helpers::PrototypeHelper
-  include ActionView::Helpers::JavaScriptHelper
+  #include ActionView::Helpers::PrototypeHelper
+  #include ActionView::Helpers::JavaScriptHelper
   include ActionView::Helpers::UrlHelper
-  include ApplicationHelper
   include ActionView::Helpers::TagHelper
   include ActionView::Helpers::FormTagHelper
+  include ActionView::Helpers::CaptureHelper
+  include ActionView::Helpers::TextHelper
+  include ApplicationHelper
+    
+  
+  def is_haml?; false; end  ### FIXME: this seems to be a problem with rails/haml.
+  #def _erbout();end
+  def protect_against_forgery?; false; end  ### needed in rails 2.1.
   
   
   # extend StatefulWidget for testing purposes.
@@ -92,13 +99,26 @@ class ViewHelperTest < Test::Unit::TestCase
     assert_match /type=click/, l
   end
   
-  def dont_test_form_to_event
+  def test_form_to_event
     get :index
     Apotomo::StatefulWidget.current_widget = @b
     
     # test default source -------------------------------------
-    l = form_to_widget
+    l = form_to_event
+    puts l
+    
     assert_match /source=b/, l
+    assert_match /<form/, l
+    assert_no_match /<\/form>/, l
+    
+    return
+    ### FIXME: could someone make this test work?
+    # test with block -----------------------------------------
+    l = form_to_event do
+    end
+    puts l    
+    assert_match /<form/, l
+    assert_match /<\/form>/, l
   end
 
 
