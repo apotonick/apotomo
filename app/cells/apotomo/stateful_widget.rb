@@ -167,8 +167,7 @@ module Apotomo
     # this is a part i don't like.
     #--
     # Central entry point for starting the FSM, executing state methods and rendering 
-    # state views.
-    #def invoke(state="_")
+    # state views. See #invoke_state.
     def invoke(state=nil)
       puts "\ninvoke on #{name}"
 
@@ -209,7 +208,7 @@ module Apotomo
       def render_content_for_state(state)
         @content        = []
         @cell_views     = {}
-        @@current_cell  = self
+        #@@current_cell  = self
 
         #content = render_state(state) # dispatch to the actual method, render view.
         content = ""
@@ -273,7 +272,7 @@ module Apotomo
 
       freeze
 
-      ###@ @@current_cell = self
+      @@current_cell = self # only needed in views, so set it here.
       content
     end
 
