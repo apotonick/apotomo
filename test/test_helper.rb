@@ -53,8 +53,8 @@ module Apotomo::UnitTestCase
   end
   
   
-  def assert_selekt(content, *args)
-    assert_select(HTML::Document.new(content).root, *args)
+  def assert_selekt(content, *args, &block)
+    assert_select(HTML::Document.new(content).root, *args, &block)
   end
   
   def re(str)
