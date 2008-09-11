@@ -1,6 +1,15 @@
 require 'singleton'
 
 module Apotomo
+  # Implements a pipeline for EventHandlers to be executed.
+  # Discussion is needed here.
+  # - should an EventHandler be executed right in time when it is queued?
+  #   or should we rather wait until the current rendering cycle finishes?
+  #   or introduce a method to stop rendering right after firing in the state method?
+  # - should we delete contents that are <= newer contents? they are outdated, though.
+  # - should we stop an invoke cycle if a new event is fired which has an EventHandler
+  #   that is >= the firing widget. After more thinking, i came to the conclusion this is
+  #   too complicated and should put the user's responsibility.
   class EventProcessor
     include Singleton
     attr_accessor :queue, :already_processed, :processed_handlers
@@ -19,22 +28,6 @@ module Apotomo
     end
     
     
-    def process_handlers_for_tree(handlers, tree)
-      raise "deprecated"
-      #puts already_processed.inspect
-      handlers.each do |handler|
-        #puts handler.inspect
-        #puts
-        #next if already_processed[handler.widget_id.to_s + "-" + handler.state.to_s]
-        process_handler_for_tree(handler, tree)
-      end
-      
-      #puts "queue:"
-      #puts handlers.inspect
-      #  puts
-    end
-    
-    
     def process_handlers_for(handlers, tree, page=nil)
       #puts already_processed.inspect
       handlers.each do |handler|
@@ -49,24 +42,6 @@ module Apotomo
       #  puts
     end
     
-    
-    
-    def process_handler_for_tree(handler, tree)
-      raise "deprecated"
-      return if already_processed[handler.widget_id.to_s + "-" + handler.state.to_s]
-      puts "processing: "+handler.widget_id.to_s + "-" + handler.state.to_s
-      #puts already_processed.inspect
-      processed = handler.process_for_tree(tree)
-      
-      already_processed[handler.widget_id.to_s + "-" + handler.state.to_s] = true
-      processed_handlers << processed
-      
-        ### FIXME!
-        ### DISCUSS: put this in the EventHandler?
-
-
-###@        process_for(:onWidget, handler.widget_id) # "trigger onWidget event".
-    end
     
     def process_handler_for(handler, tree, page=nil)
       return if already_processed[handler.widget_id.to_s + "-" + handler.state.to_s]
@@ -88,11 +63,6 @@ module Apotomo
       handlers.each {|h| queue_handler(h)}
     end
     
-    def process_queue_for_tree(tree)
-      raise "deprecated"
-      process_handlers_for_tree(self.queue, tree)
-      return processed_handlers
-    end
     
     ### DISCUSS: right now, page is not used since widgets shouldn't fiddle around with
     ###   RJS.

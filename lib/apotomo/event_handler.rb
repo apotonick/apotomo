@@ -1,6 +1,6 @@
 module Apotomo
   class EventHandler
-    attr_accessor :widget_id, :state, :content
+    attr_accessor :widget_id, :state, :content, :event
     
     
     def process_for(tree, page)

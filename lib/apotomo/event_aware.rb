@@ -46,6 +46,9 @@ module Apotomo
       evt_table.monitor(event_type, observed_id, target_id, target_state)
     end
     
+    #--
+    ### DISCUSS: introduce #watch_any/#watch_all ?
+    #--
     
     # Shortcut method for creating an Event with the respective type and 
     # <tt>source_id</tt> and firing it, so it bubbles up from the triggering widget to
@@ -76,12 +79,19 @@ module Apotomo
         if event.type == :invoke
           ### FIXME: state should be passed in event.
           ###   this is a security hole.
-          watch(:invoke, event.source_id, params[:state].to_sym)
+          watch(:invoke, event.source_id, event.data[:state])
         end
       end
       
       puts "looking up callback for #{event.type}: #{event.source_id} [#{name}]"
       local_handlers = evt_table.event_handlers_for(event.type, event.source_id)
+      
+      
+      ### DISCUSS: instantly process handlers (pass event to them)
+      ###   if target >= source stop rendering and handle event, forget the former content
+      ###   EventHandler can evt.skip (keep going) or evt.stop ?
+      local_handlers.each { |h| h.event = event}
+      
       handlers      += local_handlers
       
       #puts local_handlers
@@ -102,11 +112,16 @@ module Apotomo
       Apotomo::EventProcessor.instance.queue_handlers(handlers)
     end
     
-  end
-
-
-  class Event
-    attr_accessor :type, :source_id, :data
+    
+    def invoke_for_event(evt)
+      processor = Apotomo::EventProcessor.instance
+      processor.init
+      
+      fire(evt) # this stores the content in the EventProcessor, which is semi-clean.
+      
+      return processor.process_queue_for(root, evt)
+    end
+    
   end
 
 end

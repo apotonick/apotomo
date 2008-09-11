@@ -57,6 +57,16 @@ module Apotomo::UnitTestCase
     assert_select(HTML::Document.new(content).root, *args, &block)
   end
   
+  # Assert the <tt>widget</tt> is in <tt>state</tt>.
+  def assert_state(widget, state)
+    assert_equal state, widget.last_state
+  end
+  
+  def assert_event(type, source_id)
+    handlers = Apotomo::EventProcessor.instance.processed_handlers
+    assert handlers.find{|h| h.event.type == type and h.event.source_id == source_id}
+  end
+  
   def re(str)
     Regexp.new(Regexp.escape(str))
   end

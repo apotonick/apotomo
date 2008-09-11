@@ -28,20 +28,31 @@ module Apotomo
       return root.find_by_id(widget_id).render_content
     end
     
-    
+    #--
     # incoming event processing -------------------------------------------------
+    #--
     
     def process_event_request(action)
       tree      = ::ApplicationWidgetTree.new(self).draw_tree.root
-      processor = Apotomo::EventProcessor.instance
-      processor.init
+      
+      source  = tree.find_by_id(params[:source])
+      evt     = Event.new(params[:type], source.name) # type is :invoke per default.
+      
+      ### NOTE: this will be removed when the WidgetTree is fully dynamic.
+      if evt.type == :invoke
+        evt.data={:state => params[:state].to_sym}   
+        ### FIXME: this is InvokeEvent specific and
+        ### currently is only needed for explicit invoke(:some_state). 
+        ### usually the next state should be found automatically.
+      end
+      
+      
+      #tree.find_by_id(params[:source]).fire(evt)
+      
+      processed_handlers = source.invoke_for_event(evt)
+      #tree.find_by_id(params[:source]).trigger(type.to_sym)
 
-      type = params[:type] || :invoke
-
-
-      tree.find_by_id(params[:source]).trigger(type.to_sym)
-
-      processed_handlers = processor.process_queue_for(tree, nil)
+      ###@ processed_handlers = processor.process_queue_for(tree, nil)
       
       # usually an event is reported via this controller action:
       if action == :event
