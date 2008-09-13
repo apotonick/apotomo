@@ -1,63 +1,35 @@
 <style type="text/css">
-  ul.ApotomoTabs {
-    border-bottom: 2px solid #9d9d9d;
-    height: 20px;
-    
-    padding: 0 0 0 3;
-  }
-  
-  .ApotomoTabs li {
-	  list-style-type: none;     
+  .TabPanel ul {
+    display: block;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 -1px 0;
+    height: 100%;
+    font-size: 14px;
+    border-left: 1px solid #888888;
+
   }
 
-  .tab_left, .tab_right {
-	  width: 12px;
+  .TabPanel ul li {
     float: left;
-    height: 22px;
-    background-repeat: no-repeat;
+    margin: 0;
+    padding: 5px;
+    background-color: #f2f2f2;
+    color: #888888;
+    border-top: 1px solid #888888;
+    border-right: 1px solid #888888;
+    border-bottom: 1px solid #888888;
   }
-  
-  li.TabActive .tab_left {
-    background-image: url(<%= image_path 'tab_left_active.png', :plugin => 'apotomo' %>);
+
+  .TabPanel ul li.active {
+    border-bottom: 1px solid #ffffff;
+    background-color: #ffffff;
+    color: #000000;
+
   }
-  li.TabActive .tab_right {
-    background-image: url(<%= image_path 'tab_right_active.png', :plugin => 'apotomo' %>);
-  }
-  
-  
-  li.TabActive .tab_middle {
-    float: left;
-    background-image: url(<%= image_path 'tab_middle_active.png', :plugin => 'apotomo' %>);
-    
-    vertical-align: middle;
-    padding-top: 3px;
-    height: 19px;
-  }
-  
-  li.TabInactive .tab_left {
-    background-image: url(<%= image_path 'tab_left_inactive.png', :plugin => 'apotomo' %>);
-  }
-  li.TabInactive .tab_right {
-    background-image: url(<%= image_path 'tab_right_inactive.png', :plugin => 'apotomo' %>);
-  }
-  
-  
-  li.TabInactive .tab_middle {
-    float: left;
-    background-image: url(<%= image_path 'tab_middle_inactive.png', :plugin => 'apotomo' %>);
-    
-    padding-top: 3px;
-    height: 19px;
-  }
-  
-  .ApotomoTabs a, .ApotomoTabs a:visited {
-	  color: #7e7e7e;
-	  font: bold 10pt "Georgia", serif;
-	  text-decoration: none;
-  }
-  
-  .ApotomoTabs a:hover {
-	  color: #942278;
+
+  .TabPanel ul li a, .TabPanel ul li a:visited {
+    color: #888888
   }
 </style>
 
@@ -65,43 +37,22 @@
 
 
 
-
-
 <div class="TabPanel">
-  <%###@ @tab_address.inspect %>
-  <%# @content %>
-
-  <%# @header %>
-  
-  <ul class="ApotomoTabs"> <% 
-    @tabs.each do |tab|      
-      html_opts = {}
-      html_opts[:class] = 'active' if tab.name == @current_child_title
-      html_opts[:title] = tab.title || tab.name
-      if eval(tab.condition) -%>
-        
-        <%
-          tab_class = (tab.name == @current_child_title) ? "TabActive" : "TabInactive"
-        
-        %>
-        
-        <li class="<%= tab_class %>">
-          <div class="tab_left">
-          </div>
-          <span class="tab_middle">
-            <%= link_to tab.name, tab.link, html_opts -%>
-          </span>
-          <div class="tab_right">
-          </div>
-        </li>
-  
-      <% 
-      end 
-    end -%>
+  <ul>
+    <% @tabs.each do |tab|      
+          html_opts = {}
+          html_opts[:class] = 'active' if tab.first == @current_child_title
+          html_opts[:title] = tab.first || tab.first
+          tab_class = (tab.first == @current_child_title) ? "active" : ""
+    %>
+    <li class="<%= tab_class %>">
+      <%= link_to tab.first, tab.last %>
+    </li>
+    <% end -%>
+    
+    <div style="clear: both;"
   </ul>
-
-
-  <%= @content.to_s %>
-
-  <%= @footer %>
 </div>
+<div style="clear: both;"
+
+<%= @content.to_s %>
