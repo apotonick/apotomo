@@ -64,20 +64,17 @@ class EventSystemTest < Test::Unit::TestCase
     puts Apotomo::EventProcessor.instance.processed_handlers
   end
   
-  
-  def fixture_widgets
-    root = widget(:test_widget, 'root', :simple_state)
+  def test_processed_handlers_resetting
+    w1  = widget(:test_widget, 'w1', :simple_state)
     
-    root << widget(:test_widget, '')
-    root << widget('test_widget', :target_widget_id)
-    root << widget('test_widget', :target2_widget_id)
-    root << widget('test_widget', :widget_one)
-    root << widget('test_widget', :widget_two)
-    root << widget('test_widget', :widget_three)
-    root
+    evt = Apotomo::Event.new(:invoke, w1.name, {:state => :simple_state})      
+    w1.invoke_for_event(evt)
+    assert_equal 1, Apotomo::EventProcessor.instance.processed_handlers.size
     
-    root << widget('test_widget', :fireing, :fireing_state)
-    root << widget('test_widget', :fireman, :fireman_state)
-    root.watch(:click, :fireman, :fireman_state, :fireing)
+    # do it again! the processed_handlers queue should be reset.
+    evt = Apotomo::Event.new(:invoke, w1.name, {:state => :simple_state})      
+    w1.invoke_for_event(evt)
+    assert_equal 1, Apotomo::EventProcessor.instance.processed_handlers.size
   end
+  
 end

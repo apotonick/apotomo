@@ -121,6 +121,7 @@ module Apotomo
     #--
     ### DISCUSS: this is state_data:
     #--
+    ### FIXME: we have to #reload the AR instances here!
     def thaw_child_params ### FIXME: is this good?
       return unless widget_session
       return widget_session['@child_params']
@@ -171,7 +172,7 @@ module Apotomo
     def invoke(state=nil)
       puts "\ninvoke on #{name}"
 
-      last_state = thaw_last_state
+      ###@ last_state = thaw_last_state
       #puts last_state
       if state.to_s == "*"
         @is_f5_fixme = true
@@ -191,8 +192,9 @@ module Apotomo
     # - invoke the children
     # - render the view for the state (per default named after the state method)
     def invoke_state(state=nil)
+      puts "last state: #{@last_state}"
       unless start_state?(state)
-        thaw
+        ###@ thaw
         state = find_next_state_for(last_state, state)
       end 
       
@@ -246,7 +248,10 @@ module Apotomo
 
       #if content.class == String
       return content if content
-
+      
+      puts "rendering state #{state} in"
+      puts name
+      puts "#{Apotomo::StatefulWidget.current_widget.name}"
       return render_view_for_state(state)
     end
 
@@ -270,9 +275,11 @@ module Apotomo
 
       render_children
 
-      freeze
-
+      ###@ freeze
+      
+      
       @@current_cell = self # only needed in views, so set it here.
+      
       content
     end
 
@@ -422,6 +429,73 @@ module Apotomo
     def self.current_widget
       @@current_cell
     end
+    
+    
+    
+    def controller
+      puts "asking for controller. mine: #{@controller.inspect}"
+      @controller || root.controller
+    end
+    
+    def createDumpRep
+      strRep = String.new
+      strRep << @name.to_s << @@fieldSep << self.class.to_s << @@fieldSep << (isRoot? ? @name.to_s : @parent.name.to_s)
+      
+      strRep << @@fieldSep << dump_instance_variables << @@recordSep
+    end
+  
+  def dump_instance_variables
+    content = {}
+    (self.instance_variables - ivars_to_forget).each do |var|
+      content[var] = instance_variable_get(var)
+    end
+    Marshal.dump(content)
+  end
+
+  def _dump(depth)
+      strRep = String.new
+      each {|node| strRep << node.createDumpRep}
+      strRep
+  end
+  
+    def self._load(str)
+      ### TODO: fix multiple loading issue.
+      #@@load_count ||= 0
+      #@@load_count+=1
+      #raise "too much loading" if @@load_count > 1
+      
+      loadDumpRep(str)
+    end
+    def self.loadDumpRep(str)
+      nodeHash = Hash.new
+      rootNode = nil
+      str.split(@@recordSep).each do |line|
+        
+          name, klass, parent, content_str = line.split(@@fieldSep)
+          
+          puts "#{name}->#{parent}"
+          #puts content_str
+          
+          #content = Marshal.load(contentStr)
+          
+          
+          currentNode = klass.constantize.new(nil, name)
+          
+          Marshal.load(content_str).each do |k,v|
+            puts "setting "+k.inspect
+            currentNode.instance_variable_set(k, v)
+          end
+          
+          nodeHash[name] = currentNode
+          if name != parent  # Do for a child node
+              nodeHash[parent].add(currentNode)
+          else
+              rootNode = currentNode
+          end
+      end
+      rootNode
+  end
+  
   end
 
 end

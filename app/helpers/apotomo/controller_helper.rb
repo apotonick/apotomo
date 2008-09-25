@@ -8,6 +8,10 @@ module Apotomo
     # into the controller action. Additionally activates event processing for this
     # widget and all its children.
     def act_as_widget(widget_id, model_tree_class = ::ApplicationWidgetTree)
+      # create tree (new/from store)...
+      
+      # and pass it to the dispatched actions:
+      
       if action = params['apotomo_action']  ### DISCUSS: how to find out if we're in Apotomo context?
         process_event_request(action.to_sym)
         return
@@ -21,11 +25,11 @@ module Apotomo
     # Finds the widget named <tt>widget_id</tt> and renders it.
     def render_widget_from_tree(widget_id, model_tree_class)
       tree = model_tree_class.new(self)
-      #session['model_tree'] = Marshal.dump(model)
-      #model = Marshal.load(session['model_tree'])
-      
       root = tree.draw_tree
-      return root.find_by_id(widget_id).render_content
+      
+      content = root.find_by_id(widget_id).render_content
+      session['apotomo_widget_tree'] = root
+      return content
     end
     
     #--
@@ -33,7 +37,10 @@ module Apotomo
     #--
     
     def process_event_request(action)
-      tree      = ::ApplicationWidgetTree.new(self).draw_tree.root
+      #tree      = ::ApplicationWidgetTree.new(self).draw_tree.root
+      puts "restoring *dynamic*  widget_tree from session."
+      tree = session['apotomo_widget_tree'] 
+      tree.each do |c| c.controller = self; end  # connect current controller to the tree.
       
       source  = tree.find_by_id(params[:source])
       evt     = Event.new(params[:type], source.name) # type is :invoke per default.
@@ -52,7 +59,8 @@ module Apotomo
       processed_handlers = source.invoke_for_event(evt)
       #tree.find_by_id(params[:source]).trigger(type.to_sym)
 
-      ###@ processed_handlers = processor.process_queue_for(tree, nil)
+      #session['apotomo_widget_tree'] = tree
+      #puts "saving tree in session."
       
       # usually an event is reported via this controller action:
       if action == :event
@@ -60,7 +68,8 @@ module Apotomo
       elsif action == :iframe2event
         #puts "IFRAME2EVENT happened!"
         render_iframe_update_for(processed_handlers)
-      end      
+      end
+      
     end
     
     

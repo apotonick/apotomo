@@ -8,7 +8,7 @@ module TreeNode
   attr_writer :content
 
   @@fieldSep = '|'
-  @@recordSep = "\n"
+  @@recordSep = "\n.\n"
 
   # Constructor which expects the name of the node
   #
@@ -195,7 +195,18 @@ module TreeNode
       strRep = String.new
       #strRep << @name << @@fieldSep << (isRoot? ? @name : @parent.name)
       strRep << @name.to_s << @@fieldSep << (isRoot? ? @name.to_s : @parent.name.to_s)
-      strRep << @@fieldSep << Marshal.dump(@content) << @@recordSep
+      #strRep << @@fieldSep << Marshal.dump(@content) << @@recordSep
+      
+      instance_content = String.new
+      
+      (self.instance_variables - ivars_to_forget).each do |var|
+        #puts var
+        #puts instance_variable_get(var).inspect
+        instance_content << var << ":" << Marshal.dump(instance_variable_get(var)) << "^"
+      end
+      #strRep << @@fieldSep << Marshal.dump(@content) << @@recordSep
+      
+      strRep << @@fieldSep << instance_content << @@recordSep
   end
 
   def _dump(depth)
@@ -203,6 +214,7 @@ module TreeNode
       each {|node| strRep << node.createDumpRep}
       strRep
   end
+  
 
   #def TreeNode.loadDumpRep(str)
   def self.loadDumpRep(str)

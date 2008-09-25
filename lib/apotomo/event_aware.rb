@@ -79,7 +79,10 @@ module Apotomo
         if event.type == :invoke
           ### FIXME: state should be passed in event.
           ###   this is a security hole.
-          watch(:invoke, event.source_id, event.data[:state])
+          
+          ### FIXME: prevent multiple watching!
+          watch(:invoke, event.source_id, event.data[:state]) unless evt_table.source2evt[name] and evt_table.source2evt[name][:invoke]
+          
         end
       end
       
@@ -113,6 +116,9 @@ module Apotomo
     end
     
     
+    # Start the rendering/event cycle by fireing an <tt>event</tt>.
+    # Returns the filled, rendered EventHandler pipeline after all handlers have been
+    # executed.
     def invoke_for_event(evt)
       processor = Apotomo::EventProcessor.instance
       processor.init
