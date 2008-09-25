@@ -78,6 +78,7 @@ module Apotomo
     # Freezes the widget's instance variables, so it can reconstruct the state in the
     # next request.
     def freeze
+      raise "deprecated"
       session[name.to_s] = freezer = {}
 
       (self.instance_variables - ivars_to_forget).each do |var|
@@ -87,6 +88,7 @@ module Apotomo
     end
     
     def thaw
+      raise "deprecated"
       return unless widget_session
 
       widget_session.each do |var, val|
@@ -113,6 +115,7 @@ module Apotomo
     end
 
     def thaw_last_state
+      raise "deprecated"
       return unless widget_session
       #puts "session is here: #{session[name.to_s].inspect}"
       return widget_session['@last_state']
@@ -123,11 +126,13 @@ module Apotomo
     #--
     ### FIXME: we have to #reload the AR instances here!
     def thaw_child_params ### FIXME: is this good?
+      raise "deprecated"
       return unless widget_session
       return widget_session['@child_params']
     end
 
     def widget_session
+      raise "deprecated"
       session[name.to_s]
     end
 
@@ -249,9 +254,6 @@ module Apotomo
       #if content.class == String
       return content if content
       
-      puts "rendering state #{state} in"
-      puts name
-      puts "#{Apotomo::StatefulWidget.current_widget.name}"
       return render_view_for_state(state)
     end
 
@@ -266,16 +268,10 @@ module Apotomo
 
 
     def dispatch_state(state)    
-      #@last_state = state.to_sym
-
-
       content = execute_state(state)  # call the state.
       ### DISCUSS: maybe there's a state jump here.
-
-
+      
       render_children
-
-      ###@ freeze
       
       
       @@current_cell = self # only needed in views, so set it here.
@@ -433,7 +429,6 @@ module Apotomo
     
     
     def controller
-      puts "asking for controller. mine: #{@controller.inspect}"
       @controller || root.controller
     end
     
@@ -473,16 +468,10 @@ module Apotomo
         
           name, klass, parent, content_str = line.split(@@fieldSep)
           
-          puts "#{name}->#{parent}"
-          #puts content_str
-          
-          #content = Marshal.load(contentStr)
-          
-          
           currentNode = klass.constantize.new(nil, name)
           
           Marshal.load(content_str).each do |k,v|
-            puts "setting "+k.inspect
+            ###@ puts "setting "+k.inspect
             currentNode.instance_variable_set(k, v)
           end
           
