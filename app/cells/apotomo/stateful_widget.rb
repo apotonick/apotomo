@@ -177,8 +177,6 @@ module Apotomo
     def invoke(state=nil)
       puts "\ninvoke on #{name}"
 
-      ###@ last_state = thaw_last_state
-      #puts last_state
       if state.to_s == "*"
         @is_f5_fixme = true
         state= start_state_for_state(last_state)
@@ -197,9 +195,7 @@ module Apotomo
     # - invoke the children
     # - render the view for the state (per default named after the state method)
     def invoke_state(state=nil)
-      puts "last state: #{@last_state}"
       unless start_state?(state)
-        ###@ thaw
         state = find_next_state_for(last_state, state)
       end 
       
@@ -369,9 +365,10 @@ module Apotomo
     ### * explicitly means here: set only for the next invocation.
     def param(name, cell=self)
       # if called outside #invoke, get child params from last invocation:
-      unless hot?
-        @child_params = thaw_child_params || {}
-      end
+      
+      ###@ unless hot?
+      ###@   @child_params = thaw_child_params || {}
+      ###@ end
 
       ### opts -> param_for (in both frozen/thawed) -> child_params -> parent?
       return @opts[name] || param_for(name, cell) || child_param(cell.name, name) || local_param(name) || find_param(name, cell)
