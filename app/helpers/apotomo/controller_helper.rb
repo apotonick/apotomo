@@ -28,8 +28,33 @@ module Apotomo
       root = tree.draw_tree
       
       content = root.find_by_id(widget_id).render_content
-      session['apotomo_widget_tree'] = root
+      #session['apotomo_widget_tree'] = root
+      
+      
+      freeze_tree(root)
+      
+      
+      
       return content
+    end
+    
+    def freeze_tree(root)
+      # put widget structure into session:
+      session['apotomo_widget_tree'] = root
+      # put widget instance variables into session:
+      session['apotomo_widget_content'] = {}
+      root.freeze_instance_vars_to_storage(session['apotomo_widget_content'])
+    end
+    
+    def thaw_tree
+      # get widget structure from session:
+      tree = session['apotomo_widget_tree'].root
+      # set widget instance variables from session:
+      tree.thaw_instance_vars_from_storage(session['apotomo_widget_content'])
+      
+      tree.each do |c| c.controller = self; end  # connect current controller to the tree.
+      
+      return tree
     end
     
     #--
@@ -39,8 +64,12 @@ module Apotomo
     def process_event_request(action)
       #tree      = ::ApplicationWidgetTree.new(self).draw_tree.root
       puts "restoring *dynamic*  widget_tree from session."
-      tree = session['apotomo_widget_tree'] 
-      tree.each do |c| c.controller = self; end  # connect current controller to the tree.
+      
+      tree = thaw_tree
+      
+      
+      #tree = session['apotomo_widget_tree'] 
+      
       
       source  = tree.find_by_id(params[:source])
       evt     = Event.new(params[:type], source.name) # type is :invoke per default.
@@ -61,6 +90,7 @@ module Apotomo
 
       #session['apotomo_widget_tree'] = tree
       #puts "saving tree in session."
+      freeze_tree(tree)
       
       # usually an event is reported via this controller action:
       if action == :event

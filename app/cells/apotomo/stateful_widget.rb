@@ -433,15 +433,27 @@ module Apotomo
       strRep = String.new
       strRep << @name.to_s << @@fieldSep << self.class.to_s << @@fieldSep << (isRoot? ? @name.to_s : @parent.name.to_s)
       
-      strRep << @@fieldSep << dump_instance_variables << @@recordSep
+      ###@ strRep << @@fieldSep << dump_instance_variables << @@recordSep
+      strRep << @@recordSep
     end
   
-  def dump_instance_variables
-    content = {}
+  def freeze_instance_vars_to_storage(storage)
+    storage[name] = {}  ### DISCUSS: check if we overwrite stuff?
     (self.instance_variables - ivars_to_forget).each do |var|
-      content[var] = instance_variable_get(var)
+      storage[name][var] = instance_variable_get(var)
+      #puts "#{var}: #{instance_variable_get(var)}"
     end
-    Marshal.dump(content)
+    
+    children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }
+  end
+  def thaw_instance_vars_from_storage(storage)
+    #puts "thawing in #{name}"
+    storage[name].each do |k, v|
+      instance_variable_set(k, v)
+      #puts "  set #{k}: #{v}"
+    end
+    
+    children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }
   end
 
   def _dump(depth)
@@ -463,14 +475,15 @@ module Apotomo
       rootNode = nil
       str.split(@@recordSep).each do |line|
         
-          name, klass, parent, content_str = line.split(@@fieldSep)
+          ###@ name, klass, parent, content_str = line.split(@@fieldSep)
+          name, klass, parent = line.split(@@fieldSep)
           
           currentNode = klass.constantize.new(nil, name)
           
-          Marshal.load(content_str).each do |k,v|
-            ###@ puts "setting "+k.inspect
-            currentNode.instance_variable_set(k, v)
-          end
+          ###@ Marshal.load(content_str).each do |k,v|
+          ###@   ###@ puts "setting "+k.inspect
+          ###@   currentNode.instance_variable_set(k, v)
+          ###@ end
           
           nodeHash[name] = currentNode
           if name != parent  # Do for a child node
