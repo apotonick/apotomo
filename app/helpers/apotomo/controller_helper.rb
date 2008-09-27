@@ -24,8 +24,14 @@ module Apotomo
     
     # Finds the widget named <tt>widget_id</tt> and renders it.
     def render_widget_from_tree(widget_id, model_tree_class)
-      tree = model_tree_class.new(self)
-      root = tree.draw_tree
+      
+      
+      if session['apotomo_widget_tree']
+        root = thaw_tree
+      else
+        tree = model_tree_class.new(self)
+        root = tree.draw_tree
+      end
       
       content = root.find_by_id(widget_id).render_content
       #session['apotomo_widget_tree'] = root
