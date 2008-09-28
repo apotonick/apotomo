@@ -53,7 +53,7 @@ class ParamTest < Test::Unit::TestCase
     
     # simulate request ----------------------------------------
     controller.params = {}
-    w = cell(:param, :set_my_param, 'a')
+    
     assert_equal w.param(:my_param), "set_in_set_local_param"
     w.invoke
     assert_equal w.param(:my_param), "set_in_set_local_param"
@@ -85,10 +85,7 @@ class ParamTest < Test::Unit::TestCase
     
     # simulate request ----------------------------------------
     controller.params = {}
-    dmn = cell(:dynamic_domain, :no_state, 'b')
-      dmn << w = cell(:param, :set_my_param, 'a')
     
-    puts "remembering test:"
     assert_equal w.param(:my_param), "1-dynamic"
   end
   
@@ -135,7 +132,7 @@ class DynamicDomainCell < Apotomo::StatefulWidget
     if value = params[:my_param]
       value = "#{value}-dynamic"
       set_local_param(:my_param, value)
-      freeze
+      #freeze
     else
       value = local_param(:my_param)
     end

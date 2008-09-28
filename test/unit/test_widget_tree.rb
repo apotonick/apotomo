@@ -8,7 +8,7 @@ class MyTestCell < Apotomo::StatefulWidget
   end
 end
 
-class TestWidgetTree < Apotomo::WidgetTree  
+class MyTestWidgetTree < Apotomo::WidgetTree  
   def draw(root)
     root << widget('apotomo/stateful_widget', 'widget_one')
     root << cell(:my_test, :a_state, 'my_test_cell')
@@ -20,13 +20,12 @@ class TestWidgetTree < Apotomo::WidgetTree
 end
 
 
-class ModelTreeTest < Test::Unit::TestCase
+class WidgetTreeTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
   
   def test_initialization
-    @controller.session = {}
-    tree = TestWidgetTree.new(@controller)
+    tree = MyTestWidgetTree.new(controller)
     
     r = tree.draw_tree.root
     assert_kind_of Apotomo::StatefulWidget, r.find_by_id('widget_one')

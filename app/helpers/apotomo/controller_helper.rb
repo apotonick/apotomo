@@ -44,23 +44,33 @@ module Apotomo
       return content
     end
     
-    def freeze_tree(root)
+    ### TODO: put next two methods in Apotomo::Persistance or so. ---------------
+    def freeze_tree_for(root, storage, controller=nil)
       # put widget structure into session:
-      session['apotomo_widget_tree'] = root
+      storage['apotomo_widget_tree'] = root
       # put widget instance variables into session:
-      session['apotomo_widget_content'] = {}
-      root.freeze_instance_vars_to_storage(session['apotomo_widget_content'])
+      storage['apotomo_widget_content'] = {}
+      root.freeze_instance_vars_to_storage(storage['apotomo_widget_content'])
+    end
+    def thaw_tree_for(storage, controller)
+      # get widget structure from session:
+      tree = storage['apotomo_widget_tree'].root
+      # set widget instance variables from session:
+      tree.thaw_instance_vars_from_storage(storage['apotomo_widget_content'])
+      
+      tree.each do |c| c.controller = controller; end  # connect current controller to the tree.
+      
+      return tree
+    end
+    #----------------------------------------------------------------------------
+    
+    
+    def freeze_tree(root)
+      freeze_tree_for(root, session)
     end
     
     def thaw_tree
-      # get widget structure from session:
-      tree = session['apotomo_widget_tree'].root
-      # set widget instance variables from session:
-      tree.thaw_instance_vars_from_storage(session['apotomo_widget_content'])
-      
-      tree.each do |c| c.controller = self; end  # connect current controller to the tree.
-      
-      return tree
+      thaw_tree_for(session, self)
     end
     
     #--

@@ -21,7 +21,7 @@ end
 
 module Apotomo::UnitTestCase
   
-  attr_accessor :controller
+  attr_accessor :controller, :session
   
   # allow people to set up trees within test methods, with shortcuts.
   include Apotomo::WidgetShortcuts
@@ -31,7 +31,7 @@ module Apotomo::UnitTestCase
     super ### FIXME: if omitted, the fixtures don't get inserted.
     @controller = ApotomoUnitTestController.new
     @controller.params  = {}
-    @controller.session = {}
+    @controller.session = @session = {}
     
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
