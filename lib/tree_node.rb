@@ -215,8 +215,7 @@ module TreeNode
       strRep
   end
   
-
-  #def TreeNode.loadDumpRep(str)
+  
   def self.loadDumpRep(str)
       nodeHash = Hash.new
       rootNode = nil
@@ -264,15 +263,17 @@ module TreeNode
     return nil  ### DISCUSS: what about some exception if we can't find the node?
   end
   
-  ### TODO: deprecate.
-  def find_all
-    raise "deprecated"
-    nodes = []
-    self.each do |node|
-      nodes << node if yield node
+  
+  # Returns the path from the widget to root, encoded as a string of dot-seperated names. 
+  def path
+    path      = [name]     
+    ancestor  = parent
+    while ancestor
+      path << ancestor.name
+      ancestor = ancestor.parent
     end
     
-    return nodes
+    path.reverse.join(".")
   end
   
 end

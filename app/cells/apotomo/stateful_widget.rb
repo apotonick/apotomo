@@ -437,18 +437,22 @@ module Apotomo
       strRep << @@recordSep
     end
   
+  #--
+  ### DISCUSS: taking the path as key slightly blows up the session.
+  #--
   def freeze_instance_vars_to_storage(storage)
-    storage[name] = {}  ### DISCUSS: check if we overwrite stuff?
+    #puts "freezing in #{path}"
+    storage[path] = {}  ### DISCUSS: check if we overwrite stuff?
     (self.instance_variables - ivars_to_forget).each do |var|
-      storage[name][var] = instance_variable_get(var)
-      #puts "#{var}: #{instance_variable_get(var)}"
+      storage[path][var] = instance_variable_get(var)
+      #puts "  #{var}: #{instance_variable_get(var)}"
     end
     
     children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }
   end
   def thaw_instance_vars_from_storage(storage)
-    #puts "thawing in #{name}"
-    storage[name].each do |k, v|
+    #puts "thawing in #{path}"
+    storage[path].each do |k, v|
       instance_variable_set(k, v)
       #puts "  set #{k}: #{v}"
     end

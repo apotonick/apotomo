@@ -76,6 +76,19 @@ class PersistenceTest < Test::Unit::TestCase
   end
   
   
+  # test if each widget has it's own namespaced session container:
+  def test_widget_session_encapsulation
+    r = cell(:my_test, :some, 'root')
+      r << a= cell(:my_test, :some, 'a')
+      r << b1= cell(:my_test, :some, 'b')
+        a << b2= cell(:my_test, :some, 'b')
+    
+    freeze_tree_for(r, session)
+    
+    assert_equal session['apotomo_widget_content'].size, 4
+  end
+  
+  
 end
 
 class SharedObject
