@@ -44,6 +44,21 @@ module Apotomo
       return content
     end
     
+    
+    def render_widget(widget_id)
+      render_widget_from_tree(widget_id, ::ApplicationWidgetTree)
+    end
+    
+    def widget_event?
+      params['apotomo_action']
+    end
+    
+    def render_event_response
+      action = params['apotomo_action']   ### TODO: i don't like that. why?
+      process_event_request(action.to_sym)
+    end
+    
+    
     ### TODO: put next two methods in Apotomo::Persistance or so. ---------------
     def freeze_tree_for(root, storage, controller=nil)
       # put widget structure into session:
