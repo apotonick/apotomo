@@ -48,6 +48,18 @@ class TabPanelTest < Test::Unit::TestCase
     t = Apotomo::TabWidget.new(@controller, 'tab_id', :widget_content, :title => "The Tab")
     
     assert_equal t.title, "The Tab"
+    
+    t = tab('my_id', :title => "A Title")
+    assert_equal t.title, "A Title"
+  end
+  
+  
+  def test_tab_widget_title
+    t = tab('my_id', :title => "A Title")
+    assert_equal t.title, "A Title"
+    
+    t = hibernate_tree(t)
+    assert_equal t.title, "A Title"
   end
   
   

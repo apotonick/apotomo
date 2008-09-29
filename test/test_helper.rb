@@ -53,6 +53,26 @@ module Apotomo::UnitTestCase
   end
   
   
+  # session/request simulation --------------------------------------------------
+  include Apotomo::ControllerHelper ### TODO: move neccessary methods to Persistance module.
+  
+  # Simulate a request-cycle end and the start of a new request. The tree is returned  
+  # exactly as if there had been a new request and Rails handled the session thawing.
+  def hibernate_tree(tree)
+    freeze_tree_for(tree, session)
+    
+    # simulate CGI::Session's marshaling:
+    dumped_tree = Marshal.dump(session['apotomo_widget_tree'])
+    session['apotomo_widget_tree'] = Marshal.load(dumped_tree)
+    
+    return thaw_tree_for(session, controller)
+  end
+  
+  
+  
+  
+  # assertions ------------------------------------------------------------------
+  
   def assert_selekt(content, *args, &block)
     assert_select(HTML::Document.new(content).root, *args, &block)
   end
@@ -66,6 +86,8 @@ module Apotomo::UnitTestCase
     handlers = Apotomo::EventProcessor.instance.processed_handlers
     assert handlers.find{|h| h.event.type == type and h.event.source_id == source_id}
   end
+  
+  # test utils ------------------------------------------------------------------
   
   def re(str)
     Regexp.new(Regexp.escape(str))
