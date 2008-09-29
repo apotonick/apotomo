@@ -4,28 +4,21 @@ module Apotomo
     def switch
       super
       
-    # create TabNav model according to TabPages:
-      #tabnav_class = Class.new(Tabnav::Base)  # this instance will be garbage after this method. (?)
       @tabs=[]
       
       for tab in children
-        @tabs << [tab.title, tab.address]
-        #tabnav_class.add_tab do
-        #  named tab.title
-        #  links_to tab.address
-        #end
+        @tabs << [tab.title, local_address(tab, nil, nil), tab.name]
       end
 
       set_current_child
-      #@tabs = tabnav_class.instance.tabs
-      
+            
       nil
     end
     
     
     def _switch
       super
-      set_current_child
+      set_current_child # sets #state_view to :switch.
       
       nil
     end

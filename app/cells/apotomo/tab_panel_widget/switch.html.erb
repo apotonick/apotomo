@@ -33,9 +33,6 @@
   }
 </style>
 
-<!-- end stylesheet -->
-
-
 
 <div class="TabPanel">
   <ul>
@@ -46,7 +43,9 @@
           tab_class = (tab.first == @current_child_title) ? "active" : ""
     %>
     <li class="<%= tab_class %>">
-      <%= link_to tab.first, tab.last %>
+      <%### TODO: let the user switch between these two approaches (site reload<->AJAX). %>
+      <%# = link_to_widget tab.first, tab.last %>
+      <%= link_to_event tab.first, {:type => :switchChild}.merge!(tab[1]) %>
     </li>
     <% end -%>
     

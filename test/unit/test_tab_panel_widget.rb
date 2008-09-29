@@ -36,8 +36,15 @@ class TabPanelTest < Test::Unit::TestCase
       p << tab("First")
       p << tab("Second")
       p << tab("Third")
-        
-    c = p.render_content
+    
+    
+    c = p.invoke
+    assert_selekt c, ".TabPanel>ul>li", "First" # test tab.
+    assert_selekt c, "div#my_tab_panel #First"  # test tab content.
+    
+    p = hibernate_tree(p)
+    
+    c = p.invoke
     assert_selekt c, ".TabPanel>ul>li", "First" # test tab.
     assert_selekt c, "div#my_tab_panel #First"  # test tab content.
   end
