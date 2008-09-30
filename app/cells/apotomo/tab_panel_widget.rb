@@ -11,7 +11,9 @@ module Apotomo
       end
 
       set_current_child
-            
+      
+      peek(:switchChild, name, :_switch)
+      
       nil
     end
     

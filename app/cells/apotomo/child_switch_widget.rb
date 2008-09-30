@@ -29,6 +29,8 @@ class Apotomo::ChildSwitchWidget < Apotomo::StatefulWidget
   
   def find_current_child
     child_id = param(param_name_for_current_child)
+    puts param_name_for_current_child
+    puts :xo
     find_child_for_id(child_id) || find_child_for_id(@current_child_id) || default_child
   end
   

@@ -20,6 +20,17 @@ class TestWidget < Apotomo::StatefulWidget
   end
 end
 
+class MyTestWidget < Apotomo::StatefulWidget
+  def state_1
+    peek :invoke, name, :state_after_peeking
+    ""
+  end
+  
+  def state_2
+    peek :invoke, name, :state_after_peeking
+    ""
+  end
+end
 
 class ApplicationWidgetTree < Apotomo::WidgetTree
   
@@ -77,4 +88,13 @@ class EventSystemTest < Test::Unit::TestCase
     assert_equal 1, Apotomo::EventProcessor.instance.processed_handlers.size
   end
   
+  
+  def test_peek
+    w1  = widget(:my_test_widget, 'w1', [:state_1, :state_2])
+    w1.invoke(:state_1)
+    assert_equal 1, w1.evt_table.event_handlers_for(:invoke, w1.name).size
+    
+    w1.invoke(:state_2)
+    assert_equal 1, w1.evt_table.event_handlers_for(:invoke, w1.name).size
+  end
 end

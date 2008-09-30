@@ -42,10 +42,20 @@ module Apotomo
     # <tt>email</tt> widget trigger a <tt>change</tt> event, and will invoke the state
     # <tt>:_process_events</tt> on the widget named <tt>my_form</tt>.
     
-    def watch(event_type, target_id, target_state, observed_id=self.name)      
+    def watch(event_type, target_id, target_state, observed_id=self.name)
       evt_table.monitor(event_type, observed_id, target_id, target_state)
     end
     
+    # Same as #watch, but checks if the identical EventHandler has already been set.
+    # If so, attaching is omitted. This prevents <em>multiple identical</em> 
+    # EventHandlers for the same Event.
+    def peek(event_type, target_id, target_state, observed_id=self.name)
+      return if evt_table.event_handlers_for(event_type, observed_id).find do |h|
+        h.widget_id == target_id and h.state == target_state
+      end
+      
+      watch(event_type, target_id, target_state, observed_id)  
+    end
     #--
     ### DISCUSS: introduce #watch_any/#watch_all ?
     #--
@@ -81,7 +91,7 @@ module Apotomo
           ###   this is a security hole.
           
           ### FIXME: prevent multiple watching!
-          watch(:invoke, event.source_id, event.data[:state]) unless evt_table.source2evt[name] and evt_table.source2evt[name][:invoke]
+          watch(:invoke, event.source_id, event.data[:state]) unless evt_table.source2evt[name] and evt_table.source2evt[name][:invoke] 
           
         end
       end

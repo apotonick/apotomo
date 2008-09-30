@@ -201,5 +201,4 @@ class EventTableTest < Test::Unit::TestCase
     #f.evt_table.already_process
   end
   
-  
 end

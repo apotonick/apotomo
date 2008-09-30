@@ -1,6 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 
+### FIXME: how can we set @@current_cell from outside without destroying the world?
+#Apotomo::StatefulWidget.class_eval do
+#    def self.set_current_widget=(widget)
+#      @@current_cell = widget
+#    end
+#  end
+  
 class ViewHelperTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
@@ -19,11 +26,9 @@ class ViewHelperTest < Test::Unit::TestCase
   #def _erbout();end
   def protect_against_forgery?; false; end  ### needed in rails 2.1.
   
-  
   # extend StatefulWidget for testing purposes.
-  Apotomo::StatefulWidget.class_eval do
-    cattr_accessor :current_widget
-  end
+  
+
   
   class CWidget < Apotomo::StatefulWidget
     def local_address(*args); {:c_address => :important}; end
@@ -43,13 +48,15 @@ class ViewHelperTest < Test::Unit::TestCase
   # test Apotomo::ViewHelper methods --------------------------
   
   def test_current_tree
-    Apotomo::StatefulWidget.current_widget = @a
-    assert_equal current_tree, @a # --> #current_tree should return the root.
+    @a.invoke
+    #Apotomo::StatefulWidget.set_current_widget=(@a)
+    assert_equal @a, current_tree # --> #current_tree should return the root.
   end
   
   
   def test_target_widget_for
-    Apotomo::StatefulWidget.current_widget = @a
+    @a.invoke
+    #Apotomo::StatefulWidget.set_current_widget = @a
     assert_equal target_widget_for(), @a
     assert_equal target_widget_for('b'), @b
   end
@@ -57,7 +64,8 @@ class ViewHelperTest < Test::Unit::TestCase
   
   def test_static_link_to_widget
     get :index
-    Apotomo::StatefulWidget.current_widget = @a
+    @a.invoke
+    #Apotomo::StatefulWidget.set_current_widget = @a
     l = static_link_to_widget("Static Link", false, :static => true)
     puts l
     assert_no_match /static=/, l
@@ -65,14 +73,16 @@ class ViewHelperTest < Test::Unit::TestCase
   
   def test_static_link_to_widget_with_controller
     get :index
-    Apotomo::StatefulWidget.current_widget = @a
+    @a.invoke
+    #Apotomo::StatefulWidget.set_current_widget = @a
     l = static_link_to_widget("Static Link", false, :controller => 'user')
     assert_match /\/user/, l
   end
   
   def test_link_to_widget
     get :index
-    Apotomo::StatefulWidget.current_widget = @c
+    @c.invoke
+    #Apotomo::StatefulWidget.set_current_widget = @c
     l = link_to_widget("Static Link")
     assert_no_match /static=/, l
     assert_match /c_address=important/, l
@@ -80,7 +90,8 @@ class ViewHelperTest < Test::Unit::TestCase
   
   def test_link_to_event
     get :index
-    Apotomo::StatefulWidget.current_widget = @a
+    @a.invoke
+    #Apotomo::StatefulWidget.set_current_widget = @a
     
     # test explicit source ------------------------------------
     l = link_to_event("Event Link", :source => 'b')
@@ -101,7 +112,8 @@ class ViewHelperTest < Test::Unit::TestCase
   
   def test_form_to_event
     get :index
-    Apotomo::StatefulWidget.current_widget = @b
+    @b.invoke
+    #Apotomo::StatefulWidget.set_current_widget = @b
     
     # test default source -------------------------------------
     l = form_to_event
@@ -123,7 +135,8 @@ class ViewHelperTest < Test::Unit::TestCase
 
 
   def test_address_to_event_for_widget
-    Apotomo::StatefulWidget.current_widget = @a
+    #Apotomo::StatefulWidget.set_current_widget = @a
+    @a.invoke
     
     assert_equal Apotomo::StatefulWidget.current_widget, @a
     
@@ -141,7 +154,8 @@ class ViewHelperTest < Test::Unit::TestCase
   
   
   def test_address_to_event
-    Apotomo::StatefulWidget.current_widget = @a
+    @a.invoke
+    #Apotomo::StatefulWidget.set_current_widget = @a
         
     addr = address_to_event()
     assert addr[:source], 'a'
