@@ -20,7 +20,7 @@ module Apotomo
     #   :source   explicitly specifies an event source.
     #             The default is to take the currently rendered widget as source.
     #   :type     explicitly specifies the event type.
-    #             The default is :invoke
+    #             The default is :invoke  ### FIXME: more writing here!
     #
     # Any other option will be directly passed into the address hash and will be 
     # available via StatefulWidget#param in the widget.
@@ -35,12 +35,30 @@ module Apotomo
     def address_to_event(way={}, action='event')
       target = target_widget_for(way[:source])
       
+      
+      # handle implicit :invoke event:
+      if ! way[:type]
+        type_uid =  type_uid_for(target, way)
+        
+        # attach invoke handler to target:
+        target.peek(type_uid, target.name, way[:state])
+        
+        #puts target.evt_table.inspect
+        way[:type] = type_uid
+        way.delete(:state)  ### DISCUSS: do that in type_uid_for ?
+      end
+      
+      
       way.merge({ #:action     => action,
                   :apotomo_action     => action,
                   #:controller => 'apotomo', 
                   :source => target.name})
     end
     
+    def type_uid_for(target, way)
+      "#{target.name}_#{way[:state]}".to_sym
+    end
+        
     
     # Creates a link that triggers an event via AJAX.
     # See #address_to_event for options for <tt>way</tt>

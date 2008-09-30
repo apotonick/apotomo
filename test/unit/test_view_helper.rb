@@ -103,7 +103,7 @@ class ViewHelperTest < Test::Unit::TestCase
     assert_match /source=a/, l
     assert_no_match /source=b/, l
     # test implicit type --------------------------------------
-    assert_no_match /type=/, l
+    assert_match /type=a_/, l
     
     # test explicit type --------------------------------------
     l = link_to_event("Event Link", :type => :click)
@@ -168,4 +168,8 @@ class ViewHelperTest < Test::Unit::TestCase
     assert addr[:param_1],    'one'
   end
   
+  
+  def test_address_to_event_with_implicit_invoke_handler
+  
+  end
 end

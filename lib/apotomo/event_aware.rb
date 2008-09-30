@@ -46,6 +46,7 @@ module Apotomo
       evt_table.monitor(event_type, observed_id, target_id, target_state)
     end
     
+    
     # Same as #watch, but checks if the identical EventHandler has already been set.
     # If so, attaching is omitted. This prevents <em>multiple identical</em> 
     # EventHandlers for the same Event.
@@ -83,33 +84,16 @@ module Apotomo
     
     
     def bubble_handlers_for(event, handlers=[])
-      if event.source_id == name
-        ### FIXME: let the source widget add this handler:
-        ###   should be added by #link_to_event or #form_to_event.
-        if event.type == :invoke
-          ### FIXME: state should be passed in event.
-          ###   this is a security hole.
-          
-          ### FIXME: prevent multiple watching!
-          watch(:invoke, event.source_id, event.data[:state]) unless evt_table.source2evt[name] and evt_table.source2evt[name][:invoke] 
-          
-        end
-      end
-      
       puts "looking up callback for #{event.type}: #{event.source_id} [#{name}]"
       local_handlers = evt_table.event_handlers_for(event.type, event.source_id)
-      
+      ### DISCUSS: rename to #event_handlers_for_event(event)?
       
       ### DISCUSS: instantly process handlers (pass event to them)
       ###   if target >= source stop rendering and handle event, forget the former content
       ###   EventHandler can evt.skip (keep going) or evt.stop ?
       local_handlers.each { |h| h.event = event}
       
-      handlers      += local_handlers
-      
-      #puts local_handlers
-      #puts evt_table.source2evt.inspect
-      
+      handlers += local_handlers
       ### DISCUSS: we always bubble up, if handlers are found or not.
       ###   should we have a stop-assignment ("veto")?
       if isRoot?
