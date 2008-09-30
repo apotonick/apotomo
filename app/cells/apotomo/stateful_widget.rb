@@ -244,7 +244,7 @@ module Apotomo
       state = state.to_s
       self.state_name = state
       self.last_state = state
-
+      
       content = dispatch_state(state)
 
       #if content.class == String

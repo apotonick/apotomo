@@ -62,7 +62,7 @@ module Apotomo
     ### TODO: put next two methods in Apotomo::Persistance or so. ---------------
     def freeze_tree_for(root, storage, controller=nil)
       # put widget structure into session:
-      storage['apotomo_widget_tree'] = root
+      storage['apotomo_widget_tree'] = root # CGI::Session calls Marshal#dump on this.
       # put widget instance variables into session:
       storage['apotomo_widget_content'] = {}
       root.freeze_instance_vars_to_storage(storage['apotomo_widget_content'])

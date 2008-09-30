@@ -50,6 +50,46 @@ class TabPanelTest < Test::Unit::TestCase
   end
   
   
+  def test_panel_event_cycle_for_f5_request
+    p = tab_panel('my_tab_panel')
+      p << tab("First")
+      p << tab("Second")
+      p << tab("Third")
+    
+    c = p.invoke
+    assert_state p, :switch
+    
+    p = hibernate_tree(p)
+    controller.params = {}
+    
+    c = p.invoke
+    assert_state p, :_switch
+    assert_equal p.current_child_id, "First"
+  end
+  
+  
+  def test_panel_event_cycle_for_ajax_request
+    p = tab_panel('my_tab_panel')
+      p << tab("First")
+      p << tab("Second")
+      p << tab("Third")
+    
+    c = p.invoke
+    assert_state p, :switch
+    
+    # next request ------------------------------------------
+    p = hibernate_tree(p)    
+    controller.params = {'my_tab_panel_child' => "Third"}
+    
+    
+    evt = Apotomo::Event.new(:switchChild, p.name, {'my_tab_panel_child' => "Third"})
+    c = p.invoke_for_event(evt)
+    
+    assert_state p, :_switch
+    assert_equal p.current_child_id, "Third"
+  end
+  
+  
   
   def test_tab_widget_api
     t = Apotomo::TabWidget.new(@controller, 'tab_id', :widget_content, :title => "The Tab")
