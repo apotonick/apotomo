@@ -43,7 +43,7 @@ class EventSystemTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
   def test_single_widget_rendering
-    w = widget(:test_widget, 'root', :simple_state)
+    w = widget(:test_widget, :simple_state, 'root')
     w.watch(:invoke, w.name, :simple_state)
     
     evt = Apotomo::Event.new(:invoke, w.name)
@@ -55,9 +55,9 @@ class EventSystemTest < Test::Unit::TestCase
   end
   
   def test_widget_firing_event
-    w1  = widget(:test_widget, 'w1', :fireing_state)
-    w2  = widget(:test_widget, 'w2', :simple_state)
-    w3  = widget(:test_widget, 'w3', :following_state)
+    w1  = widget(:test_widget, :fireing_state, 'w1')
+    w2  = widget(:test_widget, :simple_state, 'w2')
+    w3  = widget(:test_widget, :following_state, 'w3')
     
     w1 << w2
     w1 << w3
@@ -79,7 +79,7 @@ class EventSystemTest < Test::Unit::TestCase
   end
   
   def test_processed_handlers_resetting
-    w1  = widget(:test_widget, 'w1', :simple_state)
+    w1  = widget(:test_widget, :simple_state, 'w1')
     w1.watch(:invoke, w1.name, :simple_state)
     evt = Apotomo::Event.new(:invoke, w1.name)      
     w1.invoke_for_event(evt)
@@ -93,7 +93,7 @@ class EventSystemTest < Test::Unit::TestCase
   
   
   def test_peek
-    w1  = widget(:my_test_widget, 'w1', [:state_1, :state_2])
+    w1  = widget(:my_test_widget, [:state_1, :state_2], 'w1')
     w1.invoke(:state_1)
     assert_equal 1, w1.evt_table.event_handlers_for(:invoke, w1.name).size
     

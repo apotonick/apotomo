@@ -10,7 +10,7 @@ module Apotomo
     
     def initialize(controller)
       @controller = controller      
-      @root       = widget('apotomo/stateful_widget', 'root')
+      @root       = widget('apotomo/stateful_widget', :widget_content, 'root')
     end
     
     
