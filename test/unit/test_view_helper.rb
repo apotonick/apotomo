@@ -170,6 +170,6 @@ class ViewHelperTest < Test::Unit::TestCase
   
   
   def test_address_to_event_with_implicit_invoke_handler
-  
+    # test if handler is attached  to correct target!
   end
 end

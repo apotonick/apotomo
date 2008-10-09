@@ -107,6 +107,7 @@ module Apotomo
       
       ### NOTE: this will be removed when the WidgetTree is fully dynamic.
       if evt.type == :invoke
+        raise "deprecated"
         evt.data={:state => params[:state].to_sym}   
         ### FIXME: this is InvokeEvent specific and
         ### currently is only needed for explicit invoke(:some_state). 

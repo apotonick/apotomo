@@ -21,16 +21,16 @@ class ApplicationWidgetTree < Apotomo::WidgetTree
   def draw(root)
     root.watch(:onWidget, :widget_one, :widget_two, :some_state)
     
-    root << widget('test_widget', :test_widget_id)
-    root << widget('test_widget', :target_widget_id)
-    root << widget('test_widget', :target2_widget_id)
-    root << widget('test_widget', :widget_one)
-    root << widget('test_widget', :widget_two)
-    root << widget('test_widget', :widget_three)
+    root << widget('test_widget', :widget_content, :test_widget_id)
+    root << widget('test_widget', :widget_content, :target_widget_id)
+    root << widget('test_widget', :widget_content, :target2_widget_id)
+    root << widget('test_widget', :widget_content, :widget_one)
+    root << widget('test_widget', :widget_content, :widget_two)
+    root << widget('test_widget', :widget_content, :widget_three)
     root
     
-    root << widget('test_widget', :fireing, :fireing_state)
-    root << widget('test_widget', :fireman, :fireman_state)
+    root << widget('test_widget', :fireing_state, :fireing)
+    root << widget('test_widget', :fireman_state, :fireman)
     root.watch(:click, :fireman, :fireman_state, :fireing)
   end
 end

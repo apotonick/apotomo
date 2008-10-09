@@ -88,6 +88,24 @@ class PersistenceTest < Test::Unit::TestCase
     assert_equal session['apotomo_widget_content'].size, 4
   end
   
+  # test if removed widgets are removed from the session container:
+  def test_widget_session_cleanup
+    r = cell(:my_test, :some, 'root')
+      r << a= cell(:my_test, :some, 'a')
+      r << b1= cell(:my_test, :some, 'b')
+        a << b2= cell(:my_test, :some, 'b')
+    
+    
+    freeze_tree_for(r, session)
+    
+    r = thaw_tree_for(session, controller)
+    r.find_by_id('b').removeFromParent!
+    
+    freeze_tree_for(r, session)
+    assert_equal session['apotomo_widget_content'].size, 3
+    #assert session['apotomo_widget_content'].reject?('b')
+  end
+  
   
 end
 

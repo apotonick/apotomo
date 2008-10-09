@@ -28,7 +28,8 @@ module Apotomo
     # Get EventHandlers for the specified +evt_type+ and the source widget +source_id+.
     # Note that sourceless handlers for +evt_type+ are returned, too.
     def event_handlers_for(evt_type, source_id)
-      raise "no source_id given for #event_handlers_for!" unless source_id
+      ### DISCUSS: why did i check source_id?
+      #raise "no source_id given for #event_handlers_for!" unless source_id
       
       ### DISCUSS: handlers with explicit source first.
       handlers_for_type_and_source(evt_type, source_id) + handlers_for_type(evt_type)

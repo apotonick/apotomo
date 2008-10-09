@@ -74,32 +74,6 @@ module Apotomo
     def widget_content
     end
 
-    
-    # Freezes the widget's instance variables, so it can reconstruct the state in the
-    # next request.
-    def freeze
-      raise "deprecated"
-      session[name.to_s] = freezer = {}
-
-      (self.instance_variables - ivars_to_forget).each do |var|
-        freezer[var.to_s] =  instance_variable_get(var)
-      end
-
-    end
-    
-    def thaw
-      raise "deprecated"
-      return unless widget_session
-
-      widget_session.each do |var, val|
-        ### DISCUSS: what about some "generic" special treatment?
-        if val.kind_of?(ActiveRecord::Base) and not val.new_record?
-          val.reload
-        end
-        self.instance_variable_set(var, val)
-      end
-    end
-
 
     # Defines the instance vars that should <em>not</em> survive between requests, 
     # which means they're not frozen in Apotomo::StatefulWidget#freeze.
@@ -113,30 +87,10 @@ module Apotomo
       '@is_f5_fixme'
       ]
     end
-
-    def thaw_last_state
-      raise "deprecated"
-      return unless widget_session
-      #puts "session is here: #{session[name.to_s].inspect}"
-      return widget_session['@last_state']
-    end
     
-    #--
-    ### DISCUSS: this is state_data:
-    #--
-    ### FIXME: we have to #reload the AR instances here!
-    def thaw_child_params ### FIXME: is this good?
-      raise "deprecated"
-      return unless widget_session
-      return widget_session['@child_params']
-    end
-
-    def widget_session
-      raise "deprecated"
-      session[name.to_s]
-    end
-
+    
     # Returns true if the widget is currently rendering itself or its children.
+    ### DISCUSS: 2BRM.
     def hot?
       @content
     end

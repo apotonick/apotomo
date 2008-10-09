@@ -16,9 +16,10 @@ desc 'Generate documentation for Apotomo.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'Apotomo API'
-  rdoc.options << '--line-numbers' << '--inline-source'
+  rdoc.options << '--line-numbers' << '--inline-source' << '-m README'
   
   rdoc.rdoc_files.include('lib/**/*.rb')
   rdoc.rdoc_files.include('app/**/*.rb')
+  rdoc.rdoc_files.include('test/*.rb')
   rdoc.rdoc_files.include('README')
 end
