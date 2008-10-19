@@ -46,13 +46,13 @@ module Apotomo
   # Listeners that handle an event are attached with EventAware#watch.
   
   class StatefulWidget < Cell::Base
-    attr_reader :last_state
     attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
 
     include TreeNode
-    include Apotomo::EventAware   ### TODO: set a "see also" link in the docs.
-    include Apotomo::Transitions
-
+    include EventAware   ### TODO: set a "see also" link in the docs.
+    include Transitions
+    include Caching
+    
     helper Apotomo::ViewHelper
 
 
@@ -64,7 +64,7 @@ module Apotomo
       @start_states = start_states.kind_of?(Array) ? start_states : [start_states]
 
       @child_params = {}  ### DISCUSS: child params are deleted once per request right now. what if we are called twice and need a clean hash? do we need that?
-
+            
       init_tree_node(id)
     end
 
@@ -159,25 +159,20 @@ module Apotomo
       render_content_for_state(state)    
     end
     
-    #--
-    ### DISCUSS: #rename to render_widget_for_state?
-    #--
-      def render_content_for_state(state)
-        @content        = []
-        @cell_views     = {}
-        #@@current_cell  = self
 
-        #content = render_state(state) # dispatch to the actual method, render view.
-        content = ""
-
-        while (state != content)
-          state = catch(:state_jump) do
-            content = render_state(state)
-          end
+    def render_content_for_state(state)
+      @content        = []
+      @cell_views     = {}
+      
+      content = ""
+      while (state != content)
+        state = catch(:state_jump) do
+          content = render_state(state)
         end
-
-        frame_content(content)
       end
+
+      frame_content(content)
+    end
 
 
     # Wrap the widget's current state content into a div frame.
@@ -185,26 +180,12 @@ module Apotomo
       '<div id="' + name.to_s + '">'+content+"</div>"
     end
 
-
+    def last_state; @state_name; end
 
     def last_state=(state)
+      raise "deprecated"
       puts "last_state => #{state}"
       @last_state = state.to_sym
-    end 
-
-
-    def render_state(state)
-      @cell = self
-      state = state.to_s
-      self.state_name = state
-      self.last_state = state
-      
-      content = dispatch_state(state)
-
-      #if content.class == String
-      return content if content
-      
-      return render_view_for_state(state)
     end
 
 
@@ -217,12 +198,11 @@ module Apotomo
     end
 
 
-    def dispatch_state(state)    
+    def dispatch_state(state)
       content = execute_state(state)  # call the state.
       ### DISCUSS: maybe there's a state jump here.
       
       render_children
-      
       
       @@current_cell = self # only needed in views, so set it here.
       
