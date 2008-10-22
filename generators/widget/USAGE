@@ -1,0 +1,15 @@
+Description:
+	Stubs out a new cell widget, its state views and a functional test.
+  Pass the cell name, either CamelCased or under_scored, and a list 
+  of states as arguments.
+	
+	This generates a cell class in app/cells and view templates in
+	app/cells/cell_name.
+
+Example:
+	'./script/generate cell Posting new'
+	
+	This will create an Apotomo Posting cell:
+		Cell: app/cells/posting_cell.rb
+		Views: app/cells/posting/new.html.erb
+    Test: test/functional/test_posting_cell.rb
