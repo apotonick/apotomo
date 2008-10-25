@@ -4,7 +4,7 @@ module Apotomo
     
     
     def process_for(tree, page)
-      target = tree.find_by_id(widget_id)
+      target = tree.find_by_path(widget_id) ### DISCUSS: widget_id or widget_selector?
       raise "widget '#{widget_id}' could not be found." unless target
       
       puts "EventHandler: invoking #{target.name}##{state}"

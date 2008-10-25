@@ -7,7 +7,7 @@ Description:
 	app/cells/cell_name.
 
 Example:
-	'./script/generate cell Posting new'
+	'./script/generate widget Posting new'
 	
 	This will create an Apotomo Posting cell:
 		Cell: app/cells/posting_cell.rb

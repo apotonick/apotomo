@@ -82,6 +82,8 @@ module Apotomo::UnitTestCase
     assert_equal state, widget.last_state
   end
   
+  # Assert that an event of <tt>type</tt> and with <tt>source_id</tt> was triggered
+  # and catched by at least one EventHandler.
   def assert_event(type, source_id)
     handlers = Apotomo::EventProcessor.instance.processed_handlers
     assert handlers.find{|h| h.event.type == type and h.event.source_id == source_id}

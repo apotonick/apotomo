@@ -3,7 +3,7 @@ module Apotomo
     
     
     def target_widget_for(widget_id=false)
-      widget_id ? current_tree.find_by_id(widget_id) : Apotomo::StatefulWidget.current_widget
+      widget_id ? current_tree.find_by_path(widget_id) : Apotomo::StatefulWidget.current_widget
     end
     
     
@@ -49,10 +49,11 @@ module Apotomo
       end
       
       
-      way.merge({ #:action     => action,
-                  :apotomo_action     => action,
-                  #:controller => 'apotomo', 
-                  :source => target.name})
+      way.merge({ :apotomo_action   => action,
+                  :source           => target.name,
+                  
+                  #:escape => false, ### DISCUSS: do we need this always?
+                  })
     end
     
     def type_uid_for(target, way)

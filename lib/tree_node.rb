@@ -242,16 +242,16 @@ module TreeNode
   private_class_method :loadDumpRep
   
   
-  
-  
-  
-  
-  ###@ stuff i added:
-  
-  ### TODO: deprecate.
-  def find_by_name(node_name)
-    raise "deprecated"
-    return find {|node| node.name == node_name}
+  def find_by_path(selector)
+    next_node = self
+    last      = nil # prevents self-finding loop.
+    selector.to_s.split(/ /).each do |node_id| 
+      last = next_node = next_node.find {|n|
+        n.name.to_s == node_id.to_s and not n==last
+      }
+    end
+    
+    return next_node
   end
   
   
@@ -264,7 +264,8 @@ module TreeNode
   end
   
   
-  # Returns the path from the widget to root, encoded as a string of dot-seperated names. 
+  # Returns the path from the widget to root, encoded as 
+  # a string of slash-seperated names. 
   def path
     path      = [name]     
     ancestor  = parent
@@ -273,7 +274,7 @@ module TreeNode
       ancestor = ancestor.parent
     end
     
-    path.reverse.join(".")
+    path.reverse.join("/")
   end
   
 end

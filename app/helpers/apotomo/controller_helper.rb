@@ -124,12 +124,16 @@ module Apotomo
       #puts "saving tree in session."
       freeze_tree(tree)
       
+      
+      
       # usually an event is reported via this controller action:
       if action == :event
         render_page_update_for(processed_handlers)      
       elsif action == :iframe2event
         #puts "IFRAME2EVENT happened!"
         render_iframe_update_for(processed_handlers)
+      elsif action == :data
+        render_data_for(processed_handlers)
       end
       
     end
@@ -156,6 +160,7 @@ module Apotomo
     
     
     def render_data_for(processed_handlers)
+      #puts "returning #{processed_handlers.first.content}"
       ### TODO: what if more events have been attached, smart boy?
       render :text => processed_handlers.first.content
     end

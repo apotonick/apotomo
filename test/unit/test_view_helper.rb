@@ -166,6 +166,7 @@ class ViewHelperTest < Test::Unit::TestCase
     addr = address_to_event(:param_1 => 'one')
     assert addr[:source],  'a'
     assert addr[:param_1],    'one'
+    
   end
   
   
