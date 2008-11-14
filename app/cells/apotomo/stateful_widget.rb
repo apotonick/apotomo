@@ -78,7 +78,7 @@ module Apotomo
     # Defines the instance vars that should <em>not</em> survive between requests, 
     # which means they're not frozen in Apotomo::StatefulWidget#freeze.
     def ivars_to_forget
-      ivars_to_ignore + ['@content', '@cell_views']
+      ivars_to_ignore + ['@content', '@cell_views', '@rendered_children']
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.
@@ -162,7 +162,7 @@ module Apotomo
 
     def render_content_for_state(state)
       @content        = []
-      @cell_views     = {}
+      @cell_views = @rendered_children    = {}  ### TODO: deprecate @cell_views.
       
       content = ""
       while (state != content)
@@ -231,7 +231,7 @@ module Apotomo
     def render_child(cell, state)
       view = cell.invoke(state)
       @content << view
-      @cell_views[cell.name] = view
+      @rendered_children[cell.name] = view
     end
 
     def decide_child_state_for(child, state)

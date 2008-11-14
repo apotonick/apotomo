@@ -7,7 +7,7 @@ module Apotomo
     # Renders the widget named <tt>widget_id</tt> from the ApplicationWidgetTree
     # into the controller action. Additionally activates event processing for this
     # widget and all its children.
-    def act_as_widget(widget_id, model_tree_class = ::ApplicationWidgetTree)
+    def act_as_widget(widget_id, opts={})
       # create tree (new/from store)...
       
       # and pass it to the dispatched actions:
@@ -17,23 +17,28 @@ module Apotomo
         return
       end
     
-      render :text => render_widget_from_tree(widget_id, model_tree_class), 
+      render :text => render_widget_from_tree(widget_id, opts), 
         :layout => true
     end
     
     
+    ### TODO: put it in WidgetTree or somewhere else, as it's not a controller 
+    ###   helper.
     # Finds the widget named <tt>widget_id</tt> and renders it.
-    def render_widget_from_tree(widget_id, model_tree_class)
+    def render_widget_from_tree(widget_id, opts={})
       
       
       if session['apotomo_widget_tree']
         root = thaw_tree
       else
-        tree = model_tree_class.new(self)
+        tree = widget_tree_class.new(self)
         root = tree.draw_tree
       end
       
-      content = root.find_by_id(widget_id).render_content
+      target  = root.find_by_path(widget_id)
+      target.opts = opts unless opts.empty?
+      
+      content = target.render_content
       #session['apotomo_widget_tree'] = root
       
       
@@ -45,8 +50,8 @@ module Apotomo
     end
     
     
-    def render_widget(widget_id)
-      render_widget_from_tree(widget_id, ::ApplicationWidgetTree)
+    def render_widget(widget_id, opts={})
+      render_widget_from_tree(widget_id, opts)
     end
     
     def widget_event?
@@ -59,7 +64,9 @@ module Apotomo
     end
     
     
-    ### TODO: put next two methods in Apotomo::Persistance or so. ---------------
+    def widget_tree_class; ::ApplicationWidgetTree; end
+    
+    ### TODO: put next two methods in Apotomo::WidgetTree or so. ---------------
     def freeze_tree_for(root, storage, controller=nil)
       # put widget structure into session:
       storage['apotomo_widget_tree'] = root # CGI::Session calls Marshal#dump on this.
