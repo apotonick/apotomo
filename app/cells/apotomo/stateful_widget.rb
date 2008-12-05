@@ -64,7 +64,8 @@ module Apotomo
       @start_states = start_states.kind_of?(Array) ? start_states : [start_states]
 
       @child_params = {}  ### DISCUSS: child params are deleted once per request right now. what if we are called twice and need a clean hash? do we need that?
-            
+      @visible = true
+      
       init_tree_node(id)
     end
 
@@ -84,7 +85,8 @@ module Apotomo
     # Defines the instance vars which should <em>not</em> be copied to the view.
     def ivars_to_ignore
       super + ['@children', '@parent', '@childrenHash', '@cell', '@opts', '@state_view',
-      '@is_f5_fixme'
+      '@is_f5_fixme',
+      '@visible'
       ]
     end
     
@@ -214,7 +216,9 @@ module Apotomo
     end
 
     def children_to_render
-      children
+      children.find_all do |w|
+        w.visible?
+      end
     end
 
     def render_children
@@ -362,6 +366,16 @@ module Apotomo
     def controller
       @controller || root.controller
     end
+    
+    # Sets the widget to invisible, which will usually suppress executing the 
+    # state method and rendering. Apparently the same applies to all children 
+    # of this widget.
+    def invisible!; @visible = false; end
+    # Sets the widget to visible (default).
+    def visible!;   @visible = true; end
+    # Returns if visible.
+    def visible?;   @visible; end
+    
     
     def createDumpRep
       strRep = String.new
