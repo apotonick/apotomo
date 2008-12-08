@@ -10,6 +10,8 @@ module Apotomo
       puts "EventHandler: invoking #{target.name}##{state}"
       @content = target.invoke(state)
       
+      ### FIXME: this :afterInvoke event is somehow inconsistent, it just notifies about
+      ###   _one_ #invoke per handler (although there might be children invoked!).
       target.trigger(:afterInvoke)
       
       self

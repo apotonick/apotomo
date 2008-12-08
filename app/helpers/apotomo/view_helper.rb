@@ -1,6 +1,9 @@
 module Apotomo
   module ViewHelper
     
+    # ### TODO: discuss the request-event cycle.
+    # ### TODO: explain that an 'address' to a widget is a set of parameters needed to
+    #   display the targeted widget when re-rendering the screen.
     
     def target_widget_for(widget_id=false)
       widget_id ? current_tree.find_by_path(widget_id) : Apotomo::StatefulWidget.current_widget
@@ -11,9 +14,7 @@ module Apotomo
       Apotomo::StatefulWidget.current_widget.root
     end
     
-    
-    # public methods ------------------------------------------------------------
-    
+        
     # Returns the address hash to the event controller and the targeted widget.
     #
     # Reserved options for <tt>way</tt>:
@@ -31,37 +32,56 @@ module Apotomo
     #   <%= address_to_event :type => :click, :item_id => 9 %>
     # will result in an address that triggers a <tt>:click</tt> event from the current
     # widget and also provides the parameter <tt>:item_id</tt>.
-    
     def address_to_event(way={}, action='event')
       target = target_widget_for(way[:source])
       
-      
       # handle implicit :invoke event:
       if ! way[:type]
-        type_uid =  type_uid_for(target, way)
-        
-        # attach invoke handler to target:
-        target.peek(type_uid, target.name, way[:state])
-        
-        #puts target.evt_table.inspect
-        way[:type] = type_uid
-        way.delete(:state)  ### DISCUSS: do that in type_uid_for ?
+        attach_invoke_handler_to(target, way) 
       end
       
       
       way.merge({ :apotomo_action   => action,
-                  :source           => target.name,
-                  
-                  #:escape => false, ### DISCUSS: do we need this always?
-                  })
+                  :source           => target.name })
     end
     
     def type_uid_for(target, way)
       "#{target.name}_#{way[:state]}".to_sym
     end
+    
+    
+    # Attaches an event handler to the target widget which will allow send
+    # the widget to another state ("invoking"). This happens automatically when
+    # omitting a <tt>:type</tt> argument or setting it to <tt>:invoke</tt>.
+    #
+    # You can set the new state of the targeted widget by
+    # providing the <tt>:state</tt> argument in link_to_event, form_to_event or
+    # address_to_event. For example
+    #   
+    #   form_to_event(:state => :next_state)
+    #
+    # would send the current widget (which rendered the form) to its 
+    # <tt>:next_state</tt> state when the form is submitted.
+    #
+    # You shouldn't call this method since it is automatically run in link_to_event,
+    # form_to_event or address_to_event.
+    def attach_invoke_handler_to(target, way)
+      type_uid =  type_uid_for(target, way)
         
+      # attach invoke handler to target:
+      target.peek(type_uid, target.name, way[:state])
+
+      #puts target.evt_table.inspect
+      way[:type] = type_uid
+      way.delete(:state)  ### DISCUSS: do that in type_uid_for ?
+    end
+    
     
     # Creates a link that triggers an event via AJAX.
+    # This link will <em>only</em> work in JavaScript-able browsers.
+    #
+    # Note that the link is created using #link_to_remote.
+    #
     # See #address_to_event for options for <tt>way</tt>
     #--
     ### TODO: discuss the request cycle behaviour.
@@ -112,42 +132,55 @@ module Apotomo
     
     
     
-    # Creates a bookmarkable link to a widget. See #static_link_to_widget.
+    # Creates a dynamic - but still bookmarkable - link to an application state.
+    # Both browsers with JavaScript turned on, or turned off (like search bots)
+    # will be able to follow this link.
+    #
+    # If clicked with JS turned on, an AJAX event will be triggered which redraws the
+    # screen to switch the application state (eg to change to another subtree).
+    # In non-JS browsers the whole page will simply reload, being in exactly the same 
+    # state as if the browser had JS turned on.
     def link_to_widget(title, widget_id=false, way={}, html_options={})
-      static_link_to_widget(title, widget_id, way, html_options)
+      link_to_app_state(title, widget_id, way, html_options)
     end
     
     
-    # Creates a bookmarkable link to a widget. When clicked, the whole application
-    # state ("page") is reloaded without AJAX.
+    # Creates a bookmarkable link to an application state, without any JavaScript. 
+    # When clicked, the whole application ("page") is reloaded without AJAX.
     # 
+    # Note that the link is created using #link_to.
+    #
     # This allows links that contain enough state information to display even deeply
     # nested widgets, e.g. a form within a TabWidget that itself is under a
     # ChildSwitchWidget.
     def static_link_to_widget(title, widget_id=false, way={}, html_options={})
       target = target_widget_for(widget_id)
-      way.delete(:static)
       
       link_to(title, target.address(way), html_options)
     end
     
     
+    
+    def link_to_app_state(title, widget_id=false, way={}, html_options={})
+      target = target_widget_for(widget_id)
+      way.delete(:static)
+      
+      # address to application state:
+      widget_address = target.address(way)
+            
+      # the static link is simply the routed widget's address:
+      html_options[:href] = url_for(widget_address)
+      
+      ### TODO/DISCUSS: currently we have to manually attach a :redrawApp handler to
+      ###   the respective on-screen "root" widget.
+      evt_address = address_to_event({:type => :redrawApp}.merge!(target.address(way)) )
+      
+      link_to_remote(title, {:url=>evt_address}, html_options)
+    end
+    
     def iframe_id
       'apotomo_iframe'
     end
-    
-    
-    # explicit _for_widget methods ----------------------------------------------
-    
-    
-    # Same as #address_to_event, for people who like to explicity set <tt>:source</tt> via
-    # the <tt>widget_id</tt> parameter.
-    def address_to_event_for_widget(widget_id=false, way={})
-      way[:source] = widget_id
-      address_to_event(way)
-    end
-    
-    
    end
 
 end

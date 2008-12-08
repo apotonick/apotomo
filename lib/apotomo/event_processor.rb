@@ -56,7 +56,7 @@ module Apotomo
     
     
     def queue_handler(handler)
-      puts "queueing... #{handler.inspect}"
+      puts "queueing... #{handler.widget_id}->#{handler.state}"
       self.queue << handler
     end
     def queue_handlers(handlers)

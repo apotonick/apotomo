@@ -66,9 +66,9 @@ class ViewHelperTest < Test::Unit::TestCase
     get :index
     @a.invoke
     #Apotomo::StatefulWidget.set_current_widget = @a
-    l = static_link_to_widget("Static Link", false, :static => true)
+    l = static_link_to_widget("Static Link")
     puts l
-    assert_no_match /static=/, l
+    assert_no_match /onclick=/, l
   end
   
   def test_static_link_to_widget_with_controller
@@ -131,25 +131,6 @@ class ViewHelperTest < Test::Unit::TestCase
     puts l    
     assert_match /<form/, l
     assert_match /<\/form>/, l
-  end
-
-
-  def test_address_to_event_for_widget
-    #Apotomo::StatefulWidget.set_current_widget = @a
-    @a.invoke
-    
-    assert_equal Apotomo::StatefulWidget.current_widget, @a
-    
-    addr = address_to_event_for_widget()
-    #puts addr.inspect
-    assert addr[:source], 'a'
-    
-    addr = address_to_event_for_widget('b')
-    assert addr[:source], 'b'
-    
-    addr = address_to_event_for_widget(false, :param_1 => 'one')
-    assert addr[:source],  'a'
-    assert addr[:param_1],    'one'
   end
   
   

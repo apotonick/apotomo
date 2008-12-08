@@ -85,7 +85,16 @@ module TreeNode
       @children.clear
       self
   end
-
+  
+  def move_children_to(target)
+    children.clone.each {|c|# puts "adding child #{c}";  
+      @childrenHash.delete(c.name)
+      @children.delete(c)
+      target << c
+    }
+  end
+  
+  
   # Private method which sets this node as a root node.
   def setAsRoot!
       @parent = nil

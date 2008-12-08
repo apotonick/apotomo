@@ -22,13 +22,4 @@
 #  
 
 module Apotomo
-  module VERSION
-    Major = 0 # change implies compatibility breaking with previous versions
-    Minor = 1 # change implies backwards-compatible change to API
-    Release = 0 # incremented with bug-fixes, updates, etc.
-  end
 end
-
-#Engines.current.version = Apotomo::VERSION
-
-Dependencies.load_paths << RAILS_ROOT+"/app/apotomo"

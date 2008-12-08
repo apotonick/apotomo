@@ -128,8 +128,10 @@ module Apotomo
     # the is_f5_fixme flag is needed for context propagation when children are rendered.
     # this is a part i don't like.
     #--
-    # Central entry point for starting the FSM, executing state methods and rendering 
-    # state views. See #invoke_state.
+    # Central entry point for starting the FSM and recursively executing the respective
+    # state method and rendering its view. The invoke'd widget will call #invoke
+    # for each visible child, per default.
+    # See #invoke_state.
     def invoke(state=nil)
       puts "\ninvoke on #{name}"
 
