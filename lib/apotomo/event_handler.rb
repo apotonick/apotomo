@@ -8,6 +8,9 @@ module Apotomo
       raise "widget '#{widget_id}' could not be found." unless target
       
       puts "EventHandler: invoking #{target.name}##{state}"
+      ### DISCUSS: let target access event?
+      ###   pass additional opts to #invoke?
+      target.opts[:event] = event
       @content = target.invoke(state)
       
       ### FIXME: this :afterInvoke event is somehow inconsistent, it just notifies about
