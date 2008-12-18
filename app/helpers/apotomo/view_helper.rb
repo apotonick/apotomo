@@ -163,7 +163,6 @@ module Apotomo
     
     def link_to_app_state(title, widget_id=false, way={}, html_options={})
       target = target_widget_for(widget_id)
-      way.delete(:static)
       
       # address to application state:
       widget_address = target.address(way)
@@ -173,7 +172,7 @@ module Apotomo
       
       ### TODO/DISCUSS: currently we have to manually attach a :redrawApp handler to
       ###   the respective on-screen "root" widget.
-      evt_address = address_to_event({:type => :redrawApp}.merge!(target.address(way)) )
+      evt_address = address_to_event({:type => :redrawApp}.merge!(widget_address) )
       
       link_to_remote(title, {:url=>evt_address}, html_options)
     end
