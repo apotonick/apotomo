@@ -29,8 +29,9 @@ class Apotomo::ChildSwitchWidget < Apotomo::StatefulWidget
   
   def find_current_child
     child_id = param(param_name_for_current_child)
-    puts param_name_for_current_child
-    puts :xo
+    #puts param_name_for_current_child
+    #puts child_id
+    #puts :xo
     find_child_for_id(child_id) || find_child_for_id(@current_child_id) || default_child
   end
   
@@ -55,7 +56,9 @@ class Apotomo::ChildSwitchWidget < Apotomo::StatefulWidget
   # @test: test_tab_panel_widget#test_switch_addressing
   
   def local_address(target, way, state)
-    return super(target, way, state) if target == self
+    #return super(target, way, state) if target == self
+    #return {param_name_for_current_child => target.name} if target == self
+    return {param_name_for_current_child => find_current_child_id} if target == self
     
     while target.parent != self
       target = target.parent
