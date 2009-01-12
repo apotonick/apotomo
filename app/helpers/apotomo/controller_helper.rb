@@ -25,10 +25,8 @@ module Apotomo
     ### TODO: put it in WidgetTree or somewhere else, as it's not a controller 
     ###   helper.
     # Finds the widget named <tt>widget_id</tt> and renders it.
-    def render_widget_from_tree(widget_id, opts={})
-      
-      
-      if session['apotomo_widget_tree']
+    def render_widget_from_tree(widget_id, opts={})      
+      if thaw_tree? and session['apotomo_widget_tree']
         root = thaw_tree
       else
         tree = widget_tree_class.new(self)
@@ -48,6 +46,16 @@ module Apotomo
       
       return content
     end
+    
+    # If true, the widget tree is reloaded during runtime, even if it was already frozen
+    # before. Reloading creates and runs ApplicationWidgetTree#draw.
+    # This is used in development mode when you changed the tree while the server is
+    # running. Default is to <em>not</em> reload the tree.
+    def redraw_tree?
+      ### DISCUSS: how to set this flag from outside?
+      params[:reload_tree] || false
+    end
+    def thaw_tree?; ! redraw_tree?; end
     
     
     def render_widget(widget_id, opts={})
@@ -184,9 +192,7 @@ module Apotomo
             script += 'Element.replace("'+handler.widget_id+'", "'+content.gsub('"', '\\\\\"').gsub("\n", "").gsub("'", "\\\\'")+'");'
             #page.replace handler.widget_id, content
           else
-            ### TODO: implement me.
-            raise ""
-            page << content
+            script += content
           end
         end
     
