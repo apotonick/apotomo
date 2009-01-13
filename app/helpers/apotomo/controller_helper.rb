@@ -192,10 +192,10 @@ module Apotomo
             script += 'Element.replace("'+handler.widget_id+'", "'+content.gsub('"', '\\\\\"').gsub("\n", "").gsub("'", "\\\\'")+'");'
             #page.replace handler.widget_id, content
           else
-            script += content
+            script += content.gsub("\n", "").gsub("'", "\\\\'")
           end
         end
-    
+      logger.info script
     
       # stolen from responds_to_parent, thanks sean tradeway and you other guys!
       render :text => "<html><body><script type='text/javascript' charset='utf-8'>
