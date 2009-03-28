@@ -7,18 +7,6 @@ class ApotomoUnitTestController < ApplicationController
   def index; render :text => ""; end
 end
 
-module Apotomo::EmptyModule
-  def setup
-    super
-    @controller = ApotomoUnitTestController.new
-    @controller.params  = {}
-    
-    
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-  end
-end
-
 module Apotomo::UnitTestCase
   
   attr_accessor :controller, :session
@@ -28,28 +16,13 @@ module Apotomo::UnitTestCase
   
   
   def setup
-    super ### FIXME: if omitted, the fixtures don't get inserted.
     @controller = ApotomoUnitTestController.new
-    @controller.params  = {}
-    @controller.session = @session = {}
-    
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-    
-    ### FIXME: we need this to initialize the controller.
-    get :index
-  end
-  
-  
-  def with_loading(*from)
- 	  old_mechanism, Dependencies.mechanism = Dependencies.mechanism, :load
- 	  dir = File.dirname(__FILE__)
- 	  prior_autoload_paths = Dependencies.load_paths
- 	  Dependencies.load_paths = from.collect { |f| "#{dir}/unit/#{f}" }
- 	  yield
-  ensure
- 	  Dependencies.load_paths = prior_autoload_paths
- 	  Dependencies.mechanism = old_mechanism
+    @controller.request   = @request
+    @controller.response  = @response
+    @controller.params    = {}
+    @controller.session   = @session = {}
   end
   
   

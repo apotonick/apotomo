@@ -106,6 +106,41 @@ class PersistenceTest < Test::Unit::TestCase
     #assert session['apotomo_widget_content'].reject?('b')
   end
   
+  def test_widget_start_state_cleanup
+    r = cell(:my_test, :start, 'root')
+    # :start will set a state variable.
+    r.invoke
+    assert_state r, :start
+    assert_equal "value", r.ivar
+    
+    # if going to a start state, there shouldn't be anything left in the widget.
+    r.instance_eval { def start; ""; end; }
+    r.invoke
+    assert_state r, :start
+    assert_equal nil, r.ivar
+  end
+  
+  def test_brain
+    r = cell(:my_test, :start, 'root')
+    # :start will set a state variable.
+    r.invoke
+    assert_state r, :start
+    assert_equal "value", r.ivar
+    assert_equal ['@ivar'], r.brain
+    
+    # next, go to :one and set another state variable.
+    r.invoke :one
+    assert_state r, :one
+    assert_equal "value", r.ivar
+    assert_equal "1",     r.one
+    assert_equal ['@ivar', '@one'], r.brain
+    
+    # and go back to the start state, flushing the brain and starting over:
+    r.invoke
+    assert_state r, :start
+    assert_equal "value", r.ivar
+    assert_equal ['@ivar'], r.brain
+  end
   
 end
 
@@ -162,4 +197,17 @@ class SlaveCell < Apotomo::StatefulWidget
 end
 
 class MyTestCell < Apotomo::StatefulWidget
+  attr_reader :ivar, :one
+  attr_reader :brain
+  
+  transition :in    => :start
+  transition :from  => :start, :to => :one
+  
+  def start
+    @ivar = "value"
+  end
+  
+  def one
+    @one  = "1"
+  end
 end

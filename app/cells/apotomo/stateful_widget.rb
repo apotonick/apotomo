@@ -1,4 +1,4 @@
-### (c) 2008, Nick Sutterer <nick@tesbo.com>
+### (c) 2008-2009, Nick Sutterer <nick@tesbo.com>
 module Apotomo
   # The StatefulWidget is the core component in Apotomo. Any widget is derived from 
   # this class.
@@ -22,7 +22,7 @@ module Apotomo
   # form had valid input.
   # 
   # To send a widget - from outside - into a certain state, you usually #invoke a
-  # state. Start states are defined in #new. Valid transitions are defined in
+  # state. Initial start states are defined in #new. Valid transitions are defined in
   # #transition_map and you can jump to an arbitrary state by calling #jump_to_state
   # inside a state method.
   #
@@ -53,18 +53,22 @@ module Apotomo
     include Transitions
     include Caching
     
+    
     helper Apotomo::ViewHelper
 
 
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.
+    attr_reader :last_brain
     def initialize(controller, id, start_states=:widget_content, opts={})
-      super(controller, id, opts)
-      @cell_name    = @name  = id
+      super(controller, opts)
+      @name         = id
       @start_states = start_states.kind_of?(Array) ? start_states : [start_states]
 
-      @child_params = {}  ### DISCUSS: child params are deleted once per request right now. what if we are called twice and need a clean hash? do we need that?
-      @visible = true
+      @child_params = {}
+      @visible      = true
+      
+      @brain        = []    # ivars set during state execution.
       
       init_tree_node(id)
     end
@@ -79,46 +83,25 @@ module Apotomo
     # Defines the instance vars that should <em>not</em> survive between requests, 
     # which means they're not frozen in Apotomo::StatefulWidget#freeze.
     def ivars_to_forget
-      ivars_to_ignore + ['@content', '@cell_views', '@rendered_children']
+      unfreezeable_ivars + ['@rendered_children']
+    end
+    
+    def unfreezeable_ivars
+      ['@childrenHash', '@children', '@parent', '@controller', '@cell']
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.
+    # Called in Cell::Base.
     def ivars_to_ignore
-      super + ['@children', '@parent', '@childrenHash', '@cell', '@opts', '@state_view',
-      '@is_f5_fixme',
-      '@visible'
-      ]
+      (instance_variables - ivars_to_expose)
     end
     
-    
-    # Returns true if the widget is currently rendering itself or its children.
-    ### DISCUSS: 2BRM.
-    def hot?
-      @content
+    # Defines the ivars which should be copied to and accessable in the view.
+    def ivars_to_expose
+      @brain + ['@rendered_children']
     end
 
-    # Explicitly defines the valid state transistions for this widget.
-    #
-    # Example:
-    #   def transition_map
-    #     { :start_state_one  => [:some_state, :looping_state],
-    #       :looping_state    => [:looping_state]
-    #     }
-    #   end
-    #
-    # This would create a state machine like
-    #
-    #
-    #                        |---> :some_state
-    #   :start_state_one --->|
-    #                        |---> :looping_state ---
-    #                                         ^     |
-    #                                         |     |
-    #                                         -------
-    def transition_map; {}; end
-    def transitions
-      transition_map
-    end
+    
 
     #--
     # don't thaw when
@@ -138,8 +121,9 @@ module Apotomo
       if state.to_s == "*"
         @is_f5_fixme = true
         state= start_state_for_state(last_state)
+        #flush_brain
         puts "F5, going back to #{state}"
-      end    
+      end
       
       invoke_state(state)
     end
@@ -157,16 +141,23 @@ module Apotomo
         state = find_next_state_for(last_state, state)
       end 
       
+      ### DISCUSS: at this point, we finally know the concrete next state.
+      if start_state?(state)
+        flush_brain
+      end
+      
+      
       puts "#{name}: transition: #{last_state} to #{state}"
       puts "                                    ...#{state}"
       
-      render_content_for_state(state)    
+      
+      render_content_for_state(state)
     end
     
-
+        
     def render_content_for_state(state)
-      @content        = []
-      @cell_views = @rendered_children    = {}  ### TODO: deprecate @cell_views.
+      ### TODO: implementation decision, move outside!
+      @rendered_children = ActiveSupport::OrderedHash.new 
       
       content = ""
       while (state != content)
@@ -183,14 +174,8 @@ module Apotomo
     def frame_content(content)
       '<div id="' + name.to_s + '">'+content+"</div>"
     end
-
-    def last_state; @state_name; end
-
-    def last_state=(state)
-      raise "deprecated"
-      puts "last_state => #{state}"
-      @last_state = state.to_sym
-    end
+    
+    def last_state; @state_name; end  # Set in Cell::Base#render_state
 
 
     # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 
@@ -203,8 +188,18 @@ module Apotomo
 
 
     def dispatch_state(state)
+      ivars_before = instance_variables      
+      
       content = execute_state(state)  # call the state.
       ### DISCUSS: maybe there's a state jump here.
+      
+      ivars_after = instance_variables
+      puts @brain.inspect
+      puts "state ivars:"  
+      @brain |= (ivars_after - ivars_before)
+      puts @brain.inspect
+      
+      
       
       render_children
       
@@ -225,7 +220,7 @@ module Apotomo
 
     def render_children
       children_to_render.each do |cell|
-        #puts cell
+        puts cell
         ### FIXME: call to state_name here SUCKS:
         child_state = decide_child_state_for(cell, state_name.to_sym)
 
@@ -236,7 +231,6 @@ module Apotomo
 
     def render_child(cell, state)
       view = cell.invoke(state)
-      @content << view
       @rendered_children[cell.name] = view
     end
 
@@ -339,7 +333,11 @@ module Apotomo
     # from the targeted to root can insert state recovery information in the address
     # by overriding #local_address.
     def address(way={}, target=self, state=nil)
+    #def address(way=HashWithIndifferentAccess.new, target=self, state=nil)
       way.merge!( local_address(target, way, state) )
+      
+      #puts "address: #{name}"
+      #puts way.inspect
 
       return way if isRoot?
 
@@ -395,7 +393,7 @@ module Apotomo
     storage[path] = {}  ### DISCUSS: check if we overwrite stuff?
     (self.instance_variables - ivars_to_forget).each do |var|
       storage[path][var] = instance_variable_get(var)
-      #puts "  #{var}: #{instance_variable_get(var)}"
+      #puts "  #{var}: "
     end
     
     children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }
@@ -408,6 +406,14 @@ module Apotomo
     end
     
     children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }
+  end
+  
+  ### DISCUSS: should we forget all in start state?
+  def flush_brain
+    @brain.each do |var|
+      instance_variable_set(var, nil) ### FIXME: how to unset?
+    end
+    @brain.clear
   end
 
   def _dump(depth)
@@ -431,7 +437,7 @@ module Apotomo
         
           ###@ name, klass, parent, content_str = line.split(@@fieldSep)
           name, klass, parent = line.split(@@fieldSep)
-          
+          puts "thawing #{name}->#{parent}"
           currentNode = klass.constantize.new(nil, name)
           
           ###@ Marshal.load(content_str).each do |k,v|
