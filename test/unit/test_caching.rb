@@ -7,7 +7,7 @@ class ApotomoCachingTest < Test::Unit::TestCase
   def setup
     super
     @controller.session= {}
-    @cc = CachingCell.new(@controller, 'caching_cell', :cached_state)
+    @cc = CachingCell.new(@controller, 'caching_cell', :start)
   end
   
   
@@ -28,6 +28,13 @@ end
 class CachingCell < Apotomo::StatefulWidget
   
   cache :cached_state
+  
+  transition :in => :cached_state
+  
+  
+  def start
+    jump_to_state :cached_state
+  end
   
   def cached_state
     @counter ||= 0

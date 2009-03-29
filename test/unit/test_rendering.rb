@@ -18,7 +18,7 @@ class ApotomoRenderingTest < ActionController::TestCase
   Cell::Base.view_paths << File.expand_path(File.dirname(__FILE__) + "/../fixtures")
   
   
-  
+  # we only want a small set of ivars exposed in the view.
   def test_assigns_in_view
     w = widget(:rendering_test_widget, :check_state, 'my_widget')
     c = w.invoke
@@ -30,16 +30,28 @@ class ApotomoRenderingTest < ActionController::TestCase
     assert ! w.ivars_to_ignore.include?('@rendered_children') # we want that in the view!
   end
   
-  
+  # is @rendered_children in views a ordered hash?
   def test_rendered_children
-    w = widget(:rendering_test_widget, :check_state, 'a')
-    w << widget(:rendering_test_widget, :check_state, 'b')
-    w << widget(:rendering_test_widget, :check_state, 'c')
+    ### TODO: move to abc_tree.
+    w = widget(:rendering_test_widget, :widget_content, 'a')
+    w << widget(:rendering_test_widget, :widget_content, 'b')
+    w << widget(:rendering_test_widget, :widget_content, 'c')
     c = w.invoke
     
-    # test if rendered_children is an ordered hash, since some widgets need the order:
     r = w.rendered_children.to_a
     assert_equal 'b',   r[0].first
     assert_equal 'c',   r[1].first
+  end
+  
+  # the default view "widget_content.html.erb" should just concat itself and its children.
+  def test_default_widget_content_view
+    ### TODO: move to abc_tree.
+    w = widget(:rendering_test_widget, :widget_content, 'a')
+    w << widget(:rendering_test_widget, :widget_content, 'b')
+    w << widget(:rendering_test_widget, :widget_content, 'c')
+    c = w.invoke
+    
+    assert_selekt c, "#a>#b:nth-child(1)"
+    assert_selekt c, "#a>#c:nth-child(2)"
   end
 end
