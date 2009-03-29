@@ -23,9 +23,11 @@ class ApotomoRenderingTest < ActionController::TestCase
     w = widget(:rendering_test_widget, :check_state, 'my_widget')
     c = w.invoke
     
-    # there should be exactly two variables exposed in the view:
+    # there should be exactly two variables exposed in the view, 
+    # the state ivars and @rendered_children:
+    puts "content: #{c}"
     assert_selekt c, "#my_widget", "my_widget is cool."
-    
+    assert_equal 1, w.brain.size
     assert w.brain.include?('@ivar')
     assert ! w.ivars_to_ignore.include?('@rendered_children') # we want that in the view!
   end
@@ -54,4 +56,5 @@ class ApotomoRenderingTest < ActionController::TestCase
     assert_selekt c, "#a>#b:nth-child(1)"
     assert_selekt c, "#a>#c:nth-child(2)"
   end
+
 end

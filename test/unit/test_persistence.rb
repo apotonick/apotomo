@@ -120,6 +120,7 @@ class PersistenceTest < Test::Unit::TestCase
     assert_equal nil, r.ivar
   end
   
+  # @brain should contain all ivars set during successive state executions.
   def test_brain
     r = cell(:my_test, :start, 'root')
     # :start will set a state variable.
@@ -142,6 +143,24 @@ class PersistenceTest < Test::Unit::TestCase
     assert_equal ['@ivar'], r.brain
   end
   
+    
+  # @state_view, @rendered_children shouldn't be remembered after state rendering.
+  def test_reset_rendering_ivars
+    r = cell(:my_test, :set_state_view, 'a')
+    
+    # render state that sets an explicit @state_view:
+    r.invoke
+    assert_state r, :set_state_view
+    assert_equal :widget_content, r.state_view
+    
+    # go to a state that doesn't set @state_view, which should also be empty now:
+    r.invoke :one
+    assert_state r, :one
+    assert r.state_view.blank?
+    assert r.rendered_children.blank?
+  end
+  
+  
 end
 
 class SharedObject
@@ -159,12 +178,12 @@ class MasterCell < Apotomo::StatefulWidget
     @my_shared = SharedObject.new
     @my_shared.value = "first value"
     set_local_param(:shared, @my_shared)
-    ""
+    state_view! :widget_content
   end
   
   def reset_shared
     @my_shared.value = "second value"
-    ""
+    state_view! :widget_content
   end
   
   def set_shared_in_session
@@ -173,7 +192,7 @@ class MasterCell < Apotomo::StatefulWidget
     session['my_shared'] = my_shared
     
     set_local_param(:shared, session['my_shared'])
-    ""
+    state_view! :widget_content
   end
 end
 
@@ -198,7 +217,8 @@ end
 
 class MyTestCell < Apotomo::StatefulWidget
   attr_reader :ivar, :one
-  attr_reader :brain
+  # allow testing library ivars from outside:
+  attr_reader :brain, :state_view, :rendered_children
   
   transition :in    => :start
   transition :from  => :start, :to => :one
@@ -209,5 +229,10 @@ class MyTestCell < Apotomo::StatefulWidget
   
   def one
     @one  = "1"
+  end
+  
+  transition :from => :set_state_view, :to => :one
+  def set_state_view
+    state_view! :widget_content
   end
 end

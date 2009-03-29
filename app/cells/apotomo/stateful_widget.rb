@@ -45,9 +45,17 @@ module Apotomo
   # Widgets can also fire events internally using EventAware#trigger.
   # Listeners that handle an event are attached with EventAware#watch.
   
+  # The brain
+  # collects ivars set during state execution(s), even in successive state jumps.
+  # brain content is exposed to view and unset when hitting a start state.
+  # If you want to set an everlasting ivar which survives a start state, set it before
+  # #render_content_for_state, best place is the constructor.
+  
   class StatefulWidget < Cell::Base
     attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
-
+    
+    attr_reader :last_state
+    
     include TreeNode
     include EventAware   ### TODO: set a "see also" link in the docs.
     include Transitions
@@ -67,8 +75,13 @@ module Apotomo
 
       @child_params = {}
       @visible      = true
+      @version      = 0
+      @last_state   = nil
+      @ivars_before = nil
+            
+      reset_rendering_ivars!    ### DISCUSS: called twice, see #render_content_for_state.
       
-      @brain        = []    # ivars set during state execution.
+      @brain        = []        # ivars set during state execution(s).
       
       init_tree_node(id)
     end
@@ -83,7 +96,7 @@ module Apotomo
     # Defines the instance vars that should <em>not</em> survive between requests, 
     # which means they're not frozen in Apotomo::StatefulWidget#freeze.
     def ivars_to_forget
-      unfreezeable_ivars + ['@rendered_children']
+      unfreezeable_ivars
     end
     
     def unfreezeable_ivars
@@ -102,6 +115,12 @@ module Apotomo
     end
 
     
+    ### DISCUSS: @state_view and @ivars_before are both flags i'd like to get rid of.
+    def reset_rendering_ivars!
+      @state_view         = nil
+      ### TODO: implementation decision, move outside!
+      @rendered_children  = ActiveSupport::OrderedHash.new
+    end
 
     #--
     # don't thaw when
@@ -154,20 +173,60 @@ module Apotomo
       render_content_for_state(state)
     end
     
-        
+    
     def render_content_for_state(state)
-      ### TODO: implementation decision, move outside!
-      @rendered_children = ActiveSupport::OrderedHash.new 
+      reset_rendering_ivars!
       
+      
+      @ivars_before = instance_variables   
+      new_state=state
       content = ""
       while (state != content)
         state = catch(:state_jump) do
-          content = render_state(state)
+          new_state = state
+          content = render_state(state)  # calls Cell::render_state, which is caching-aware.
         end
       end
-
-      frame_content(content)
+      
+      
+      
+      @last_state = new_state
+      
+      return content
     end
+    
+    
+    # either jump out due to a state_jump, or return the complete widget content,
+    # including rendered children.
+    # called in Cell::Base#render_state
+    def dispatch_state(state)
+      content = super(state)  # maybe state jump -> my_dispatch_state
+      
+      
+      
+      
+      puts @brain.inspect
+      puts "state ivars:"  
+      @brain |= (instance_variables - @ivars_before)
+      puts @brain.inspect
+      
+      
+      
+      # directly return content, without framing!
+      return content if content.kind_of? String
+      
+      
+      render_children_for_state(state)
+      
+      
+      @@current_cell = self # only needed in views, so set it here.
+      
+      state = @state_view if @state_view 
+      content = render_view_for_state(state)
+      
+      return frame_content(content)
+    end    
+    
 
 
     # Wrap the widget's current state content into a div frame.
@@ -175,8 +234,6 @@ module Apotomo
       '<div id="' + name.to_s + '">'+content+"</div>"
     end
     
-    def last_state; @state_name; end  # Set in Cell::Base#render_state
-
 
     # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 
     # transition or not.
@@ -187,21 +244,27 @@ module Apotomo
     end
 
 
-    def dispatch_state(state)
-      ivars_before = instance_variables      
+    def my_dispatch_state(state)
+      @ivars_before = instance_variables      
+      new_state=state
+      content = ""
+      while (state != content)
+        state = catch(:state_jump) do
+          new_state = state
+          content = render_state(state)  # call the state, being prepared for state jumps.
+        end
+      end
       
-      content = execute_state(state)  # call the state.
-      ### DISCUSS: maybe there's a state jump here.
+      return [state, content]
       
       ivars_after = instance_variables
       puts @brain.inspect
       puts "state ivars:"  
       @brain |= (ivars_after - ivars_before)
       puts @brain.inspect
+      return [new_state, content]
       
-      
-      
-      render_children
+      render_children_for_state(st)
       
       @@current_cell = self # only needed in views, so set it here.
       
@@ -211,18 +274,24 @@ module Apotomo
     def execute_state(state)
       send(state)
     end
-
+    
+    
+    #def render_view_for_state(state)
+    #  state = @state_view if @state_view
+    #  super(state)
+    #end
+    
+    
     def children_to_render
       children.find_all do |w|
         w.visible?
       end
     end
 
-    def render_children
+    def render_children_for_state(state)
       children_to_render.each do |cell|
-        puts cell
         ### FIXME: call to state_name here SUCKS:
-        child_state = decide_child_state_for(cell, state_name.to_sym)
+        child_state = decide_child_state_for(cell, state.to_sym)
 
         puts "    #{cell.name} -> #{child_state}"
         render_child(cell, child_state)
@@ -256,12 +325,13 @@ module Apotomo
     end
 
 
-    def render_view_for_state(state)
-      state = @state_view if @state_view
-      super(state)
-    end
-
+    
+    
     def state_view(view_name)
+      ### TODO: deprecate
+      state_view!(view_name)
+    end
+    def state_view!(view_name)
       puts "setting state_view to #{view_name}"
       @state_view = view_name
       nil
@@ -408,7 +478,7 @@ module Apotomo
     children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }
   end
   
-  ### DISCUSS: should we forget all in start state?
+  
   def flush_brain
     @brain.each do |var|
       remove_instance_variable(var)
@@ -437,7 +507,7 @@ module Apotomo
         
           ###@ name, klass, parent, content_str = line.split(@@fieldSep)
           name, klass, parent = line.split(@@fieldSep)
-          puts "thawing #{name}->#{parent}"
+          #puts "thawing #{name}->#{parent}"
           currentNode = klass.constantize.new(nil, name)
           
           ###@ Marshal.load(content_str).each do |k,v|
@@ -454,7 +524,6 @@ module Apotomo
       end
       rootNode
   end
-  
   end
 
 end

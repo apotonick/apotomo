@@ -1,24 +1,24 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
+### DISCUSS: move some tests from PersistenceTest to this test file.
 
-class InterStateTest < Test::Unit::TestCase
-  include Apotomo::UnitTestCase
+
+class InterStateTest < ActionController::TestCase
+  include Apotomo::UnitTestCase  
   
-  cattr_accessor :hot_flag
-  
-  
-  def setup
-    super
-    @controller.session = {}
-  end
-  
-  
+  # do we really jump to the correct state?
+  # and: are all state ivars remembered while jumping?
   def test_three_state_jumps
     w = StateJumpCell.new(@controller, 'x', :one)
     c = w.invoke  # :one -> :_two -> :_three
     
-    assert_equal w.last_state, :_three
-    assert_selekt c, "#x", "three"
+    assert_state w, :_three
+    puts "brain dump:"
+    puts w.brain.inspect
+    
+    assert w.brain.include?("@var")
+    assert w.brain.include?("@one");
+    assert_equal "three,one", c
   end
   
   def test_last_state
@@ -27,29 +27,14 @@ class InterStateTest < Test::Unit::TestCase
     assert_equal w.last_state, :four
   end
   
-  def test_hot?
-    self.hot_flag = false
-    w = StateJumpCell.new(@controller, 'x', :set_hot)
-    assert ! w.hot? # => false
-    c = w.invoke
-    ### TODO: implement #hot? correct.
-    #assert ! w.hot?
-    assert self.hot_flag  # => true, we're hot.
-  end
-  
 end 
 
 
 class StateJumpCell < Apotomo::StatefulWidget
-  
-  def transition_map
-    {
-    }
-  end
-  
-  
+  attr_reader :brain
   def one
-    @var = "one"  
+    @var = "one"
+    @one = "one"
     jump_to_state :_two
   end
   
@@ -60,13 +45,11 @@ class StateJumpCell < Apotomo::StatefulWidget
   
   def _three
     @var = "three"
+    "#{@var},#{@one}"
   end
   
   def four
+    ""
   end
   
-  def set_hot
-    InterStateTest.hot_flag = hot?
-    nil
-  end
 end
