@@ -411,7 +411,7 @@ module Apotomo
   ### DISCUSS: should we forget all in start state?
   def flush_brain
     @brain.each do |var|
-      instance_variable_set(var, nil) ### FIXME: how to unset?
+      remove_instance_variable(var)
     end
     @brain.clear
   end
