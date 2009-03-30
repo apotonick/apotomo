@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 
-class PersistenceTest < Test::Unit::TestCase
+class PersistenceTest < ActionController::TestCase
   include Apotomo::UnitTestCase
   
   def test_dump
@@ -158,6 +158,14 @@ class PersistenceTest < Test::Unit::TestCase
     assert_state r, :one
     assert r.state_view.blank?
     assert r.rendered_children.blank?
+    
+    
+    # set state_view, jump to :next state, and render :next view, not the old one:
+    r = cell(:rendering_test, :set_state_view_and_jump, 'b')
+    c = r.invoke  # state_view! => jump_to_state => :check_state
+    assert_state r, :check_state
+    assert r.state_view.blank?
+    assert_selekt c, "#b", "b is cool."
   end
   
   

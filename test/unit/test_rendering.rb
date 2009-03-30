@@ -1,26 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 
-class RenderingTestWidget < Apotomo::StatefulWidget
-  attr_reader :brain
-  attr_reader :rendered_children
-  
-  def check_state   # view resides in fixtures/apotomo/stateful_widget/
-    @ivar = "#{@name} is cool."
-    nil
-  end
-end
+
 
 
 class ApotomoRenderingTest < ActionController::TestCase
-  include Apotomo::UnitTestCase
-  
-  Cell::Base.view_paths << File.expand_path(File.dirname(__FILE__) + "/../fixtures")
-  
+  include Apotomo::UnitTestCase  
   
   # we only want a small set of ivars exposed in the view.
   def test_assigns_in_view
-    w = widget(:rendering_test_widget, :check_state, 'my_widget')
+    w = cell(:rendering_test, :check_state, 'my_widget')
     c = w.invoke
     
     # there should be exactly two variables exposed in the view, 
@@ -35,9 +24,9 @@ class ApotomoRenderingTest < ActionController::TestCase
   # is @rendered_children in views a ordered hash?
   def test_rendered_children
     ### TODO: move to abc_tree.
-    w = widget(:rendering_test_widget, :widget_content, 'a')
-    w << widget(:rendering_test_widget, :widget_content, 'b')
-    w << widget(:rendering_test_widget, :widget_content, 'c')
+    w = cell(:rendering_test, :widget_content, 'a')
+    w << cell(:rendering_test, :widget_content, 'b')
+    w << cell(:rendering_test, :widget_content, 'c')
     c = w.invoke
     
     r = w.rendered_children.to_a
@@ -48,9 +37,9 @@ class ApotomoRenderingTest < ActionController::TestCase
   # the default view "widget_content.html.erb" should just concat itself and its children.
   def test_default_widget_content_view
     ### TODO: move to abc_tree.
-    w = widget(:rendering_test_widget, :widget_content, 'a')
-    w << widget(:rendering_test_widget, :widget_content, 'b')
-    w << widget(:rendering_test_widget, :widget_content, 'c')
+    w = cell(:rendering_test, :widget_content, 'a')
+    w << cell(:rendering_test, :widget_content, 'b')
+    w << cell(:rendering_test, :widget_content, 'c')
     c = w.invoke
     
     assert_selekt c, "#a>#b:nth-child(1)"

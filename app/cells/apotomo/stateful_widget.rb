@@ -134,17 +134,19 @@ module Apotomo
     # state method and rendering its view. The invoke'd widget will call #invoke
     # for each visible child, per default.
     # See #invoke_state.
-    def invoke(state=nil)
-      puts "\ninvoke on #{name}"
+    
+    ### DISCUSS: state is input in FSM speech, or event.
+    def invoke(input=nil)
+      puts "\ninvoke on #{name} with #{input.inspect}"
 
-      if state.to_s == "*"
+      if input.to_s == "*"
         @is_f5_fixme = true
-        state= start_state_for_state(last_state)
+        input= start_state_for_state(last_state)
         #flush_brain
-        puts "F5, going back to #{state}"
+        puts "F5, going back to #{input}"
       end
       
-      invoke_state(state)
+      process_input(input)
     end
 
     # Initiates the rendering cycle of the widget:
@@ -155,52 +157,52 @@ module Apotomo
     #   (per default also named <tt>state</tt>)
     # - invoke the children
     # - render the view for the state (per default named after the state method)
-    def invoke_state(state=nil)
-      unless start_state?(state)
-        state = find_next_state_for(last_state, state)
+    def process_input(input)
+      state = input
+      unless start_state?(input)
+        state = find_next_state_for(last_state, input)
       end 
       
-      ### DISCUSS: at this point, we finally know the concrete next state.
-      if start_state?(state)
-        flush_brain
-      end
       
       
+      invoke_state(state)
+    end
+    
+    # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
+    # This might lead us to some other state since the state method could call #jump_to_state.
+    def invoke_state(state)
       puts "#{name}: transition: #{last_state} to #{state}"
       puts "                                    ...#{state}"
       
+      ### DISCUSS: at this point, we finally know the concrete next state.
+      ### this is the next state we go to, all prior references to state where input.
+      ### #render_state really means what it does: we processed the input symbol, checked the condition and now go to the new state (which produces output).
       
-      render_content_for_state(state)
+      flush_brain if start_state?(state)
+      @ivars_before = instance_variables
+      
+      run(state)
     end
     
-    
-    def render_content_for_state(state)
-      reset_rendering_ivars!
-      
-      
-      @ivars_before = instance_variables   
-      new_state=state
-      content = ""
-      while (state != content)
+    # This freaky method is dedicated to Lance Ivy.
+    def run(state)
+      while true
         state = catch(:state_jump) do
-          new_state = state
           content = render_state(state)  # calls Cell::render_state, which is caching-aware.
+          
+          @last_state = state
+          return content
         end
       end
-      
-      
-      
-      @last_state = new_state
-      
-      return content
     end
-    
     
     # either jump out due to a state_jump, or return the complete widget content,
     # including rendered children.
     # called in Cell::Base#render_state
     def dispatch_state(state)
-      content = super(state)  # maybe state jump -> my_dispatch_state
+      reset_rendering_ivars!
+      
+      content = super(state)  # maybe there's a state jump in here and we're out.
       
       
       
@@ -219,12 +221,12 @@ module Apotomo
       render_children_for_state(state)
       
       
-      @@current_cell = self # only needed in views, so set it here.
+      @@current_cell = self # needed in views, so set it here. ### DISCUSS: do we really need a global var? what about @cell in the view, heh?
       
       state = @state_view if @state_view 
-      content = render_view_for_state(state)
+      content = render_view_for_state(state)  # defined in Cell::Base.
       
-      return frame_content(content)
+      frame_content(content)
     end    
     
 
@@ -242,44 +244,6 @@ module Apotomo
 
       throw :state_jump, state
     end
-
-
-    def my_dispatch_state(state)
-      @ivars_before = instance_variables      
-      new_state=state
-      content = ""
-      while (state != content)
-        state = catch(:state_jump) do
-          new_state = state
-          content = render_state(state)  # call the state, being prepared for state jumps.
-        end
-      end
-      
-      return [state, content]
-      
-      ivars_after = instance_variables
-      puts @brain.inspect
-      puts "state ivars:"  
-      @brain |= (ivars_after - ivars_before)
-      puts @brain.inspect
-      return [new_state, content]
-      
-      render_children_for_state(st)
-      
-      @@current_cell = self # only needed in views, so set it here.
-      
-      content
-    end
-
-    def execute_state(state)
-      send(state)
-    end
-    
-    
-    #def render_view_for_state(state)
-    #  state = @state_view if @state_view
-    #  super(state)
-    #end
     
     
     def children_to_render
