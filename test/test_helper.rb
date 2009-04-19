@@ -55,7 +55,7 @@ module Apotomo::UnitTestCase
   
   
   # session/request simulation --------------------------------------------------
-  include Apotomo::ControllerHelper ### TODO: move neccessary methods to Persistance module.
+  include Apotomo::ControllerMethods ### TODO: move neccessary methods to Persistance module.
   
   # Simulate a request-cycle end and the start of a new request. The tree is returned  
   # exactly as if there had been a new request and Rails handled the session thawing.

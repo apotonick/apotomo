@@ -64,7 +64,9 @@ module Apotomo
     
     helper Apotomo::ViewHelper
     
-    cattr_reader :current_widget
+    ### DISCUSS: should be protected, set in #render_widget/#act_as_widget:
+    cattr_accessor :current_widget, :default_url_options
+    @@default_url_options = {}
     
 
     # Constructor which needs a unique id for the widget and one or multiple start states.
@@ -223,7 +225,7 @@ module Apotomo
       render_children_for_state(state)
       
       
-      @@current_cell = self # needed in views, so set it here. ### DISCUSS: do we really need a global var? what about @cell in the view, heh?
+      self.class.current_widget = self # needed in views, so set it here. ### DISCUSS: do we really need a global var? what about @cell in the view, heh?
       
       state = @state_view if @state_view 
       content = render_view_for_state(state)  # defined in Cell::Base.

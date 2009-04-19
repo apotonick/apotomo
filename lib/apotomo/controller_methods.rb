@@ -1,5 +1,5 @@
 module Apotomo
-  module ControllerHelper
+  module ControllerMethods
     
     # outgoing rendering --------------------------------------------------------
     
@@ -7,18 +7,21 @@ module Apotomo
     # Renders the widget named <tt>widget_id</tt> from the ApplicationWidgetTree
     # into the controller action. Additionally activates event processing for this
     # widget and all its children.
-    def act_as_widget(widget_id, opts={})
+    def act_as_widget(widget_id, options={})
       # create tree (new/from store)...
       
       # and pass it to the dispatched actions:
       
-      if action = params['apotomo_action']  ### DISCUSS: how to find out if we're in Apotomo context?
+      if action = widget_event?
         process_event_request(action.to_sym)
         return
       end
-    
-      render :text => render_widget_from_tree(widget_id, opts), 
-        :layout => true
+      
+      options_for_action = {}
+      options_for_action[:layout] = options.delete(:layout) if options.key?(:layout)
+      options_for_action[:text]   = render_widget_from_tree(widget_id, options)
+      
+      render options_for_action
     end
     
     
@@ -58,8 +61,15 @@ module Apotomo
     def thaw_tree?; ! redraw_tree?; end
     
     
-    def render_widget(widget_id, opts={})
-      render_widget_from_tree(widget_id, opts)
+    # :process is true by default.
+    def render_widget(widget_id, options={})
+      process_events = options.key?(:process_events) ? options.delete(:process_events) : true
+      
+      if process_events
+        Apotomo::StatefulWidget.default_url_options[:action] = :render_event_response
+      end
+        
+      render_widget_from_tree(widget_id, options)
     end
     
     def widget_event?
@@ -75,6 +85,7 @@ module Apotomo
     def widget_tree_class; ::ApplicationWidgetTree; end
     
     ### TODO: put next two methods in Apotomo::WidgetTree or so. ---------------
+    ###   or at least private
     def freeze_tree_for(root, storage, controller=nil)
       # put widget structure into session:
       storage['apotomo_widget_tree'] = root # CGI::Session calls Marshal#dump on this.

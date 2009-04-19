@@ -1,25 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 
-### FIXME: how can we set @@current_cell from outside without destroying the world?
-#Apotomo::StatefulWidget.class_eval do
-#    def self.set_current_widget=(widget)
-#      @@current_cell = widget
-#    end
-#  end
-  
-class ViewHelperTest < ActionView::TestCase
-  include Apotomo::UnitTestCase
-  
-  include Apotomo::ViewHelper
-  #include ActionView::Helpers::PrototypeHelper
-  #include ActionView::Helpers::JavaScriptHelper
-  include ActionView::Helpers::UrlHelper
-  include ActionView::Helpers::TagHelper
-  include ActionView::Helpers::FormTagHelper
-  include ActionView::Helpers::CaptureHelper
-  include ActionView::Helpers::TextHelper
-  include ApplicationHelper
+class ViewHelperTest < ActionView::TestCase  
+  tests Apotomo::ViewHelper
     
   
   def test_link_tag_without_host_option
@@ -73,6 +56,10 @@ class ViewHelperTest < ActionView::TestCase
     @c = CWidget.new(@controller, 'c')
     @a << @b
     @a << @c
+  end
+  
+  def teardown
+    Apotomo::StatefulWidget.default_url_options = {}
   end
   
   def protect_against_forgery?
@@ -154,14 +141,40 @@ class ViewHelperTest < ActionView::TestCase
     Apotomo::StatefulWidget.current_widget = @a
         
     addr = address_to_event()
-    assert addr[:source], 'a'
+    assert_equal addr[:source], 'a'
     
     addr = address_to_event(:source => 'b')
-    assert addr[:source], 'b'
+    assert_equal addr[:source], 'b'
     
     addr = address_to_event(:param_1 => 'one')
-    assert addr[:source],  'a'
-    assert addr[:param_1],    'one'
+    assert_equal addr[:source],   'a'
+    assert_equal addr[:param_1],  'one'
+  end
+  
+  def test_address_to_event_with_default_url_options
+    Apotomo::StatefulWidget.current_widget = @a
+    
+    # test implicit behaviour, with no :action set ------------
+    addr = address_to_event
+    assert_nil addr[:action]
+    
+    # set :action ---------------------------------------------
+    Apotomo::StatefulWidget.default_url_options = {:action => :my_process_event}
+    addr = address_to_event()
+    assert_equal  :my_process_event, addr[:action]
+    assert_nil    addr[:controller]
+    
+    # set :action and :controller -----------------------------
+    Apotomo::StatefulWidget.default_url_options = {:action => :my_process_event, :controller => :beers}
+    addr = address_to_event
+    assert_equal  :my_process_event,  addr[:action]
+    assert_equal  :beers,             addr[:controller]
+    
+    # set both but pass in :action as arg ---------------------
+    Apotomo::StatefulWidget.default_url_options = {:action => :my_process_event, :controller => :beers}
+    addr = address_to_event(:action => :another_process_event)
+    assert_equal  :another_process_event, addr[:action]
+    assert_equal  :beers,                 addr[:controller]
   end
   
   

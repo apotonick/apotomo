@@ -33,6 +33,13 @@ module Apotomo
     # will result in an address that triggers a <tt>:click</tt> event from the current
     # widget and also provides the parameter <tt>:item_id</tt>.
     def address_to_event(way={}, action='event')
+      # only set param in address when there really is one provided as default or as arg.
+      # otherwise, let #url_for handle this.
+      [:controller, :action].each do |param|
+        next unless value = Apotomo::StatefulWidget.default_url_options[param]
+        way[param] ||= value # args in way have precedence.
+      end
+      
       target = target_widget_for(way[:source])
       
       # handle implicit :invoke event:
@@ -180,6 +187,13 @@ module Apotomo
     def iframe_id
       'apotomo_iframe'
     end
+    
+    
+    ### TODO: test me.
+    def content
+      @rendered_children.collect{|e| e.last}.join("\n")
+    end
+    
    end
 
 end
