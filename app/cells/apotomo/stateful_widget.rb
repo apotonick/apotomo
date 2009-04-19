@@ -63,7 +63,9 @@ module Apotomo
     
     
     helper Apotomo::ViewHelper
-
+    
+    cattr_reader :current_widget
+    
 
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.
@@ -391,9 +393,6 @@ module Apotomo
     end
     
     
-    def self.current_widget
-      @@current_cell
-    end
     
     
     

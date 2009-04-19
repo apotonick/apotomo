@@ -8,7 +8,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 #    end
 #  end
   
-class ViewHelperTest < Test::Unit::TestCase
+class ViewHelperTest < ActionView::TestCase
   include Apotomo::UnitTestCase
   
   include Apotomo::ViewHelper
@@ -22,11 +22,15 @@ class ViewHelperTest < Test::Unit::TestCase
   include ApplicationHelper
     
   
-  def is_haml?; false; end  ### FIXME: this seems to be a problem with rails/haml.
-  #def _erbout();end
-  def protect_against_forgery?; false; end  ### needed in rails 2.1.
+  def test_link_tag_without_host_option
+    ActionController::Base.class_eval { attr_accessor :url }
+    url = {:controller => 'weblog', :action => 'show'}
+    @controller = ActionController::Base.new
+    @controller.request = ActionController::TestRequest.new
+    @controller.url = ActionController::UrlRewriter.new(@controller.request, url)
+    assert_dom_equal(%q{<a href="/weblog/show">Test Link</a>}, link_to('Test Link', url))
+  end
   
-  # extend StatefulWidget for testing purposes.
   
 
   
@@ -36,7 +40,33 @@ class ViewHelperTest < Test::Unit::TestCase
   
   
   def setup
-    super
+    Apotomo::StatefulWidget.class_eval { cattr_accessor :current_widget }
+    
+    
+    ### FIXME: copied from rails-2.3/actionpack/url_helper_test.rb
+    ###   found no other way to test methods relying on #url_for due to rails' paucity
+    ###   of an internal API, and too many dependencies on instance vars instead of arguments
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    @controller = Class.new do
+      def url_for(options)
+        url         =  "http://www.apotomo.de/"
+        action      = options[:action]      || :drink
+        controller  = options[:controller]  || :beers
+        
+        url << "#{controller}/#{action}"
+        
+        return url unless options
+        
+        options.delete(:only_path)
+        options.delete(:controller)
+        options.delete(:action)        
+        
+        url << "?" + options.sort{|a,b| a.to_s <=> b.to_s}.collect {|e| "#{e.first}=#{e.last}"}.join("&") unless options.blank?
+        url
+      end
+    end.new
+    
     
     @a = Apotomo::StatefulWidget.new(@controller, 'a')
     @b = Apotomo::StatefulWidget.new(@controller, 'b')
@@ -45,75 +75,61 @@ class ViewHelperTest < Test::Unit::TestCase
     @a << @c
   end
   
+  def protect_against_forgery?
+    false
+  end
+  
   # test Apotomo::ViewHelper methods --------------------------
   
   def test_current_tree
-    @a.invoke
-    #Apotomo::StatefulWidget.set_current_widget=(@a)
+    Apotomo::StatefulWidget.current_widget = @a
     assert_equal @a, current_tree # --> #current_tree should return the root.
   end
   
   
   def test_target_widget_for
-    @a.invoke
-    #Apotomo::StatefulWidget.set_current_widget = @a
+    Apotomo::StatefulWidget.current_widget = @a
     assert_equal target_widget_for(), @a
     assert_equal target_widget_for('b'), @b
   end
   
   
   def test_static_link_to_widget
-    get :index
-    @a.invoke
-    #Apotomo::StatefulWidget.set_current_widget = @a
-    l = static_link_to_widget("Static Link")
-    puts l
-    assert_no_match /onclick=/, l
-  end
-  
-  def test_static_link_to_widget_with_controller
-    get :index
-    @a.invoke
-    #Apotomo::StatefulWidget.set_current_widget = @a
-    l = static_link_to_widget("Static Link", false, :controller => 'user')
-    assert_match /\/user/, l
+    Apotomo::StatefulWidget.current_widget = @a
+    
+    # address current widget ----------------------------------
+    assert_dom_equal "<a href=\"http://www.apotomo.de/beers/drink\">Static Link</a>",
+      static_link_to_widget("Static Link")
+    
+    # explicitly define controller ----------------------------
+    assert_dom_equal "<a href=\"http://www.apotomo.de/milk/drink\">Static Link</a>",
+      static_link_to_widget("Static Link", false, :controller => 'milk')
   end
   
   def test_link_to_widget
-    get :index
-    @c.invoke
-    #Apotomo::StatefulWidget.set_current_widget = @c
-    l = link_to_widget("Static Link")
-    assert_no_match /static=/, l
-    assert_match /c_address=important/, l
+    Apotomo::StatefulWidget.current_widget = @c
+    
+    assert_dom_equal "<a href=\"http://www.apotomo.de/beers/drink?c_address=important\" onclick=\"new Ajax.Request('http://www.apotomo.de/beers/drink?apotomo_action=event&amp;c_address=important&amp;source=c&amp;type=redrawApp', {asynchronous:true, evalScripts:true}); return false;\">Hybrid Link</a>",
+      link_to_widget("Hybrid Link")
   end
   
-  def test_link_to_event
-    get :index
-    @a.invoke
-    #Apotomo::StatefulWidget.set_current_widget = @a
+  
+  def test_link_to_event    
+    Apotomo::StatefulWidget.current_widget = @c
+    
     
     # test explicit source ------------------------------------
-    l = link_to_event("Event Link", :source => 'b')
-    assert_match /source=b/, l
-    assert_no_match /source=a/, l
+    assert_dom_equal "<a href=\"#\" onclick=\"new Ajax.Request('http://www.apotomo.de/beers/drink?apotomo_action=event&amp;source=b&amp;type=put', {asynchronous:true, evalScripts:true}); return false;\">Event Link</a>",
+      link_to_event("Event Link", :source => 'b', :type => :put)
+    
     
     # test default source widget ------------------------------
-    l = link_to_event("Event Link")
-    assert_match /source=a/, l
-    assert_no_match /source=b/, l
-    # test implicit type --------------------------------------
-    assert_match /type=a_/, l
-    
-    # test explicit type --------------------------------------
-    l = link_to_event("Event Link", :type => :click)
-    assert_match /type=click/, l
+    assert_dom_equal "<a href=\"#\" onclick=\"new Ajax.Request('http://www.apotomo.de/beers/drink?apotomo_action=event&amp;source=c&amp;type=put', {asynchronous:true, evalScripts:true}); return false;\">Event Link</a>",
+      link_to_event("Event Link", :type => :put)
   end
   
   def test_form_to_event
-    get :index
-    @b.invoke
-    #Apotomo::StatefulWidget.set_current_widget = @b
+    Apotomo::StatefulWidget.current_widget = @b
     
     # test default source -------------------------------------
     l = form_to_event
@@ -135,8 +151,7 @@ class ViewHelperTest < Test::Unit::TestCase
   
   
   def test_address_to_event
-    @a.invoke
-    #Apotomo::StatefulWidget.set_current_widget = @a
+    Apotomo::StatefulWidget.current_widget = @a
         
     addr = address_to_event()
     assert addr[:source], 'a'
@@ -147,7 +162,6 @@ class ViewHelperTest < Test::Unit::TestCase
     addr = address_to_event(:param_1 => 'one')
     assert addr[:source],  'a'
     assert addr[:param_1],    'one'
-    
   end
   
   
