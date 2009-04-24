@@ -19,20 +19,28 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-class ApotomoUnitTestController < ApplicationController
+class UrlMockController < ActionController::Base
+  include Apotomo::ControllerMethods
   def rescue_action(e) raise e end
   
   def index; render :text => ""; end
+  
+  def url_for(options)
+    url         =  "http://www.apotomo.de/"
+    action      = options[:action]      || :drink
+    controller  = options[:controller]  || :beers
+    
+    url << "#{controller}/#{action}"
+    
+    return url unless options
+    
+    options.delete(:only_path)
+    options.delete(:controller)
+    options.delete(:action)        
+    
+    url << "?" + options.sort{|a,b| a.to_s <=> b.to_s}.collect {|e| "#{e.first}=#{e.last}"}.join("&") unless options.blank?
+    url
+  end
 end
 
 module Apotomo::UnitTestCase
@@ -44,7 +52,7 @@ module Apotomo::UnitTestCase
   
   
   def setup
-    @controller = ApotomoUnitTestController.new
+    @controller = UrlMockController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     @controller.request   = @request

@@ -28,7 +28,7 @@ end
 
 
 
-class TabPanelTest < Test::Unit::TestCase
+class TabPanelTest < ActionController::TestCase
   include Apotomo::UnitTestCase
   
   def test_tab_panel

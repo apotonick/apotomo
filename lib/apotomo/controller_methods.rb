@@ -1,12 +1,53 @@
-module Apotomo
-  module ControllerMethods
-    
+  module Apotomo
+    module ControllerMethods
+      
+      def use_widgets(widget = nil)
+        widget_tree.root << widget
+        puts widget.root.children do |c|
+          puts c.to_s
+        end
+        
+        puts widget.root.find_by_id('my_grid').to_s
+
+      end
+      
+      
+      def self.included(base) #:nodoc:
+        base.class_eval do
+          extend ClassMethods
+        end
+      end
+      
+      module ClassMethods
+        def has_widgets(widget=nil)
+          if block_given?
+            return
+          end
+          
+          return
+          ApplicationWidgetTree.new().draw_tree.root << widget
+        end
+  
+        def responds_to_event(type, options)
+        end
+      end
+      
+      
+      attr_writer :apotomo_default_url_options
+      def apotomo_default_url_options
+        @apotomo_default_url_options ||= {}
+      end
+      
+  
     # outgoing rendering --------------------------------------------------------
     
     
     # Renders the widget named <tt>widget_id</tt> from the ApplicationWidgetTree
     # into the controller action. Additionally activates event processing for this
     # widget and all its children.
+    #--
+    # NOTE: defaults to :layout => true
+    #--
     def act_as_widget(widget_id, options={})
       # create tree (new/from store)...
       
@@ -17,29 +58,36 @@ module Apotomo
         return
       end
       
-      options_for_action = {}
+      options_for_action = {:layout => true}  # same setting as when rendering an action
       options_for_action[:layout] = options.delete(:layout) if options.key?(:layout)
       options_for_action[:text]   = render_widget_from_tree(widget_id, options)
       
       render options_for_action
     end
     
+    # :process is true by default.
+    def render_widget(widget_id, options={}, &block)
+      process_events = options.key?(:process_events) ? options.delete(:process_events) : true
+      
+      if process_events
+        apotomo_default_url_options[:action] = :render_event_response
+      end
+        
+      render_widget_from_tree(widget_id, options, &block)
+    end
     
     ### TODO: put it in WidgetTree or somewhere else, as it's not a controller 
     ###   helper.
     # Finds the widget named <tt>widget_id</tt> and renders it.
-    def render_widget_from_tree(widget_id, opts={})      
-      if thaw_tree? and session['apotomo_widget_tree']
-        root = thaw_tree
-      else
-        tree = widget_tree_class.new(self)
-        root = tree.draw_tree
-      end
+    def render_widget_from_tree(widget_id, opts={}, &block)      
+      root = widget_tree
       
       target  = root.find_by_path(widget_id)
       target.opts = opts unless opts.empty?
       
-      content = target.render_content
+      #yield target
+      
+      content = target.render_content &block
       #session['apotomo_widget_tree'] = root
       
       
@@ -49,6 +97,18 @@ module Apotomo
       
       return content
     end
+    
+    ### FIXME: rethink tree.draw_tree
+    def widget_tree
+      if thaw_tree? and session['apotomo_widget_tree']
+        root = thaw_tree
+      else
+        tree = widget_tree_class.new(self)
+        root = tree.draw_tree
+      end
+      root
+    end
+    
     
     # If true, the widget tree is reloaded during runtime, even if it was already frozen
     # before. Reloading creates and runs ApplicationWidgetTree#draw.
@@ -60,17 +120,6 @@ module Apotomo
     end
     def thaw_tree?; ! redraw_tree?; end
     
-    
-    # :process is true by default.
-    def render_widget(widget_id, options={})
-      process_events = options.key?(:process_events) ? options.delete(:process_events) : true
-      
-      if process_events
-        Apotomo::StatefulWidget.default_url_options[:action] = :render_event_response
-      end
-        
-      render_widget_from_tree(widget_id, options)
-    end
     
     def widget_event?
       params['apotomo_action']

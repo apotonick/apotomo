@@ -43,7 +43,7 @@ class PersistenceTest < ActionController::TestCase
   end
   
   
-  include Apotomo::ControllerHelper ### TODO: move to UnitTest helper.
+  include Apotomo::ControllerMethods ### TODO: move to UnitTest helper.
   # tests if variable referencing is frozen/thawed correctly, especially if
   # some widget instance var points to a var in session and another widget 
   # updates it, they should both still point to the same object.

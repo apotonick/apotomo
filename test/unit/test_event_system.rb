@@ -13,6 +13,7 @@ class TestWidget < Apotomo::StatefulWidget
   
   def fireing_state
     trigger(:click)
+    ""
   end
   
   def fireman_state

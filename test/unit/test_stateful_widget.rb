@@ -9,7 +9,7 @@ class MyTestCell < Apotomo::StatefulWidget
 end
 
 
-class StatefulWidgetTest < Test::Unit::TestCase
+class StatefulWidgetTest < ActionController::TestCase
   include Apotomo::UnitTestCase
   
   def test_visibility

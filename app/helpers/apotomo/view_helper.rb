@@ -6,13 +6,15 @@ module Apotomo
     #   display the targeted widget when re-rendering the screen.
     
     def target_widget_for(widget_id=false)
-      widget_id ? current_tree.find_by_path(widget_id) : Apotomo::StatefulWidget.current_widget
+      widget_id ? current_tree.find_by_path(widget_id) : @cell
     end
     
     
     def current_tree
-      Apotomo::StatefulWidget.current_widget.root
+      @cell.root
     end
+    
+    
     
         
     # Returns the address hash to the event controller and the targeted widget.
@@ -36,7 +38,7 @@ module Apotomo
       # only set param in address when there really is one provided as default or as arg.
       # otherwise, let #url_for handle this.
       [:controller, :action].each do |param|
-        next unless value = Apotomo::StatefulWidget.default_url_options[param]
+        next unless value = @controller.apotomo_default_url_options[param]
         way[param] ||= value # args in way have precedence.
       end
       

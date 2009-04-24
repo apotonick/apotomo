@@ -23,15 +23,14 @@ class ViewHelperTest < ActionView::TestCase
   
   
   def setup
-    Apotomo::StatefulWidget.class_eval { cattr_accessor :current_widget }
-    
-    
     ### FIXME: copied from rails-2.3/actionpack/url_helper_test.rb
     ###   found no other way to test methods relying on #url_for due to rails' paucity
     ###   of an internal API, and too many dependencies on instance vars instead of arguments
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
     @controller = Class.new do
+      include Apotomo::ControllerMethods
+      
       def url_for(options)
         url         =  "http://www.apotomo.de/"
         action      = options[:action]      || :drink
@@ -58,10 +57,6 @@ class ViewHelperTest < ActionView::TestCase
     @a << @c
   end
   
-  def teardown
-    Apotomo::StatefulWidget.default_url_options = {}
-  end
-  
   def protect_against_forgery?
     false
   end
@@ -69,20 +64,20 @@ class ViewHelperTest < ActionView::TestCase
   # test Apotomo::ViewHelper methods --------------------------
   
   def test_current_tree
-    Apotomo::StatefulWidget.current_widget = @a
+    @cell =  @a
     assert_equal @a, current_tree # --> #current_tree should return the root.
   end
   
   
   def test_target_widget_for
-    Apotomo::StatefulWidget.current_widget = @a
+    @cell =  @a
     assert_equal target_widget_for(), @a
     assert_equal target_widget_for('b'), @b
   end
   
   
   def test_static_link_to_widget
-    Apotomo::StatefulWidget.current_widget = @a
+    @cell =  @a
     
     # address current widget ----------------------------------
     assert_dom_equal "<a href=\"http://www.apotomo.de/beers/drink\">Static Link</a>",
@@ -94,7 +89,7 @@ class ViewHelperTest < ActionView::TestCase
   end
   
   def test_link_to_widget
-    Apotomo::StatefulWidget.current_widget = @c
+    @cell =  @c
     
     assert_dom_equal "<a href=\"http://www.apotomo.de/beers/drink?c_address=important\" onclick=\"new Ajax.Request('http://www.apotomo.de/beers/drink?apotomo_action=event&amp;c_address=important&amp;source=c&amp;type=redrawApp', {asynchronous:true, evalScripts:true}); return false;\">Hybrid Link</a>",
       link_to_widget("Hybrid Link")
@@ -102,7 +97,7 @@ class ViewHelperTest < ActionView::TestCase
   
   
   def test_link_to_event    
-    Apotomo::StatefulWidget.current_widget = @c
+    @cell =  @c
     
     
     # test explicit source ------------------------------------
@@ -116,7 +111,7 @@ class ViewHelperTest < ActionView::TestCase
   end
   
   def test_form_to_event
-    Apotomo::StatefulWidget.current_widget = @b
+    @cell =  @b
     
     # test default source -------------------------------------
     l = form_to_event
@@ -138,7 +133,7 @@ class ViewHelperTest < ActionView::TestCase
   
   
   def test_address_to_event
-    Apotomo::StatefulWidget.current_widget = @a
+    @cell =  @a
         
     addr = address_to_event()
     assert_equal addr[:source], 'a'
@@ -152,26 +147,26 @@ class ViewHelperTest < ActionView::TestCase
   end
   
   def test_address_to_event_with_default_url_options
-    Apotomo::StatefulWidget.current_widget = @a
+    @cell =  @a
     
     # test implicit behaviour, with no :action set ------------
     addr = address_to_event
     assert_nil addr[:action]
     
     # set :action ---------------------------------------------
-    Apotomo::StatefulWidget.default_url_options = {:action => :my_process_event}
+    @controller.apotomo_default_url_options = {:action => :my_process_event}
     addr = address_to_event()
     assert_equal  :my_process_event, addr[:action]
     assert_nil    addr[:controller]
     
     # set :action and :controller -----------------------------
-    Apotomo::StatefulWidget.default_url_options = {:action => :my_process_event, :controller => :beers}
+    @controller.apotomo_default_url_options = {:action => :my_process_event, :controller => :beers}
     addr = address_to_event
     assert_equal  :my_process_event,  addr[:action]
     assert_equal  :beers,             addr[:controller]
     
     # set both but pass in :action as arg ---------------------
-    Apotomo::StatefulWidget.default_url_options = {:action => :my_process_event, :controller => :beers}
+    @controller.apotomo_default_url_options = {:action => :my_process_event, :controller => :beers}
     addr = address_to_event(:action => :another_process_event)
     assert_equal  :another_process_event, addr[:action]
     assert_equal  :beers,                 addr[:controller]

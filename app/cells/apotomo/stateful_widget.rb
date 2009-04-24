@@ -64,10 +64,6 @@ module Apotomo
     
     helper Apotomo::ViewHelper
     
-    ### DISCUSS: should be protected, set in #render_widget/#act_as_widget:
-    cattr_accessor :current_widget, :default_url_options
-    @@default_url_options = {}
-    
 
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.
@@ -82,6 +78,7 @@ module Apotomo
       @version      = 0
       @last_state   = nil
       @ivars_before = nil
+      @invoke_block = nil
             
       reset_rendering_ivars!    ### DISCUSS: called twice, see #render_content_for_state.
       
@@ -104,7 +101,7 @@ module Apotomo
     end
     
     def unfreezeable_ivars
-      ['@childrenHash', '@children', '@parent', '@controller', '@cell']
+      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block']
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.
@@ -140,13 +137,13 @@ module Apotomo
     # See #invoke_state.
     
     ### DISCUSS: state is input in FSM speech, or event.
-    def invoke(input=nil)
+    def invoke(input=nil, &block)
+      @invoke_block = block ### DISCUSS: store block so we don't have to pass it 10 times?
       puts "\ninvoke on #{name} with #{input.inspect}"
 
       if input.to_s == "*"
         @is_f5_fixme = true
         input= start_state_for_state(last_state)
-        #flush_brain
         puts "F5, going back to #{input}"
       end
       
@@ -205,10 +202,7 @@ module Apotomo
     # called in Cell::Base#render_state
     def dispatch_state(state)
       reset_rendering_ivars!
-      
-      content = super(state)  # maybe there's a state jump in here and we're out.
-      
-      
+      content = send(state, &@invoke_block)  # maybe there's a state jump in here and we're out.
       
       
       puts @brain.inspect
@@ -218,22 +212,19 @@ module Apotomo
       
       
       
-      # directly return content, without framing!
+      # instantly return content, without further view rendering or framing:
       return content if content.kind_of? String
       
       
       render_children_for_state(state)
       
       
-      self.class.current_widget = self # needed in views, so set it here. ### DISCUSS: do we really need a global var? what about @cell in the view, heh?
-      
       state = @state_view if @state_view 
       content = render_view_for_state(state)  # defined in Cell::Base.
       
       frame_content(content)
-    end    
+    end
     
-
 
     # Wrap the widget's current state content into a div frame.
     def frame_content(content)
@@ -258,7 +249,6 @@ module Apotomo
 
     def render_children_for_state(state)
       children_to_render.each do |cell|
-        ### FIXME: call to state_name here SUCKS:
         child_state = decide_child_state_for(cell, state.to_sym)
 
         puts "    #{cell.name} -> #{child_state}"
@@ -288,8 +278,8 @@ module Apotomo
 
 
     # is only called when the whole page is reloaded (F5).
-    def render_content
-      invoke("*")
+    def render_content &block
+      invoke("*", &block)
     end
 
 

@@ -12,6 +12,10 @@ class ApotomoCachingTest < Test::Unit::TestCase
   
   
   def test_caching_with_instance_version_proc
+    unless ActionController::Base.cache_configured?
+      throw Exception.new "cache_configured? returned false."
+      return
+    end
     c1 = @cc.invoke
     c2 = @cc.invoke
     assert_equal c1, c2
