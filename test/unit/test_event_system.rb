@@ -43,13 +43,18 @@ end
 class EventSystemTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
+  def setup
+    super
+    @processor = Apotomo::EventProcessor.instance.init!
+  end
+  
   def test_single_widget_rendering
     w = widget(:test_widget, :simple_state, 'root')
     w.watch(:invoke, w.name, :simple_state)
     
-    evt = Apotomo::Event.new(:invoke, w.name)
+    evt = Apotomo::Event.new(:invoke, w)
       
-    puts w.invoke_for_event(evt)
+    w.invoke_for_event(evt)
     
     assert_state w, :simple_state
     assert_event :invoke, 'root'
@@ -67,7 +72,7 @@ class EventSystemTest < Test::Unit::TestCase
     w1.watch(:click, 'w3', :simple_state)
     w1.watch(:invoke, w1.name, :simple_state)
     
-    evt = Apotomo::Event.new(:invoke, w1.name)      
+    evt = Apotomo::Event.new(:invoke, w1)      
     w1.invoke_for_event(evt)
     
     assert_state w1, :fireing_state
@@ -75,21 +80,20 @@ class EventSystemTest < Test::Unit::TestCase
     assert_state w3, :following_state
     assert_event :invoke, 'w1'
     assert_event :click, 'w1'
-    assert_equal 3, Apotomo::EventProcessor.instance.processed_handlers.size
-    puts Apotomo::EventProcessor.instance.processed_handlers
+    assert_equal 3, @processor.processed_handlers.size
   end
   
   def test_processed_handlers_resetting
     w1  = widget(:test_widget, :simple_state, 'w1')
     w1.watch(:invoke, w1.name, :simple_state)
-    evt = Apotomo::Event.new(:invoke, w1.name)      
+    evt = Apotomo::Event.new(:invoke, w1)      
     w1.invoke_for_event(evt)
-    assert_equal 1, Apotomo::EventProcessor.instance.processed_handlers.size
+    assert_equal 1, @processor.processed_handlers.size
     
     # do it again! the processed_handlers queue should be reset.
-    evt = Apotomo::Event.new(:invoke, w1.name, {:state => :simple_state})      
+    evt = Apotomo::Event.new(:invoke, w1, {:state => :simple_state})      
     w1.invoke_for_event(evt)
-    assert_equal 1, Apotomo::EventProcessor.instance.processed_handlers.size
+    assert_equal 1, @processor.processed_handlers.size
   end
   
   

@@ -62,7 +62,7 @@ module Apotomo
     #--
     
     # Shortcut method for creating an Event with the respective type and 
-    # <tt>source_id</tt> and firing it, so it bubbles up from the triggering widget to
+    # <tt>source</tt> and firing it, so it bubbles up from the triggering widget to
     # the root widget.
     # 
     # Example:
@@ -71,9 +71,9 @@ module Apotomo
     def trigger(event_type, source_id=self.name)
       puts "triggered #{event_type.inspect} in #{source_id.inspect}"
       
-      event = Event.new
-      event.type = event_type
-      event.source_id = source_id
+      event         = Event.new
+      event.type    = event_type
+      event.source  = root.find_by_id(source_id)
       
       fire(event)
     end
@@ -83,21 +83,23 @@ module Apotomo
     end
     
     
+    ### DISCUSS: rename to #bubble_event or #collect_handlers_for_bubbling_event.
     def bubble_handlers_for(event, handlers=[])
-      puts "looking up callback for #{event.type}: #{event.source_id} [#{name}]"
-      local_handlers = evt_table.event_handlers_for(event.type, event.source_id)
+      puts "looking up callback for #{event.type}: #{event.source.name} [#{name}]"
+      local_handlers = evt_table.event_handlers_for(event.type, event.source.name)
       ### DISCUSS: rename to #event_handlers_for_event(event)?
       
       ### DISCUSS: instantly process handlers (pass event to them)
       ###   if target >= source stop rendering and handle event, forget the former content
       ###   EventHandler can evt.skip (keep going) or evt.stop ?
-      local_handlers.each { |h| h.event = event}
+      
       
       handlers += local_handlers
       ### DISCUSS: we always bubble up, if handlers are found or not.
       ###   should we have a stop-assignment ("veto")?
       if isRoot?
-        process_handlers(handlers)
+        # when reaching root all handlers watching the bubbling event were collected.
+        process_handlers_with_event(handlers, event)
         return
       end
       
@@ -105,8 +107,8 @@ module Apotomo
     end
     
     
-    def process_handlers(handlers)
-      Apotomo::EventProcessor.instance.queue_handlers(handlers)
+    def process_handlers_with_event(handlers, event)
+      Apotomo::EventProcessor.instance.queue_handlers_with_event(handlers, event)
     end
     
     
@@ -114,12 +116,11 @@ module Apotomo
     # Returns the filled, rendered EventHandler pipeline after all handlers have been
     # executed.
     def invoke_for_event(evt)
-      processor = Apotomo::EventProcessor.instance
-      processor.init
+      processor = Apotomo::EventProcessor.instance.init!
       
       fire(evt) # this stores the content in the EventProcessor, which is semi-clean.
       
-      return processor.process_queue_for(root, evt)
+      return processor.process_queue
     end
     
   end

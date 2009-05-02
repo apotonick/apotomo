@@ -82,7 +82,7 @@ class TabPanelTest < ActionController::TestCase
     controller.params = {'my_tab_panel_child' => "Third"}
     
     
-    evt = Apotomo::Event.new(:switchChild, p.name, {'my_tab_panel_child' => "Third"})
+    evt = Apotomo::Event.new(:switchChild, p, {'my_tab_panel_child' => "Third"})
     c = p.invoke_for_event(evt)
     
     assert_state p, :_switch
@@ -112,8 +112,8 @@ class TabPanelTest < ActionController::TestCase
   
   def test_switch_addressing
     @controller.session = {}
-    tree = SwitchTestWidgetTree.new(@controller)
-    r = tree.draw_tree.root
+    tree = SwitchTestWidgetTree.new.reconnect(@controller).init!
+    r = tree.root
     
     child1  = r.find_by_id('first_child')
     child2  = r.find_by_id('second_child')

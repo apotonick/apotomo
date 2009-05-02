@@ -1,14 +1,20 @@
   module Apotomo
     module ControllerMethods
       
-      def use_widgets(widget = nil)
-        widget_tree.root << widget
-        puts widget.root.children do |c|
-          puts c.to_s
-        end
+      def use_widget(widget)
+        ### TODO: provide support for blocks in #use_widgets.
+        return if apotomo_root.children.find do |w| w.name == widget.name end
         
-        puts widget.root.find_by_id('my_grid').to_s
-
+        apotomo_root << widget
+      end
+        
+      def respond_to_event(type, options)
+        #widget_tree = WidgetTree.instance.reconnect(self)
+        handler = ProcEventHandler.new
+        handler.proc = options[:with]
+        puts "setting #{options[:with].inspect}"
+        ### TODO: pass :from => (event source).
+        apotomo_root.evt_table.add_handler_for(handler, type)
       end
       
       
@@ -17,6 +23,7 @@
           extend ClassMethods
         end
       end
+      
       
       module ClassMethods
         def has_widgets(widget=nil)
@@ -80,9 +87,7 @@
     ###   helper.
     # Finds the widget named <tt>widget_id</tt> and renders it.
     def render_widget_from_tree(widget_id, opts={}, &block)      
-      root = widget_tree
-      
-      target  = root.find_by_path(widget_id)
+      target  = apotomo_root.find_by_path(widget_id)
       target.opts = opts unless opts.empty?
       
       #yield target
@@ -91,22 +96,30 @@
       #session['apotomo_widget_tree'] = root
       
       
-      freeze_tree(root)
+      freeze_tree(apotomo_root)
       
       
       
       return content
     end
     
-    ### FIXME: rethink tree.draw_tree
-    def widget_tree
+    
+    
+    attr_writer :apotomo_root
+    def apotomo_root
+      return @apotomo_root if @apotomo_root # should be default.
+      
+      # this is executed once per request:
       if thaw_tree? and session['apotomo_widget_tree']
-        root = thaw_tree
+        @apotomo_root = thaw_tree ### FIXME: should return the WidgetTree, so we can call #reconnect.
       else
-        tree = widget_tree_class.new(self)
-        root = tree.draw_tree
+        tree = Apotomo::WidgetTree.new.reconnect(self).init!
+        ### DISCUSS: introduce flag to enable?
+        tree.include_application_widget_tree! #if Object.const_defined? :ApplicationWidgetTree
+        @apotomo_root = tree.root
       end
-      root
+      
+      return @apotomo_root
     end
     
     
@@ -131,8 +144,6 @@
     end
     
     
-    def widget_tree_class; ::ApplicationWidgetTree; end
-    
     ### TODO: put next two methods in Apotomo::WidgetTree or so. ---------------
     ###   or at least private
     def freeze_tree_for(root, storage, controller=nil)
@@ -143,6 +154,10 @@
       root.freeze_instance_vars_to_storage(storage['apotomo_widget_content'])
     end
     def thaw_tree_for(storage, controller)
+    puts "++++++++++++++++++ thaaaaaaaaaawing"
+    
+    ### FIXME: reconnect here? get rid of each below?
+    
       # get widget structure from session:
       tree = storage['apotomo_widget_tree'].root
       # set widget instance variables from session:
@@ -168,26 +183,14 @@
     #--
     
     def process_event_request(action)
-      #tree      = ::ApplicationWidgetTree.new(self).draw_tree.root
       puts "restoring *dynamic*  widget_tree from session."
       
       tree = thaw_tree
       
       
-      #tree = session['apotomo_widget_tree'] 
-      
-      
       source  = tree.find_by_id(params[:source])
-      evt     = Event.new(params[:type], source.name) # type is :invoke per default.
-      
-      ### NOTE: this will be removed when the WidgetTree is fully dynamic.
-      if evt.type == :invoke
-        raise "deprecated"
-        evt.data={:state => params[:state].to_sym}   
-        ### FIXME: this is InvokeEvent specific and
-        ### currently is only needed for explicit invoke(:some_state). 
-        ### usually the next state should be found automatically.
-      end
+      evt     = Event.new(params[:type], source) # type is :invoke per default.
+      ### FIXME: let trigger handle event creation!!!
       
       
       #tree.find_by_id(params[:source]).fire(evt)
@@ -197,6 +200,7 @@
 
       #session['apotomo_widget_tree'] = tree
       #puts "saving tree in session."
+
       freeze_tree(tree)
       
       
@@ -217,11 +221,12 @@
     def render_page_update_for(processed_handlers)
       render :update do |page|
         
-        processed_handlers.each do |handler|
+        processed_handlers.each do |item|
+        (handler, content) = item
           ### DISCUSS: i don't like that switch, but moving this behaviour into the
           ###   actual handler is too complicated, as we just need replace and exec.
-          content = handler.content
-          next unless content ### DISCUSS: move this decision into processed_handlers#each.
+          #content = handler.content
+          next unless content ### DISCUSS: move this decision into EventHandler#process_event_for(page).
 
           if content.class == String
             page.replace handler.widget_id, content
@@ -237,15 +242,17 @@
     def render_data_for(processed_handlers)
       #puts "returning #{processed_handlers.first.content}"
       ### TODO: what if more events have been attached, smart boy?
-      render :text => processed_handlers.first.content
+      (handler, content) = processed_handlers.first
+      
+      render :text => content
     end
     
     
     def render_iframe_update_for(processed_handlers)
       script = ""
     
-      processed_handlers.each do |handler|
-          content = handler.content
+      processed_handlers.each do |handler, content|
+          #content = handler.content
           next unless content
 
           if content.class == String

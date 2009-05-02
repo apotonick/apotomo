@@ -13,7 +13,7 @@ class ApotomoCachingTest < Test::Unit::TestCase
   
   def test_caching_with_instance_version_proc
     unless ActionController::Base.cache_configured?
-      throw Exception.new "cache_configured? returned false."
+      throw Exception.new "cache_configured? returned false. You may enable caching in your config/environments/test.rb to make this test pass."
       return
     end
     c1 = @cc.invoke

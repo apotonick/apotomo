@@ -101,7 +101,7 @@ module Apotomo
     end
     
     def unfreezeable_ivars
-      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block']
+      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block', '@ivars_before', '@rendered_children']
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.
@@ -424,10 +424,10 @@ module Apotomo
     children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }
   end
   def thaw_instance_vars_from_storage(storage)
-    #puts "thawing in #{path}"
+    puts "thawing in #{path}"
     storage[path].each do |k, v|
       instance_variable_set(k, v)
-      #puts "  set #{k}: #{v}"
+      puts "  set #{k}: #{v}"
     end
     
     children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }

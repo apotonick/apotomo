@@ -6,7 +6,7 @@ module Apotomo
       puts "ProcEventHandler: calling #{@proc}"
       #@proc.call(event)
       event.source.controller.send(@proc, event)
-      self
+      nil ### DISCUSS: needed so that controller doesn't evaluate the "content".
     end
     
     def to_s; "ProcEventHandler:#{proc}"; end

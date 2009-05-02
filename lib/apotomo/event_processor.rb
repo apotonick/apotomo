@@ -1,4 +1,4 @@
-require 'singleton'
+#require 'singleton'
 
 module Apotomo
   # Implements a pipeline for EventHandlers to be executed.
@@ -14,61 +14,52 @@ module Apotomo
     include Singleton
     attr_accessor :queue, :already_processed, :processed_handlers
     
-    #def initialize(evt_table, controller)
     def initialize
-      #@evt_table = evt_table
-      #@controller = controller
-      init
+      init!
     end
     
-    def init
+    def init!
       @processed_handlers = []
-      @already_processed = {}
       @queue = []
+      self
     end
     
+    def processed; processed_handlers;end
     
-    def process_handlers_for(handlers, tree, page=nil)
-      #puts already_processed.inspect
-      handlers.each do |handler|
-        #puts handler.inspect
-        #puts
-        #next if already_processed[handler.widget_id.to_s + "-" + handler.state.to_s]
-        process_handler_for(handler, tree, page)
-      end
+    def process_handler_for_event(handler, event)
+      puts "processing EVENT HANDLER: #{handler}"
       
-      #puts "queue:"
-      #puts handlers.inspect
-      #  puts
-    end
-    
-    
-    def process_handler_for(handler, tree, page=nil)
-      return if already_processed[handler.widget_id.to_s + "-" + handler.state.to_s]
-      puts "processing PAGE handler: #{handler.widget_id}-#{handler.state}"
+      content = handler.process_event(event)
       
-      processed = handler.process_for(tree, page)
-      
-      already_processed["#{handler.widget_id}-#{handler.state}"] = true
-      processed_handlers << processed
+      processed_handlers << [handler, content]
+    end
+    
+    def queue_handler_with_event(handler, event)
+      puts "queueing... #{event.type}: #{handler.to_s}"
+      self.queue << [handler, event]
     end
     
     
-    
-    def queue_handler(handler)
-      puts "queueing... #{handler.widget_id}->#{handler.state}"
-      self.queue << handler
-    end
-    def queue_handlers(handlers)
-      handlers.each {|h| queue_handler(h)}
+    def queue_handlers_with_event(handlers, event)
+      handlers.each do |h| queue_handler_with_event(h, event) end
     end
     
     
-    ### DISCUSS: right now, page is not used since widgets shouldn't fiddle around with
-    ###   RJS.
-    def process_queue_for(tree, page=nil)
-      process_handlers_for(self.queue, tree, page)
+    ### DISCUSS: merge with #process_handlers_for ?
+    def process_queue
+      process_handlers_for(self.queue)
       return processed_handlers
+    end
+    
+    def process_handlers_for(queue)
+      queue.each do |action|
+        (handler, event) = action.first, action.last
+        
+        ### DISCUSS: do we need to provide handler loop protection?
+        #next if processed_handlers.include?(handler)
+        
+        process_handler_for_event(handler, event)
+      end
     end
   end
 

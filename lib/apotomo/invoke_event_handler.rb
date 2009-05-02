@@ -11,9 +11,8 @@ module Apotomo
       ###   pass additional opts to #invoke?
       ### DISCUSS: pass block here?
       target.opts[:event] = event
-      @content = target.invoke(state)
       
-      self
+      target.invoke(state)
     end
     
     def to_s; "InvokeEventHandler:#{widget_id}##{state}"; end

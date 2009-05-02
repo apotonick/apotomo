@@ -20,12 +20,13 @@ class EventProcessorTest < Test::Unit::TestCase
     e.source = cell(:rendering_test, :widget_content, 'test_widget')
     
     p.queue_handler_with_event h, e
+    
     p.queue_handler_with_event h2, e
     processed = p.process_queue
     
     assert_equal 2,   processed.size
-    assert_equal h,   processed.first
-    assert_equal h2,  processed.second
+    assert_equal h,   processed.first.first
+    assert_equal h2,  processed.second.first
   end
   
   def test_process_queue_with_handler_loop
@@ -46,9 +47,12 @@ class EventProcessorTest < Test::Unit::TestCase
     p.queue_handlers_with_event [h, h2, h], e
     processed = p.process_queue
     
-    assert_equal 2,   processed.size
-    assert_equal h,   processed.first
-    assert_equal h2,  processed.second
+    #assert_equal 2,   processed.size
+    assert_equal 3,   processed.size
+    (handler, c) = processed.first
+    assert_equal h,   handler
+    (handler, c) = processed.second
+    assert_equal h2,  handler
   end
   
   

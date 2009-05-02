@@ -23,3 +23,4 @@
 
 module Apotomo
 end
+

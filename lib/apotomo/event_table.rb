@@ -17,7 +17,7 @@ module Apotomo
     
     # Attach an event handler which invokes a widget state.
     def monitor(evt_type, observed_widget_id, target_widget_id, target_state)
-      handler = EventHandler.new
+      handler = InvokeEventHandler.new
       handler.widget_id = target_widget_id
       handler.state     = target_state
       
