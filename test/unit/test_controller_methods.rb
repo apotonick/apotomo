@@ -51,13 +51,6 @@ class WidgetController < ActionController::Base
   
 end
 
-class RemoveAApplicationWidgetTree < Apotomo::WidgetTree
-  def draw(root)
-    root << cell(:rendering_test, :widget_content, 'my_widget')
-  end
-  
-  
-end
 
 class ControllerMethodsTest < ActionController::TestCase
   include Apotomo::UnitTestCase
@@ -81,9 +74,7 @@ class ControllerMethodsTest < ActionController::TestCase
   #  hibernate_tree(r)
   #  #Marshal.load(Marshal.dump(r))                                
   #end  
-    
-    
-    
+  
   def test_custom_apotomo_accessors
     @controller = WidgetController.new
     # default behaviour: -------------------------------------
@@ -92,12 +83,14 @@ class ControllerMethodsTest < ActionController::TestCase
   
   def test_use_widgets
     # create an empty tree:
-    Apotomo::WidgetTree.class_eval do
+    ApplicationWidgetTree.class_eval do
       def draw(root)
       end
     end
-    r = Apotomo::WidgetTree.new.reconnect(@controller).init!.root
-    @controller.apotomo_root = r
+    r = apotomo_root_mock
+    @controller.instance_eval do
+      @apotomo_root = r
+    end
     
     
     assert ! r.find_by_id('my_grid')
@@ -109,12 +102,10 @@ class ControllerMethodsTest < ActionController::TestCase
     assert_equal 1, r.children.collect{ |w| w.name == 'my_grid' }.size
   end
   
+
   def test_apotomo_root
-    # create an empty tree:
-    Apotomo::WidgetTree.class_eval do
-      def draw(root); end
-    end
-    ::ApplicationWidgetTree.class_eval do
+    ApplicationWidgetTree.class_eval do
+      include Apotomo::WidgetShortcuts
       def draw(root)
         root << widget('apotomo/stateful_widget', :widget_content, 'widget_in_app_tree')
       end

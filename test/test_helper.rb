@@ -21,6 +21,11 @@ end
 
 class UrlMockController < ActionController::Base
   include Apotomo::ControllerMethods
+  
+  include Apotomo::WidgetShortcuts
+  
+  def controller;self;end
+  
   def rescue_action(e) raise e end
   
   def index; render :text => ""; end
@@ -67,17 +72,20 @@ module Apotomo::UnitTestCase
   
   # Simulate a request-cycle end and the start of a new request. The tree is returned  
   # exactly as if there had been a new request and Rails handled the session thawing.
-  def hibernate_tree(tree)
-    freeze_tree_for(tree, session)
+  def hibernate_widget(widget)
+    session['apotomo_widget_content'] = {}
+    widget.freeze_instance_vars_to_storage(session['apotomo_widget_content'])
+    session['apotomo_root'] = widget
     
-    # simulate CGI::Session's marshaling:
-    dumped_tree = Marshal.dump(session['apotomo_widget_tree'])
-    session['apotomo_widget_tree'] = Marshal.load(dumped_tree)
-    
-    return thaw_tree_for(session, controller)
+    widget = Marshal.load(Marshal.dump(session))['apotomo_root']
+    widget.thaw_instance_vars_from_storage(session['apotomo_widget_content'])
+    widget.controller = @controller
+    widget
   end
   
-  
+  def apotomo_root_mock
+    widget('apotomo/stateful_widget', :widget_content, '__root__')
+  end
   
   
   # assertions ------------------------------------------------------------------

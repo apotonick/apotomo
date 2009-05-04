@@ -48,7 +48,9 @@ class EventTableTest < Test::Unit::TestCase
   
   
   def tree
-    EventTableWidgetTree.new.reconnect(@controller).init!.root
+    r = apotomo_root_mock
+    EventTableWidgetTree.new.draw(r)
+    r
   end
   
   

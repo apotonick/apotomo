@@ -64,7 +64,7 @@ module Apotomo
     
     helper Apotomo::ViewHelper
     
-
+attr_writer :controller
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.
     attr_reader :last_brain
@@ -220,6 +220,10 @@ module Apotomo
       
       
       state = @state_view if @state_view 
+      ### FIXME: we need to expose @controller here for several helper method. that sucks!
+      @controller =root.controller
+      
+      
       content = render_view_for_state(state)  # defined in Cell::Base.
       
       frame_content(content)
@@ -414,11 +418,11 @@ module Apotomo
   ### DISCUSS: taking the path as key slightly blows up the session.
   #--
   def freeze_instance_vars_to_storage(storage)
-    #puts "freezing in #{path}"
+    puts "freezing in #{path}"
     storage[path] = {}  ### DISCUSS: check if we overwrite stuff?
     (self.instance_variables - ivars_to_forget).each do |var|
       storage[path][var] = instance_variable_get(var)
-      #puts "  #{var}: "
+      #puts "  #{var}: #{storage[path][var]}"
     end
     
     children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }

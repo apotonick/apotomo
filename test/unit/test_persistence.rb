@@ -27,15 +27,13 @@ class PersistenceTest < ActionController::TestCase
     assert_state s, :read_shared
     
     
-    freeze_tree_for(m, session)
-    puts " --------- new request ---------"
-    m = thaw_tree_for(session, controller)
+    m = hibernate_widget(m)
     
     
     m.invoke(:reset_shared)
     
     s = m.find_by_id('slave')
-    
+    puts s
     assert_equal m.my_shared.value, "second value"
     assert_state m, :reset_shared
     assert_equal s.my_shared.value, "second value"
@@ -58,9 +56,8 @@ class PersistenceTest < ActionController::TestCase
     assert_equal s.my_shared.value, "value from session"
     assert_state s, :read_shared
     
-    freeze_tree_for(m, session)
+    m = hibernate_widget(m)
     puts " --------- new request ---------"
-    m = thaw_tree_for(session, controller)
     
     
     s = m.find_by_id('slave')
@@ -83,7 +80,7 @@ class PersistenceTest < ActionController::TestCase
       r << b1= cell(:my_test, :some, 'b')
         a << b2= cell(:my_test, :some, 'b')
     
-    freeze_tree_for(r, session)
+    hibernate_widget(r)
     
     assert_equal session['apotomo_widget_content'].size, 4
   end
@@ -96,12 +93,11 @@ class PersistenceTest < ActionController::TestCase
         a << b2= cell(:my_test, :some, 'b')
     
     
-    freeze_tree_for(r, session)
+    r = hibernate_widget(r)
     
-    r = thaw_tree_for(session, controller)
     r.find_by_id('b').removeFromParent!
     
-    freeze_tree_for(r, session)
+    hibernate_widget(r)
     assert_equal session['apotomo_widget_content'].size, 3
     #assert session['apotomo_widget_content'].reject?('b')
   end

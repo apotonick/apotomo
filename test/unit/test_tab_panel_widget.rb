@@ -42,7 +42,7 @@ class TabPanelTest < ActionController::TestCase
     assert_selekt c, ".TabPanel>ul>li", "First" # test tab.
     assert_selekt c, "div#my_tab_panel #First"  # test tab content.
     
-    p = hibernate_tree(p)
+    p = hibernate_widget(p)
     
     c = p.invoke
     assert_selekt c, ".TabPanel>ul>li", "First" # test tab.
@@ -59,7 +59,7 @@ class TabPanelTest < ActionController::TestCase
     c = p.invoke
     assert_state p, :switch
     
-    p = hibernate_tree(p)
+    p = hibernate_widget(p)
     controller.params = {}
     
     c = p.invoke
@@ -78,7 +78,7 @@ class TabPanelTest < ActionController::TestCase
     assert_state p, :switch
     
     # next request ------------------------------------------
-    p = hibernate_tree(p)    
+    p = hibernate_widget(p)    
     controller.params = {'my_tab_panel_child' => "Third"}
     
     
@@ -105,15 +105,15 @@ class TabPanelTest < ActionController::TestCase
     t = tab('my_id', :title => "A Title")
     assert_equal t.title, "A Title"
     
-    t = hibernate_tree(t)
+    t = hibernate_widget(t)
     assert_equal t.title, "A Title"
   end
   
   
   def test_switch_addressing
     @controller.session = {}
-    tree = SwitchTestWidgetTree.new.reconnect(@controller).init!
-    r = tree.root
+    r = apotomo_root_mock
+    tree = SwitchTestWidgetTree.new.draw(r)
     
     child1  = r.find_by_id('first_child')
     child2  = r.find_by_id('second_child')

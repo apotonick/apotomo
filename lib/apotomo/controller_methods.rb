@@ -32,7 +32,6 @@
           end
           
           return
-          ApplicationWidgetTree.new().draw_tree.root << widget
         end
   
         def responds_to_event(type, options)
@@ -93,31 +92,30 @@
       #yield target
       
       content = target.render_content &block
-      #session['apotomo_widget_tree'] = root
       
       
-      freeze_tree(apotomo_root)
-      
-      
+      freeze_apotomo_root!
       
       return content
     end
     
     
     
-    attr_writer :apotomo_root
     def apotomo_root
       return @apotomo_root if @apotomo_root # should be default.
       
       # this is executed once per request:
-      if thaw_tree? and session['apotomo_widget_tree']
-        @apotomo_root = thaw_tree ### FIXME: should return the WidgetTree, so we can call #reconnect.
+      if thaw_tree? and session['apotomo_root']
+        puts "restoring *dynamic*  widget_tree from session."
+        @apotomo_root = thaw_apotomo_root
       else
-        tree = Apotomo::WidgetTree.new.reconnect(self).init!
-        ### DISCUSS: introduce flag to enable?
-        tree.include_application_widget_tree! #if Object.const_defined? :ApplicationWidgetTree
-        @apotomo_root = tree.root
+        @apotomo_root = widget('apotomo/stateful_widget', :widget_content, '__root__')
+        
+        # mix in the application widget tree:
+        ::ApplicationWidgetTree.new.draw(@apotomo_root) ### DISCUSS: introduce flag to enable?
       end
+      
+      @apotomo_root.controller = self
       
       return @apotomo_root
     end
@@ -144,38 +142,18 @@
     end
     
     
-    ### TODO: put next two methods in Apotomo::WidgetTree or so. ---------------
-    ###   or at least private
-    def freeze_tree_for(root, storage, controller=nil)
-      # put widget structure into session:
-      storage['apotomo_widget_tree'] = root # CGI::Session calls Marshal#dump on this.
-      # put widget instance variables into session:
-      storage['apotomo_widget_content'] = {}
-      root.freeze_instance_vars_to_storage(storage['apotomo_widget_content'])
-    end
-    def thaw_tree_for(storage, controller)
-    puts "++++++++++++++++++ thaaaaaaaaaawing"
-    
-    ### FIXME: reconnect here? get rid of each below?
-    
-      # get widget structure from session:
-      tree = storage['apotomo_widget_tree'].root
-      # set widget instance variables from session:
-      tree.thaw_instance_vars_from_storage(storage['apotomo_widget_content'])
+    def freeze_apotomo_root!
+      session['apotomo_root']           = apotomo_root
+      session['apotomo_widget_content'] = {}  ### DISCUSS: always reset the hash here?
       
-      tree.each do |c| c.controller = controller; end  # connect current controller to the tree.
-      
-      return tree
-    end
-    #----------------------------------------------------------------------------
-    
-    
-    def freeze_tree(root)
-      freeze_tree_for(root, session)
+      apotomo_root.freeze_instance_vars_to_storage(session['apotomo_widget_content'])
     end
     
-    def thaw_tree
-      thaw_tree_for(session, self)
+    
+    def thaw_apotomo_root
+      root = session['apotomo_root']
+      root.thaw_instance_vars_from_storage(session['apotomo_widget_content'])
+      root
     end
     
     #--
@@ -183,25 +161,16 @@
     #--
     
     def process_event_request(action)
-      puts "restoring *dynamic*  widget_tree from session."
-      
-      tree = thaw_tree
-      
-      
-      source  = tree.find_by_id(params[:source])
+      source  = apotomo_root.find_by_id(params[:source])
       evt     = Event.new(params[:type], source) # type is :invoke per default.
       ### FIXME: let trigger handle event creation!!!
-      
-      
       #tree.find_by_id(params[:source]).fire(evt)
       
       processed_handlers = source.invoke_for_event(evt)
       #tree.find_by_id(params[:source]).trigger(type.to_sym)
-
-      #session['apotomo_widget_tree'] = tree
-      #puts "saving tree in session."
-
-      freeze_tree(tree)
+      
+      
+      freeze_apotomo_root!
       
       
       
