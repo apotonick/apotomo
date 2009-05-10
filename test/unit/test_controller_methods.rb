@@ -75,14 +75,11 @@ class ControllerMethodsTest < ActionController::TestCase
   #  #Marshal.load(Marshal.dump(r))                                
   #end  
   
-  def test_custom_apotomo_accessors
-    @controller = WidgetController.new
-    # default behaviour: -------------------------------------
-    assert_equal Hash.new,  @controller.apotomo_default_url_options
-  end
-  
-  def test_use_widgets
-    # create an empty tree:
+  # Creates the test root widget and sets it in @controller.apotomo_root for you, ensuring
+  # a blank ApplicationWidgetTree is mixed into your test tree.
+  ### DISCUSS: move to test_helper?
+  def init_apotomo_root_mock!
+    # create a blank tree:
     ApplicationWidgetTree.class_eval do
       def draw(root)
       end
@@ -91,7 +88,16 @@ class ControllerMethodsTest < ActionController::TestCase
     @controller.instance_eval do
       @apotomo_root = r
     end
-    
+  end
+  
+  def test_custom_apotomo_accessors
+    @controller = WidgetController.new
+    # default behaviour: -------------------------------------
+    assert_equal Hash.new,  @controller.apotomo_default_url_options
+  end
+  
+  def test_use_widgets
+    r = init_apotomo_root_mock!
     
     assert ! r.find_by_id('my_grid')
     @controller.use_widget cell(:rendering_test, :widget_content, 'my_grid')
@@ -102,6 +108,20 @@ class ControllerMethodsTest < ActionController::TestCase
     assert_equal 1, r.children.collect{ |w| w.name == 'my_grid' }.size
   end
   
+  def test_respond_to_event
+    r = init_apotomo_root_mock!
+    
+    assert_equal 0, r.evt_table.size
+    
+    @controller.respond_to_event :click, :with => :method
+    assert_equal 1, r.evt_table.size
+    
+    # assert that a subsequent call to #respond_to_event does not attach a second handler.
+    # since the same #respond_to_event is called multiple times in different requests, this
+    # prevents copying the handler over and over.
+    @controller.respond_to_event :click, :with => :method
+    assert_equal 1, r.evt_table.size
+  end
 
   def test_apotomo_root
     ApplicationWidgetTree.class_eval do
@@ -110,7 +130,7 @@ class ControllerMethodsTest < ActionController::TestCase
         root << widget('apotomo/stateful_widget', :widget_content, 'widget_in_app_tree')
       end
     end
-    r = @controller.apotomo_root
+    r = @controller.apotomo_root  # starts the tree creation.
     
     # test if initial ApplicationWidgetTree is included: -----
     assert r.find_by_id('widget_in_app_tree')

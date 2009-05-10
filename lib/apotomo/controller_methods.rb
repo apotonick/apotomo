@@ -1,20 +1,33 @@
   module Apotomo
     module ControllerMethods
       
+      def controller; self; end
+      
       def use_widget(widget)
         ### TODO: provide support for blocks in #use_widgets.
         return if apotomo_root.children.find do |w| w.name == widget.name end
         
         apotomo_root << widget
       end
+      
+      def use_widgets
+        ### FIXME/DISCUSS: how to remember these widgets were already added?
+        #yield apotomo_root
+        arr = []
+        yield arr
+        
+        apotomo_root << arr.first unless apotomo_root.children.find{|c| c.name == arr.first.name}
+        #catch RuntimeError
+
+      end
         
       def respond_to_event(type, options)
-        #widget_tree = WidgetTree.instance.reconnect(self)
         handler = ProcEventHandler.new
         handler.proc = options[:with]
-        puts "setting #{options[:with].inspect}"
         ### TODO: pass :from => (event source).
-        apotomo_root.evt_table.add_handler_for(handler, type)
+        
+        # attach once, not every request:
+        apotomo_root.evt_table.add_handler_once(handler, :event_type => type)
       end
       
       
@@ -209,9 +222,12 @@
     
     
     def render_data_for(processed_handlers)
-      #puts "returning #{processed_handlers.first.content}"
+      puts "returning #{processed_handlers.inspect}"
       ### TODO: what if more events have been attached, smart boy?
-      (handler, content) = processed_handlers.first
+      #(handler, content) = processed_handlers.first
+      puts "  +++++++++ page updates:"
+      puts processed_handlers.inspect
+      (handler, content) = processed_handlers.first  ### FIXME: how do we know which handler to return? better check for kind_of? Data
       
       render :text => content
     end

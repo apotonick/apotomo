@@ -59,6 +59,29 @@ class EventTableTest < Test::Unit::TestCase
     assert_kind_of Apotomo::EventTable, tbl
   end
   
+  def test_size
+    t = Apotomo::EventTable.new
+    assert_equal 0, t.size
+    
+    t.monitor(:event1, :observed_widget_id1, :target_widget_id, :another_state)
+    t.monitor(:event2, :observed_widget_id2, :target2_widget_id, :another_state2)
+    
+    assert_equal 2, t.size
+  end
+  
+  def test_add_handler_once_for
+    t = Apotomo::EventTable.new
+    
+    h = Apotomo::EventHandler.new
+    
+    t.add_handler_once h, :source => :id, :event_type => :someEvent
+    t.add_handler_once h, :source => :id, :event_type => :someEvent
+    
+    assert_equal 1, t.size
+    assert_equal h, t.event_handlers_for(:someEvent, :id)
+  end
+  
+  
   def test_register_listener
     tbl = Apotomo::EventTable.new
     

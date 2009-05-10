@@ -51,11 +51,8 @@ module Apotomo
     # If so, attaching is omitted. This prevents <em>multiple identical</em> 
     # EventHandlers for the same Event.
     def peek(event_type, target_id, target_state, observed_id=self.name)
-      return if evt_table.event_handlers_for(event_type, observed_id).find do |h|
-        h.widget_id == target_id and h.state == target_state
-      end
-      
-      watch(event_type, target_id, target_state, observed_id)  
+      handler = InvokeEventHandler.new(:widget_id => target_id, :state => target_state)
+      evt_table.add_handler_once(handler, :event_type => event_type, :observed => observed_id) 
     end
     #--
     ### DISCUSS: introduce #watch_any/#watch_all ?
@@ -118,9 +115,25 @@ module Apotomo
     def invoke_for_event(evt)
       processor = Apotomo::EventProcessor.instance.init!
       
-      fire(evt) # this stores the content in the EventProcessor, which is semi-clean.
+      fire(evt)
       
       return processor.process_queue
+    end
+    
+    # Invokes <tt>state</tt> on the widget <em>and</end> updates itself on the page. This should
+    # never be called from outside but in setters when some internal value changed and must be
+    # displayed instantly.
+    # 
+    # Implements the following pattern (TODO: remove example as soon as invoke! proofed):
+    # 
+    #   def title=(str)
+    #     @title = str
+    #     peek(:update, self.name, :display, self.name)
+    #     trigger(:update)
+    #   end
+    def invoke!(state)
+      ### TODO: encapsulate in PageUpdateQueue:
+      Apotomo::EventProcessor.instance.processed_handlers << [name, invoke(:state)]
     end
     
   end

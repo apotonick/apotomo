@@ -418,7 +418,7 @@ attr_writer :controller
   ### DISCUSS: taking the path as key slightly blows up the session.
   #--
   def freeze_instance_vars_to_storage(storage)
-    puts "freezing in #{path}"
+    #puts "freezing in #{path}"
     storage[path] = {}  ### DISCUSS: check if we overwrite stuff?
     (self.instance_variables - ivars_to_forget).each do |var|
       storage[path][var] = instance_variable_get(var)
@@ -428,10 +428,10 @@ attr_writer :controller
     children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }
   end
   def thaw_instance_vars_from_storage(storage)
-    puts "thawing in #{path}"
+    #puts "thawing in #{path}"
     storage[path].each do |k, v|
       instance_variable_set(k, v)
-      puts "  set #{k}: #{v}"
+      #puts "  set #{k}: #{v}"
     end
     
     children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }

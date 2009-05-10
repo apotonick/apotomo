@@ -24,12 +24,17 @@ end
 class MyTestWidget < Apotomo::StatefulWidget
   def state_1
     peek :invoke, name, :state_after_peeking
-    ""
+    "state_1"
   end
   
   def state_2
     peek :invoke, name, :state_after_peeking
-    ""
+    "state_2"
+  end
+  
+  def state_with_invoke
+    invoke!(:state_1)
+    "state_with_invoke"
   end
 end
 
@@ -105,4 +110,25 @@ class EventSystemTest < Test::Unit::TestCase
     w1.invoke(:state_2)
     assert_equal 1, w1.evt_table.event_handlers_for(:invoke, w1.name).size
   end
+  
+  def test_invoke!
+    w1  = widget(:my_test_widget, [:state_1, :state_2], 'w1')
+    w1.invoke!(:state_1)
+    
+    assert_state w1, :state_1
+    assert_equal 1,     Apotomo::EventProcessor.instance.processed_handlers.size
+    assert_equal 'w1',  Apotomo::EventProcessor.instance.processed_handlers.first[0]
+    assert_equal "state_1", Apotomo::EventProcessor.instance.processed_handlers.first[1]
+    
+    return
+    # test the order in processed_handlers:
+    Apotomo::EventProcessor.instance.init!
+    w1.invoke!(:state_with_invoke)
+    assert_equal 2,     Apotomo::EventProcessor.instance.processed_handlers.size
+    assert_equal 'w1',  Apotomo::EventProcessor.instance.processed_handlers.first[0]
+    assert_equal "state_1", Apotomo::EventProcessor.instance.processed_handlers.first[1]
+    assert_equal 'w1',  Apotomo::EventProcessor.instance.processed_handlers.second[0]
+    assert_equal "state_with_invoke", Apotomo::EventProcessor.instance.processed_handlers.second[1]
+  end
+  
 end

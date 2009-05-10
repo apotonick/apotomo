@@ -10,6 +10,10 @@ module Apotomo
   # - should we stop an invoke cycle if a new event is fired which has an EventHandler
   #   that is >= the firing widget. After more thinking, i came to the conclusion this is
   #   too complicated and should put the user's responsibility.
+  
+  # see acts_as_widget.txt for discussion of the queue pattern.
+  
+  
   class EventProcessor
     include Singleton
     attr_accessor :queue, :already_processed, :processed_handlers
@@ -19,7 +23,7 @@ module Apotomo
     end
     
     def init!
-      @processed_handlers = []
+      @processed_handlers = []  ### TODO: call this PageUpdateQueue [source => content]
       @queue = []
       self
     end

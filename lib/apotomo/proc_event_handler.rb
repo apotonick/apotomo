@@ -2,6 +2,10 @@ module Apotomo
   class ProcEventHandler < EventHandler
     attr_accessor :proc
     
+    def initialize(opts={})
+      @proc = opts.delete(:proc)
+    end
+    
     def process_event(event)
       puts "ProcEventHandler: calling #{@proc}"
       #@proc.call(event)
