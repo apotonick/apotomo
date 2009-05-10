@@ -63,77 +63,50 @@ class EventTableTest < Test::Unit::TestCase
     t = Apotomo::EventTable.new
     assert_equal 0, t.size
     
-    t.monitor(:event1, :observed_widget_id1, :target_widget_id, :another_state)
-    t.monitor(:event2, :observed_widget_id2, :target2_widget_id, :another_state2)
+    h = Apotomo::EventHandler.new
+    t.add_handler(h, :event_type => :event1, :source_id => :observed_widget_id1)
+    t.add_handler(h, :event_type => :event2, :source_id => :observed_widget_id2)
     
     assert_equal 2, t.size
   end
   
-  def test_add_handler_once_for
+  def test_add_handler_once
     t = Apotomo::EventTable.new
     
     h = Apotomo::EventHandler.new
     
-    t.add_handler_once h, :source => :id, :event_type => :someEvent
-    t.add_handler_once h, :source => :id, :event_type => :someEvent
+    t.add_handler_once h, :source_id => :id, :event_type => :someEvent
+    t.add_handler_once h, :source_id => :id, :event_type => :someEvent
     
     assert_equal 1, t.size
-    assert_equal h, t.event_handlers_for(:someEvent, :id)
+    assert_equal h, t.handlers_for(:someEvent, :id)
   end
   
   
-  def test_register_listener
-    tbl = Apotomo::EventTable.new
+  def test_add_handler
+    t = Apotomo::EventTable.new
     
-    tbl.monitor(:onWidget, :observed_widget_id, :target_widget_id, :another_state)
-    #tbl.register_listener()
-    events = tbl.event_handlers_for(:onWidget, :observed_widget_id)
-    assert_kind_of Array, events
-    assert_equal events.size, 1
+    h1 = Apotomo::EventHandler.new
+    h2 = Apotomo::EventHandler.new
+    h3 = Apotomo::EventHandler.new
     
-    evt_handler = events.first
-    assert_kind_of Apotomo::EventHandler, evt_handler
-    assert_equal evt_handler.widget_id, :target_widget_id
-    assert_equal evt_handler.state, :another_state
-  end
-  
-  def test_register_listener_with_two_handlers
-    tbl = Apotomo::EventTable.new
+    ### TODO: implement a catch-all:
+    #t.add_handler h
     
-    tbl.monitor(:onWidget, :observed_widget_id, :target_widget_id, :another_state)
-    tbl.monitor(:onWidget, :observed_widget_id, :target2_widget_id, :another_state2)
+    t.add_handler h1, :source_id => :id, :event_type => :idEvent
+    t.add_handler h2, :source_id => :ia, :event_type => :someEvent
+    t.add_handler h1, :source_id => :ia, :event_type => :someEvent
+    t.add_handler h3, :event_type => :someEvent
     
-    #puts tbl.source2evt.inspect
     
-    events = tbl.event_handlers_for(:onWidget, :observed_widget_id)
-    assert_kind_of Array, events
-    assert_equal events.size, 2
+    assert_equal [],            t.handlers_for(:someEvent,  :id)
+    assert_equal [h1],          t.handlers_for(:idEvent,    :id)
+    assert_equal [h2, h1],      t.handlers_for(:someEvent,  :ia)  # order matters.
+    assert_equal [h3],          t.handlers_for(:someEvent)
     
-    evt_handler = events[0]
-    assert_kind_of Apotomo::InvokeEventHandler, evt_handler
-    assert_equal evt_handler.widget_id, :target_widget_id
-    assert_equal evt_handler.state, :another_state
-    
-    evt_handler = events[1]
-    assert_kind_of Apotomo::InvokeEventHandler, evt_handler
-    assert_equal evt_handler.widget_id, :target2_widget_id
-    assert_equal evt_handler.state, :another_state2
-  end
-  
-  
-  
-  def test_processing_with_sourceless_listener
-    tbl = Apotomo::EventTable.new    
-    tbl.monitor(:someEvent, nil, :target_widget_id, :another_state)
-    
-    hs = tbl.event_handlers_for(:someEvent, :unknown_widget)
-    assert_equal 1, hs.size
-  end
-  
-  
-  ### TODO: this test is weak.
-  def test_observer_in_model_tree
-    assert tree.root.evt_table.source2evt.size > 0
+    assert_equal [h3],          t.all_handlers_for(:someEvent,  :id)
+    assert_equal [h1],          t.all_handlers_for(:idEvent,    :id)
+    assert_equal [h2,h1,h3],    t.all_handlers_for(:someEvent,  :ia)
   end
   
   

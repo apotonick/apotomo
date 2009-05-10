@@ -105,10 +105,10 @@ class EventSystemTest < Test::Unit::TestCase
   def test_peek
     w1  = widget(:my_test_widget, [:state_1, :state_2], 'w1')
     w1.invoke(:state_1)
-    assert_equal 1, w1.evt_table.event_handlers_for(:invoke, w1.name).size
+    assert_equal 1, w1.evt_table.handlers_for(:invoke, w1.name).size
     
     w1.invoke(:state_2)
-    assert_equal 1, w1.evt_table.event_handlers_for(:invoke, w1.name).size
+    assert_equal 1, w1.evt_table.handlers_for(:invoke, w1.name).size
   end
   
   def test_invoke!

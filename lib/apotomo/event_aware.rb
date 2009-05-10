@@ -18,9 +18,9 @@ module Apotomo
     # to the widget the listener is attached to.
     #
     # The <tt>observed_id</tt> argument acts as filter for the event source. The 
-    # EventHandler is only invoked if the event source matches the <tt>observed_id</tt>
+    # EventHandler is only invoked if the event source matches the <tt>source_id</tt>
     # widget name.
-    # If omitted, the <tt>observed_id</tt> is the widget the listener is attached to.
+    # If omitted, the <tt>source_id</tt> is the widget the listener is attached to.
     # You may pass <tt>nil</tt> as id to create a catch-all listener: the handler will
     # be called regardless to the source of the event.
     #
@@ -42,17 +42,18 @@ module Apotomo
     # <tt>email</tt> widget trigger a <tt>change</tt> event, and will invoke the state
     # <tt>:_process_events</tt> on the widget named <tt>my_form</tt>.
     
-    def watch(event_type, target_id, target_state, observed_id=self.name)
-      evt_table.monitor(event_type, observed_id, target_id, target_state)
+    def watch(event_type, target_id, target_state, source_id=self.name)
+      handler = InvokeEventHandler.new(:widget_id => target_id, :state => target_state) 
+      evt_table.add_handler(handler, :event_type => event_type, :source_id => source_id)
     end
     
     
     # Same as #watch, but checks if the identical EventHandler has already been set.
     # If so, attaching is omitted. This prevents <em>multiple identical</em> 
     # EventHandlers for the same Event.
-    def peek(event_type, target_id, target_state, observed_id=self.name)
+    def peek(event_type, target_id, target_state, source_id=self.name)
       handler = InvokeEventHandler.new(:widget_id => target_id, :state => target_state)
-      evt_table.add_handler_once(handler, :event_type => event_type, :observed => observed_id) 
+      evt_table.add_handler_once(handler, :event_type => event_type, :source_id => source_id) 
     end
     #--
     ### DISCUSS: introduce #watch_any/#watch_all ?
@@ -83,7 +84,7 @@ module Apotomo
     ### DISCUSS: rename to #bubble_event or #collect_handlers_for_bubbling_event.
     def bubble_handlers_for(event, handlers=[])
       puts "looking up callback for #{event.type}: #{event.source.name} [#{name}]"
-      local_handlers = evt_table.event_handlers_for(event.type, event.source.name)
+      local_handlers = evt_table.all_handlers_for(event.type, event.source.name)
       ### DISCUSS: rename to #event_handlers_for_event(event)?
       
       ### DISCUSS: instantly process handlers (pass event to them)
