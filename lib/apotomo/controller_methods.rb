@@ -1,6 +1,42 @@
   module Apotomo
     module ControllerMethods
       
+      attr_writer :apotomo_default_url_options
+      
+      def apotomo_default_url_options
+        @apotomo_default_url_options ||= {}
+      end
+      
+    
+      def apotomo_root
+        return @apotomo_root if @apotomo_root # should be default.
+        
+        # this is executed once per request:
+        if thaw_tree? and session['apotomo_root']
+          puts "restoring *dynamic*  widget_tree from session."
+          @apotomo_root = thaw_apotomo_root
+        else
+          @apotomo_root = widget('apotomo/stateful_widget', :widget_content, '__root__')
+          
+          # mix in the application widget tree:
+          ### DISCUSS: introduce flag to enable?
+          ::ApplicationWidgetTree.new.draw(@apotomo_root) if Object.const_defined?("ApplicationWidgetTree")
+        end
+        
+        @apotomo_root.controller = self
+        
+        return @apotomo_root
+      end
+      
+      
+      def render_event_response
+        action = params['apotomo_action']   ### TODO: i don't like that. why?
+        process_event_request(action.to_sym)
+      end
+      
+      
+      protected
+    
       def controller; self; end
       
       def use_widget(widget)
@@ -51,11 +87,6 @@
         end
       end
       
-      
-      attr_writer :apotomo_default_url_options
-      def apotomo_default_url_options
-        @apotomo_default_url_options ||= {}
-      end
       
   
     # outgoing rendering --------------------------------------------------------
@@ -114,24 +145,7 @@
     
     
     
-    def apotomo_root
-      return @apotomo_root if @apotomo_root # should be default.
-      
-      # this is executed once per request:
-      if thaw_tree? and session['apotomo_root']
-        puts "restoring *dynamic*  widget_tree from session."
-        @apotomo_root = thaw_apotomo_root
-      else
-        @apotomo_root = widget('apotomo/stateful_widget', :widget_content, '__root__')
-        
-        # mix in the application widget tree:
-        ::ApplicationWidgetTree.new.draw(@apotomo_root) ### DISCUSS: introduce flag to enable?
-      end
-      
-      @apotomo_root.controller = self
-      
-      return @apotomo_root
-    end
+    
     
     
     # If true, the widget tree is reloaded during runtime, even if it was already frozen
@@ -149,10 +163,7 @@
       params['apotomo_action']
     end
     
-    def render_event_response
-      action = params['apotomo_action']   ### TODO: i don't like that. why?
-      process_event_request(action.to_sym)
-    end
+    
     
     
     def freeze_apotomo_root!
@@ -210,7 +221,7 @@
           #content = handler.content
           next unless content ### DISCUSS: move this decision into EventHandler#process_event_for(page).
 
-          if content.class == String
+          if content.kind_of? String
             page.replace handler.widget_id, content
           else
             page << content
@@ -222,12 +233,10 @@
     
     
     def render_data_for(processed_handlers)
-      puts "returning #{processed_handlers.inspect}"
       ### TODO: what if more events have been attached, smart boy?
-      #(handler, content) = processed_handlers.first
       puts "  +++++++++ page updates:"
       puts processed_handlers.inspect
-      (handler, content) = processed_handlers.first  ### FIXME: how do we know which handler to return? better check for kind_of? Data
+      (handler, content) = processed_handlers.find {|i| i.last.size > 0}  ### FIXME: how do we know which handler to return? better check for kind_of? Data
       
       render :text => content
     end
