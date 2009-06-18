@@ -224,7 +224,7 @@ attr_writer :controller
       @controller =root.controller
       
       
-      content = render_view_for_state(state)  # defined in Cell::Base.
+      content = render_view_for(content, state)  # defined in Cell::Base.
       
       frame_content(content)
     end
