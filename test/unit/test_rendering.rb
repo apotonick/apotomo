@@ -42,5 +42,29 @@ class ApotomoRenderingTest < ActionController::TestCase
     assert_selekt c, "#a>#b:nth-child(1)"
     assert_selekt c, "#a>#c:nth-child(2)"
   end
+  
+  def test_render
+    RenderingTestCell.class_eval do
+      def call_render
+        render
+      end
+    end
+    
+    c = cell(:rendering_test, :call_render, 'my_cell').invoke
+    assert_selekt c,  "div#my_cell", "call_render"
+  end
+  
+  def test_render_with_different_view
+    RenderingTestCell.class_eval do
+      def call_render
+        render :view => :different
+      end
+    end
+    
+    c = cell(:rendering_test, :call_render, 'my_cell').invoke
+    assert_selekt c,  "div#my_cell", "different"
+  end
+
+  
 
 end
