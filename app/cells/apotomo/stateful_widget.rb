@@ -10,7 +10,7 @@ module Apotomo
   # and can render a corresponding view.
   # Instance variables from the widget are passed to the state view, which is
   # automatically found by convention: view filename and state method usually have the
-  # same name. If you need another view, instruct the widget by calling #state_view.
+  # same name. Use <tt>render :view => my_view</tt> to rendero alternative views.
   # 
   # You can plug multiple of these "mini-controllers" into a page, and you can even make
   # one widget contain others. The modeling currently happens in the WidgetTree.
@@ -116,9 +116,7 @@ attr_writer :controller
     end
 
     
-    ### DISCUSS: @state_view and @ivars_before are both flags i'd like to get rid of.
     def reset_rendering_ivars!
-      @state_view         = nil
       ### TODO: implementation decision, move outside!
       @rendered_children  = ActiveSupport::OrderedHash.new
     end
@@ -219,7 +217,6 @@ attr_writer :controller
       render_children_for_state(state)
       
       
-      state = @state_view if @state_view 
       ### FIXME: we need to expose @controller here for several helper method. that sucks!
       @controller =root.controller
       
@@ -288,17 +285,6 @@ attr_writer :controller
 
 
     
-    
-    def state_view(view_name)
-      ### TODO: deprecate
-      state_view!(view_name)
-    end
-    def state_view!(view_name)
-      puts "setting state_view to #{view_name}"
-      @state_view = view_name
-      nil
-    end
-    
     #--
     ### parameter accessing -------------------------------------------------------
     
@@ -322,6 +308,7 @@ attr_writer :controller
       @child_params[child_name][param] if @child_params.has_key?(child_name)
     end
 
+    
     def local_param(param)
       child_param(nil, param)
     end

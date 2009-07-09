@@ -20,7 +20,7 @@ class Apotomo::ChildSwitchWidget < Apotomo::StatefulWidget
 
     @current_child_id  = find_current_child_id
     
-    state_view :switch
+    render :view => :switch
   end
   
   def children_to_render

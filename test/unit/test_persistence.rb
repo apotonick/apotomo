@@ -142,26 +142,11 @@ class PersistenceTest < ActionController::TestCase
     
   # @state_view, @rendered_children shouldn't be remembered after state rendering.
   def test_reset_rendering_ivars
-    r = cell(:my_test, :set_state_view, 'a')
+    r = cell(:my_test, :one, 'a')
     
-    # render state that sets an explicit @state_view:
     r.invoke
-    assert_state r, :set_state_view
-    assert_equal :widget_content, r.state_view
-    
-    # go to a state that doesn't set @state_view, which should also be empty now:
-    r.invoke :one
     assert_state r, :one
-    assert r.state_view.blank?
     assert r.rendered_children.blank?
-    
-    
-    # set state_view, jump to :next state, and render :next view, not the old one:
-    r = cell(:rendering_test, :set_state_view_and_jump, 'b')
-    c = r.invoke  # state_view! => jump_to_state => :check_state
-    assert_state r, :check_state
-    assert r.state_view.blank?
-    assert_selekt c, "#b", "b is cool."
   end
   
   
@@ -182,12 +167,14 @@ class MasterCell < Apotomo::StatefulWidget
     @my_shared = SharedObject.new
     @my_shared.value = "first value"
     set_local_param(:shared, @my_shared)
-    state_view! :widget_content
+    
+    render :view => :widget_content
   end
   
   def reset_shared
     @my_shared.value = "second value"
-    state_view! :widget_content
+    
+    render :view => :widget_content
   end
   
   def set_shared_in_session
@@ -196,7 +183,8 @@ class MasterCell < Apotomo::StatefulWidget
     session['my_shared'] = my_shared
     
     set_local_param(:shared, session['my_shared'])
-    state_view! :widget_content
+    
+    render :view => :widget_content
   end
 end
 
@@ -222,7 +210,7 @@ end
 class MyTestCell < Apotomo::StatefulWidget
   attr_reader :ivar, :one
   # allow testing library ivars from outside:
-  attr_reader :brain, :state_view, :rendered_children
+  attr_reader :brain, :rendered_children
   
   transition :in    => :start
   transition :from  => :start, :to => :one
@@ -233,10 +221,5 @@ class MyTestCell < Apotomo::StatefulWidget
   
   def one
     @one  = "1"
-  end
-  
-  transition :from => :set_state_view, :to => :one
-  def set_state_view
-    state_view! :widget_content
   end
 end

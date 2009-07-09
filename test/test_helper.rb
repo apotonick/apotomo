@@ -4,15 +4,14 @@ Cell::Base.view_paths << File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
 class RenderingTestCell < Apotomo::StatefulWidget
   attr_reader :brain
-  attr_reader :rendered_children, :state_view
+  attr_reader :rendered_children
   
   def check_state   # view resides in fixtures/apotomo/stateful_widget/
     @ivar = "#{@name} is cool."
     nil
   end
   
-  def set_state_view_and_jump
-    state_view! :widget_content
+  def jump
     jump_to_state :check_state
   end
 end
