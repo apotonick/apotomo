@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper
 
 Cell::Base.view_paths << File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
+require File.expand_path(File.dirname(__FILE__) + '/fixtures/application_widget_tree.rb')
+
 class RenderingTestCell < Apotomo::StatefulWidget
   attr_reader :brain
   attr_reader :rendered_children
@@ -15,7 +17,6 @@ class RenderingTestCell < Apotomo::StatefulWidget
     jump_to_state :check_state
   end
 end
-
 
 
 class UrlMockController < ActionController::Base

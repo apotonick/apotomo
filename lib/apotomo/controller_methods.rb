@@ -1,5 +1,6 @@
   module Apotomo
     module ControllerMethods
+      include WidgetShortcuts
       
       attr_writer :apotomo_default_url_options
       
@@ -39,6 +40,7 @@
     
       def controller; self; end
       
+      # makes the passed widget a persistant (stateful!) widget.
       def use_widget(widget)
         ### TODO: provide support for blocks in #use_widgets.
         return if apotomo_root.children.find do |w| w.name == widget.name end
@@ -97,6 +99,7 @@
     # widget and all its children.
     #--
     # NOTE: defaults to :layout => true
+    # DISCUSS: remove #act_as_widget in favour of less confusion?
     #--
     def act_as_widget(widget_id, options={})
       # create tree (new/from store)...
@@ -110,34 +113,37 @@
       
       options_for_action = {:layout => true}  # same setting as when rendering an action
       options_for_action[:layout] = options.delete(:layout) if options.key?(:layout)
-      options_for_action[:text]   = render_widget_from_tree(widget_id, options)
+      options_for_action[:text]   = render_widget_for(widget_id, options)
       
       render options_for_action
     end
     
     # :process is true by default.
-    def render_widget(widget_id, options={}, &block)
+    def render_widget(widget, options={}, &block)
       process_events = options.key?(:process_events) ? options.delete(:process_events) : true
       
       if process_events
         apotomo_default_url_options[:action] = :render_event_response
       end
-        
-      render_widget_from_tree(widget_id, options, &block)
+      
+      
+      render_widget_for(widget, options, &block)
     end
     
     ### TODO: put it in WidgetTree or somewhere else, as it's not a controller 
     ###   helper.
     # Finds the widget named <tt>widget_id</tt> and renders it.
-    def render_widget_from_tree(widget_id, opts={}, &block)      
-      target  = apotomo_root.find_by_path(widget_id)
-      target.opts = opts unless opts.empty?
+    def render_widget_for(widget, opts={}, &block)      
+      ### DISCUSS: let user pass widget OR/and widget_id ?
+      widget = apotomo_root.find_by_path(widget) unless widget.kind_of? Apotomo::StatefulWidget
+      
+      widget.opts = opts unless opts.empty?
       
       #yield target
       
-      content = target.render_content &block
+      content = widget.render_content &block
       
-      
+      ### DISCUSS: this happens multiple times when calling #render_widget more than once!
       freeze_apotomo_root!
       
       return content

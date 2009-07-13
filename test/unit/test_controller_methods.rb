@@ -138,6 +138,24 @@ class ControllerMethodsTest < ActionController::TestCase
   
   def test_act_as_widget; end # is :controller/:action really current controller/action when using link_to_event? same for #render_widget :process_events => true.
   
+  
+  # render_widget --------------------------------------------------------------
+  def test_render_widget_with_id
+    r = init_apotomo_root_mock!
+    r << cell(:rendering_test, :widget_content, 'wigald')
+    c = @controller.render_widget('wigald')
+    
+    assert_selekt c, "#wigald"
+  end
+  
+  def test_render_widget_with_object
+    r = init_apotomo_root_mock!
+    w = cell(:rendering_test, :widget_content, 'wigald')
+    c = @controller.render_widget(w)
+    
+    assert ! r.find_by_id(w.name)
+    assert_selekt c, "#wigald"
+  end
 end
 
 ### DISCUSS: explicitly copy @controller to view during #invoke, or set controller at widget instantiation time? problem: what controller to connect in controller class context (e.g. in has_widgets)?
