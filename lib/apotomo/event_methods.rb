@@ -1,7 +1,7 @@
 module Apotomo
   
   # Introduces event-processing functions into the StatefulWidget.
-  module EventAware
+  module EventMethods
     attr_writer :evt_table
     attr_accessor :evt_processor
     
@@ -10,38 +10,56 @@ module Apotomo
     end
     
     
-    # Attach a listener to some widget. The listener is an Apotomo::EventHandler
-    # instance, something similar to a callback.
-    # 
-    # The created EventHandler will invoke the state <tt>target_state</tt> on the 
-    # widget named <tt>target_id</tt> if the specified <tt>event_type</tt> event bubbles
-    # to the widget the listener is attached to.
+    # Instructs the widget to look out for <tt>event_type</tt> Events that are passing by while bubbling.
+    # If an appropriate event is encountered the widget will send the targeted widget (or itself) to another
+    # state, which implies an update of the invoked widget.
     #
-    # The <tt>observed_id</tt> argument acts as filter for the event source. The 
-    # EventHandler is only invoked if the event source matches the <tt>source_id</tt>
-    # widget name.
-    # If omitted, the <tt>source_id</tt> is the widget the listener is attached to.
-    # You may pass <tt>nil</tt> as id to create a catch-all listener: the handler will
-    # be called regardless to the source of the event.
+    # You may configure the event handler with the following <tt>options</tt>:
+    #  :with  => (required) the state to invoke on the target widget
+    #  :on    => (optional) the targeted widget's id, defaults to <tt>self.name</tt>
+    #  :from  => (optional) the source id of the widget that triggered the event, defaults to any widget
     #
     # Example:
     #   
-    #   some_widget << cell(:processor, [:wait, :process_click], 'observer')
-    #   some_widget.watch(:click, 'observer', :process_click)
-    #   
-    # This will invoke the state <tt>:process_click</tt> on the widget named
-    # <tt>observer</tt> (which is a child of <tt>some_widget</tt>) if and only if
-    # <tt>some_widget</tt> triggers a <tt>click</tt> event.
-    #   
-    #   user_form = cell(:form, :gui, 'my_form')
-    #     user_form << cell(:form, :text_field, 'username')
-    #     user_form << cell(:form, :text_field, 'email')
-    #     user_form.watch(:change, 'my_form', :_process_events, nil)
+    #   trap = cell(:input_field, :smell_like_cheese, 'mouse_trap')
+    #   trap.respond_to_event :mouseOver, :with => :catch_mouse
     #
-    # The EventHandler will be called either if the <tt>username</tt> or the 
-    # <tt>email</tt> widget trigger a <tt>change</tt> event, and will invoke the state
-    # <tt>:_process_events</tt> on the widget named <tt>my_form</tt>.
+    # This would instruct <tt>trap</tt> to catch a <tt>:mouseOver</tt> event from any widget (including itself) and
+    # to invoke the state <tt>:catch_mouse</tt> on itself as trigger.
+    #
+    #   
+    #   hunter = cell(:form, :hunt_for_mice, 'my_form')
+    #     hunter << cell(:input_field, :smell_like_cheese,  'mouse_trap')
+    #     hunter << cell(:text_area,   :stick_like_honey,   'bear_trap')
+    #   hunter.respond_to_event :captured, :from => 'mouse_trap', :with => :refill_cheese, :on => 'mouse_trap'
+    #
+    # As both the bear- and the mouse trap can trigger a <tt>:captured</tt> event the later <tt>respond_to_event</tt>
+    # would invoke <tt>:refill_cheese</tt> on the <tt>mouse_trap</tt> widget as soon as this and only this widget fired.
+    # It is important to understand the <tt>:from</tt> parameter as it filters the event source - it wouldn't make
+    # sense to refill the mouse trap if the bear trap snapped, would it?
     
+    def respond_to_event(event_type, options)
+      handler_opts  = {}
+      table_opts    = {}
+      
+      # assuming we're creating InvokeEventHandlers only:
+      handler_opts[:widget_id]  = options[:on]    || self.name
+      handler_opts[:state]      = options.fetch(:with)
+      
+      table_opts[:event_type]   = event_type
+      table_opts[:source_id]    = options[:from]
+      
+      handler = InvokeEventHandler.new(handler_opts)
+      
+      if options[:again]
+        evt_table.add_handler(handler, table_opts)
+        return
+      end
+      
+      evt_table.add_handler_once(handler, table_opts)
+    end
+    
+    ### TODO: deprecate.
     def watch(event_type, target_id, target_state, source_id=self.name)
       handler = InvokeEventHandler.new(:widget_id => target_id, :state => target_state) 
       evt_table.add_handler(handler, :event_type => event_type, :source_id => source_id)
@@ -51,6 +69,8 @@ module Apotomo
     # Same as #watch, but checks if the identical EventHandler has already been set.
     # If so, attaching is omitted. This prevents <em>multiple identical</em> 
     # EventHandlers for the same Event.
+    
+    ### TODO: deprecate.
     def peek(event_type, target_id, target_state, source_id=self.name)
       handler = InvokeEventHandler.new(:widget_id => target_id, :state => target_state)
       evt_table.add_handler_once(handler, :event_type => event_type, :source_id => source_id) 

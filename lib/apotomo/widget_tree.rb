@@ -4,7 +4,7 @@ module Apotomo
   
   class WidgetTree
     
-    include Apotomo::EventAware
+    include Apotomo::EventMethods
     include WidgetShortcuts
     
     attr_reader :controller

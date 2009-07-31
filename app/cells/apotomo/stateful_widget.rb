@@ -57,7 +57,7 @@ module Apotomo
     attr_reader :last_state
     
     include TreeNode
-    include EventAware   ### TODO: set a "see also" link in the docs.
+    include EventMethods   ### TODO: set a "see also" link in the docs.
     include Transitions
     include Caching
     
