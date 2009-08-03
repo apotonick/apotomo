@@ -35,7 +35,12 @@ class TransitionsDefinedInBoth
     }
   end
 end
-  
+
+class TransitionsDefinedNowhereAtAll
+  include Apotomo::Transitions
+  def start_states; [:my_start]; end
+end
+
 
 class TransistionsTest < Test::Unit::TestCase
   def setup
@@ -64,6 +69,8 @@ class TransistionsTest < Test::Unit::TestCase
     assert_equal @b.find_next_state_for(:two, :one), :three     # in class, overwritten in instance
     assert_equal @b.find_next_state_for(:two, :two), :three     # in class, overwritten in instance
     
+    # no transitions defined
+    assert_equal :my_start, TransitionsDefinedNowhereAtAll.new.find_next_state_for(nil, :ever)
   end
   
   def test_is_start_state
