@@ -131,6 +131,13 @@ class ViewHelperTest < ActionView::TestCase
     assert_match /<\/form>/, l
   end
   
+  def test_trigger_event
+    @cell =  @a
+    
+    # test default source widget ------------------------------
+    assert_dom_equal "new Ajax.Request('http://www.apotomo.de/beers/drink?apotomo_action=event&source=a&type=alarm', {asynchronous:true, evalScripts:true})",
+      trigger_event(:alarm)
+  end
   
   def test_address_to_event
     @cell =  @a

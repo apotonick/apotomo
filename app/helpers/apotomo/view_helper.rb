@@ -85,6 +85,21 @@ module Apotomo
       way.delete(:state)  ### DISCUSS: do that in type_uid_for ?
     end
     
+    # Generates the JavaScript code to report an event of <tt>type</tt> to Apotomo with AJAX.
+    # As always per default the event source is the currently rendered widget.
+    # Internally this method just uses <tt>remote_function</tt> for JS output.
+    #
+    # Example:
+    # 
+    #   <%= image_tag "cheese.png", :onMouseover => trigger_event(:mouseAlarm) %>
+    #
+    # will trigger the event <tt>:mouseAlarm</tt> when moving the mouse over the cheese image.
+    def trigger_event(type)
+      addr  = address_to_event(:type => type)
+      
+      remote_function(:url => addr)
+    end
+    
     
     # Creates a link that triggers an event via AJAX.
     # This link will <em>only</em> work in JavaScript-able browsers.
