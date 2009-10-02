@@ -156,7 +156,17 @@ class ControllerMethodsTest < ActionController::TestCase
     assert ! r.find_by_id(w.name)
     assert_selekt c, "#wigald"
   end
+  
+  
+  def test_executable_javascript?
+    assert !  @controller.executable_javascript?("output from widget")
+    assert    @controller.executable_javascript?(Apotomo::JavascriptSource.new)
+  end
+  
 end
+
+# render_widget w, :user => user do..end
+# is passed to w (only!)
 
 ### DISCUSS: explicitly copy @controller to view during #invoke, or set controller at widget instantiation time? problem: what controller to connect in controller class context (e.g. in has_widgets)?
 

@@ -100,6 +100,10 @@ module Apotomo
       remote_function(:url => addr)
     end
     
+    ### FIXME: test me!
+    def url_for_event(type)
+      address_to_event(:type => type)
+    end
     
     # Creates a link that triggers an event via AJAX.
     # This link will <em>only</em> work in JavaScript-able browsers.
@@ -207,6 +211,7 @@ module Apotomo
     
     
     ### TODO: test me.
+    ### DISCUSS: rename to rendered_children ?
     def content
       @rendered_children.collect{|e| e.last}.join("\n")
     end

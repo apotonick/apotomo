@@ -29,10 +29,14 @@
         return @apotomo_root
       end
       
-      
       def render_event_response
         action = params['apotomo_action']   ### TODO: i don't like that. why?
         process_event_request(action.to_sym)
+      end
+      
+      
+      def executable_javascript?(content)
+        content.kind_of? JavascriptSource
       end
       
       
@@ -227,10 +231,10 @@
           #content = handler.content
           next unless content ### DISCUSS: move this decision into EventHandler#process_event_for(page).
 
-          if content.kind_of? String
-            page.replace handler.widget_id, content
-          else
+          if controller.executable_javascript?(content)
             page << content
+          else
+            page.replace handler.widget_id, content
           end
         end
         

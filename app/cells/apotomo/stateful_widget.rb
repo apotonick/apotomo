@@ -1,4 +1,4 @@
-### (c) 2008-2009, Nick Sutterer <nick@tesbo.com>
+# (c) 2008-2009, Nick Sutterer <apotonick@gmail.com>
 module Apotomo
   # The StatefulWidget is the core component in Apotomo. Any widget is derived from 
   # this class.

@@ -7,7 +7,7 @@ class <%= class_name %>Cell < Apotomo::StatefulWidget
 
 <% for action in actions -%>
   def <%= action %>
-    nil
+    render
   end
 <% end -%>
 end
