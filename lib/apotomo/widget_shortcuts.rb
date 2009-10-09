@@ -1,9 +1,8 @@
 module Apotomo
   # Provides shortcut methods for creating the widget tree.
-  # The mixin target class must have a #controller method.
   module WidgetShortcuts
     def widget(class_name, states, id, *args)
-      class_name.to_s.classify.constantize.new(controller, id, states, *args)
+      class_name.to_s.classify.constantize.new(id, states, *args)
     end
     
     def section(id, *args)

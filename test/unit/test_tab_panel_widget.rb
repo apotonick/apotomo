@@ -10,8 +10,8 @@ end
 
 class TestWidgetTree < Apotomo::WidgetTree  
   def draw(root)
-    root << tab_panel = Apotomo::TabPanelWidget.new(@controller, 'my_tab_panel', :switch)
-      tab_panel << Apotomo::TabWidget.new(@controller, 'tab_one', :widget_content, 
+    root << tab_panel = Apotomo::TabPanelWidget.new('my_tab_panel', :switch)
+      tab_panel << Apotomo::TabWidget.new('tab_one', :widget_content, 
         :title => "Tab One")
   end
 end
@@ -19,8 +19,8 @@ end
 
 class SwitchTestWidgetTree < Apotomo::WidgetTree  
   def draw(root)
-    root << first = Apotomo::ChildSwitchWidget.new(@controller, 'first_switch', :switch)
-      first << second = Apotomo::ChildSwitchWidget.new(@controller, 'second_switch', :switch)
+    root << first = Apotomo::ChildSwitchWidget.new('first_switch', :switch)
+      first << second = Apotomo::ChildSwitchWidget.new('second_switch', :switch)
        second << cell(:my_test, :a_state, 'first_child')
        second << cell(:my_test, :a_state, 'second_child')
   end
@@ -36,7 +36,7 @@ class TabPanelTest < ActionController::TestCase
       p << tab("First")
       p << tab("Second")
       p << tab("Third")
-    
+    p.controller = @controller
     
     c = p.invoke
     assert_selekt c, ".TabPanel>ul>li", "First" # test tab.
@@ -55,6 +55,7 @@ class TabPanelTest < ActionController::TestCase
       p << tab("First")
       p << tab("Second")
       p << tab("Third")
+    p.controller = @controller
     
     c = p.invoke
     assert_state p, :switch
@@ -73,6 +74,7 @@ class TabPanelTest < ActionController::TestCase
       p << tab("First")
       p << tab("Second")
       p << tab("Third")
+    p.controller = @controller
     
     c = p.invoke
     assert_state p, :switch
@@ -92,7 +94,7 @@ class TabPanelTest < ActionController::TestCase
   
   
   def test_tab_widget_api
-    t = Apotomo::TabWidget.new(@controller, 'tab_id', :widget_content, :title => "The Tab")
+    t = Apotomo::TabWidget.new('tab_id', :widget_content, :title => "The Tab")
     
     assert_equal t.title, "The Tab"
     

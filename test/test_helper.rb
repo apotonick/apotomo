@@ -22,8 +22,6 @@ end
 class UrlMockController < ActionController::Base
   include Apotomo::ControllerMethods
   
-  include Apotomo::WidgetShortcuts
-  
   def controller;self;end
   
   def rescue_action(e) raise e end
@@ -68,7 +66,10 @@ module Apotomo::UnitTestCase
   
   
   # session/request simulation --------------------------------------------------
+  def self.class_inheritable_array(*args);end
+  def self.has_widgets_blocks=(*args);end
   include Apotomo::ControllerMethods ### TODO: move neccessary methods to Persistance module.
+  
   
   # Simulate a request-cycle end and the start of a new request. The tree is returned  
   # exactly as if there had been a new request and Rails handled the session thawing.

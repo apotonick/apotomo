@@ -7,10 +7,11 @@ class ChildStatesTest < Test::Unit::TestCase
   def setup
     super
     @controller.session = {}
-    @w  = MyWidget.new(@controller, 'my_widget')
-    @c1 = MyWidget.new(@controller, 'child_1')
-    @c2 = MyWidget.new(@controller, 'child_2')
-    @c3 = MyWidget.new(@controller, 'child_3')
+    @w  = MyWidget.new('my_widget')
+    @w.controller = @controller
+    @c1 = MyWidget.new('child_1')
+    @c2 = MyWidget.new('child_2')
+    @c3 = MyWidget.new('child_3')
   end
   
   

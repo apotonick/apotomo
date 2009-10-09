@@ -50,11 +50,12 @@ class ViewHelperTest < ActionView::TestCase
     end.new
     
     
-    @a = Apotomo::StatefulWidget.new(@controller, 'a')
-    @b = Apotomo::StatefulWidget.new(@controller, 'b')
-    @c = CWidget.new(@controller, 'c')
+    @a = Apotomo::StatefulWidget.new('a')
+    @b = Apotomo::StatefulWidget.new('b')
+    @c = CWidget.new('c')
     @a << @b
     @a << @c
+    @a.controller = @controller
   end
   
   def protect_against_forgery?

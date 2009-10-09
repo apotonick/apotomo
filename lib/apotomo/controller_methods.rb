@@ -10,7 +10,7 @@
       
     
       def apotomo_root
-        return @apotomo_root if @apotomo_root # should be default.
+        return @apotomo_root if @apotomo_root # should be default, after first call.
         
         # this is executed once per request:
         if thaw_tree? and session['apotomo_root']
@@ -18,16 +18,16 @@
           @apotomo_root = thaw_apotomo_root
         else
           @apotomo_root = widget('apotomo/stateful_widget', :widget_content, '__root__')
-          
-          # mix in the application widget tree:
-          ### DISCUSS: introduce flag to enable?
-          ::ApplicationWidgetTree.new.draw(@apotomo_root) if Object.const_defined?("ApplicationWidgetTree")
         end
         
+        add_unbound_procs_to(@apotomo_root) # add #has_widgets blocks.
+        
+        ### DISCUSS: passing controller in #invoke sucks. passing in widget constructor sucks. but setting it here sucks as well. i hate controllers.
         @apotomo_root.controller = self
         
         return @apotomo_root
       end
+      
       
       def render_event_response
         action = params['apotomo_action']   ### TODO: i don't like that. why?
@@ -41,28 +41,35 @@
       
       
       protected
-    
-      def controller; self; end
       
-      # makes the passed widget a persistant (stateful!) widget.
+      # Makes the passed +widget+ instance a persistant (stateful!) widget by
+      # adding it to +root+.
       def use_widget(widget)
-        ### TODO: provide support for blocks in #use_widgets.
-        return if apotomo_root.children.find do |w| w.name == widget.name end
+        return if apotomo_root.find do |w| w.name == widget.name end
         
         apotomo_root << widget
       end
       
-      def use_widgets
-        ### FIXME/DISCUSS: how to remember these widgets were already added?
-        #yield apotomo_root
-        arr = []
-        yield arr
+      # Yields the root widget for manipulating the widget tree in a controller action.
+      # Note that this method is executed once per session and not in every request.
+      #
+      # Example:
+      #   def login
+      #     use_widgets do |root|
+      #       root << cell(:login, :form, 'login_box')
+      #     end
+      #
+      #     @box = render_widget 'login_box'
+      #   end
+      def use_widgets(&block)
+        return if bound_procs.include?(block)
         
-        apotomo_root << arr.first unless apotomo_root.children.find{|c| c.name == arr.first.name}
-        #catch RuntimeError
-
+        
+        yield apotomo_root    # yield, and..
+        bound_procs << block  # remember the proc.
       end
-        
+      
+      
       def respond_to_event(type, options)
         handler = ProcEventHandler.new
         handler.proc = options[:with]
@@ -73,28 +80,78 @@
       end
       
       
+      def add_unbound_procs_to(root)
+        collect_unbound_has_widgets_blocks.each do |proc|
+          proc.call(root)       # yield, and..
+          bound_procs << (proc) # remember the proc.
+        end
+      end
+      
+      def collect_unbound_has_widgets_blocks
+        ### TODO: implement has_widgets_blocks - bound_procs.
+        self.class.has_widgets_blocks.reject do |proc|
+          bound_procs.include?(proc)
+        end || Array.new
+      end
+      
+      
+      def bound_procs
+        session[:apotomo_bound_procs] ||= ProcHash.new  ### DISCUSS: the session dependency sucks.
+      end
+      
+          
+      
       def self.included(base) #:nodoc:
         base.class_eval do
           extend ClassMethods
+          extend WidgetShortcuts
+          
+          class_inheritable_array :has_widgets_blocks
+          base.has_widgets_blocks = []
         end
       end
       
       
       module ClassMethods
-        def has_widgets(widget=nil)
-          if block_given?
-            return
-          end
-          
-          return
+        # Same as #use_widgets but to be used in controller class context.
+        # As soon as the class is compiled, the widget tree manipulation will take effects.
+        # Also note that this method is executed only once per session.
+        # Example:
+        #
+        #   class HunterController < ApplicationController::Base
+        #     include Apotomo::ControllerMethods
+        #     
+        #     use_widgets do |root|
+        #       root << cell(:bear_trap, :charged, 'nasty_trap')
+        #     end
+        #     
+        #     def trap_bears
+        #       @box = render_widget 'nasty_trap'
+        #     end
+        def has_widgets(&block)
+          has_widgets_blocks << block
         end
-  
+        
+        ### DISCUSS: do we need that?
         def responds_to_event(type, options)
         end
       end
       
       
-  
+      class ProcHash < Array
+        def id_for_proc(proc)
+          proc.to_s.split('@').last
+        end
+      
+        def <<(proc)
+          super(id_for_proc(proc))
+        end
+        
+        def include?(proc)
+          super(id_for_proc(proc))
+        end
+      end
+      
     # outgoing rendering --------------------------------------------------------
     
     

@@ -49,6 +49,7 @@ class PersistenceTest < ActionController::TestCase
     m = cell(:master, :set_shared_in_session, 'master')
       s = m << cell(:slave, :read_shared, 'slave')
     
+    m.controller = @controller
     m.invoke
     
     assert_equal m.param(:shared).value, "value from session"

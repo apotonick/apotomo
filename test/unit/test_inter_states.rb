@@ -9,7 +9,9 @@ class InterStateTest < ActionController::TestCase
   # do we really jump to the correct state?
   # and: are all state ivars remembered while jumping?
   def test_three_state_jumps
-    w = StateJumpCell.new(@controller, 'x', :one)
+    w = StateJumpCell.new('x', :one)
+    w.controller = @controller
+    
     c = w.invoke  # :one -> :_two -> :_three
     
     assert_state w, :_three
@@ -22,7 +24,8 @@ class InterStateTest < ActionController::TestCase
   end
   
   def test_last_state
-    w = StateJumpCell.new(@controller, 'x', :four)
+    w = StateJumpCell.new('x', :four)
+    w.controller = @controller
     c = w.invoke
     assert_equal w.last_state, :four
   end

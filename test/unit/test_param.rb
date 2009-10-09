@@ -7,19 +7,21 @@ class ParamTest < Test::Unit::TestCase
   def setup
     super
     @controller.session = {}
+    
+    @w = cell(:param, :state, 'a')
+    @w.controller = @controller
   end
   
   def test_child_param_accessors
-    w = cell(:param, :state, 'a')
-    w.set_child_param('child_1', :prm, "wow")
-    assert_equal w.child_param('child_2', :prm), nil
-    assert_equal w.child_param('child_1', :prm), "wow"
-    assert_equal w.local_param(:prm), nil
-    assert_equal w.local_param(:unknown), nil
+    @w.set_child_param('child_1', :prm, "wow")
+    assert_equal @w.child_param('child_2', :prm), nil
+    assert_equal @w.child_param('child_1', :prm), "wow"
+    assert_equal @w.local_param(:prm), nil
+    assert_equal @w.local_param(:unknown), nil
   end
   
   def test_local_param_accessors
-    w = cell(:param, :state, 'a')
+    w = @w
     w.set_local_param(:prm, "wow")
     assert_equal w.child_param('child_2', :prm), nil
     assert_equal w.child_param('child_1', :prm), nil
@@ -28,7 +30,7 @@ class ParamTest < Test::Unit::TestCase
   end
   
   def test_param_from_global_params
-    w = cell(:param, :state, 'a')
+    w = @w
     
     assert_equal w.param(:my_param), nil
     assert_equal w.param('my_param'), nil
@@ -46,7 +48,9 @@ class ParamTest < Test::Unit::TestCase
   def test_param_from_child_params_standard
     controller.params = {:my_param => 1}
     
-    w = cell(:param, :set_my_param, 'a')    
+    w = cell(:param, :set_my_param, 'a')
+    w.controller = @controller
+    
     assert_equal w.param(:my_param), 1
     w.invoke
     assert_equal w.param(:my_param), "set_in_set_local_param"
@@ -64,6 +68,7 @@ class ParamTest < Test::Unit::TestCase
     
     dmn = cell(:static_domain, :no_state, 'b')
      dmn << w = cell(:param, :set_my_param, 'a')    
+    dmn.controller = @controller
     
     assert_equal w.param(:my_param), "static"
     
@@ -80,6 +85,7 @@ class ParamTest < Test::Unit::TestCase
     
     dmn = cell(:dynamic_domain, :no_state, 'b')
      dmn << w = cell(:param, :set_my_param, 'a')    
+    dmn.controller = @controller
     
     assert_equal w.param(:my_param), "1-dynamic"
     
@@ -94,6 +100,7 @@ class ParamTest < Test::Unit::TestCase
     
     dmn = cell(:static_domain, :no_state, 'b')
      dmn << w = cell(:param, :set_my_param, 'a', :my_param => "set_in_opts")
+    dmn.controller = @controller
     
     # test @opts ----------------------------------------------
     assert_equal w.param(:my_param), "set_in_opts"
@@ -103,6 +110,7 @@ class ParamTest < Test::Unit::TestCase
     
     
     w = cell(:param, :set_my_param, 'a2')
+    w.controller = @controller
     
     # test stepwise -------------------------------------------
     assert_equal w.param(:my_param), "set_globally_in_params"

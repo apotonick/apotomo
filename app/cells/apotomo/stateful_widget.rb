@@ -64,12 +64,13 @@ module Apotomo
     
     helper Apotomo::ViewHelper
     
-attr_writer :controller
-    # Constructor which needs a unique id for the widget and one or multiple start states.
-    # <tt>start_state</tt> may be a symbol or an array of symbols.
+    attr_writer :controller
     attr_reader :last_brain
-    def initialize(controller, id, start_states=:widget_content, opts={})
-      super(controller, opts)
+        
+    # Constructor which needs a unique id for the widget and one or multiple start states.
+    # <tt>start_state</tt> may be a symbol or an array of symbols.    
+    def initialize(id, start_states=:widget_content, opts={})
+      @opts         = opts  # was: super(controller, opts)
       @name         = id
       @start_states = start_states.kind_of?(Array) ? start_states : [start_states]
 
@@ -138,7 +139,8 @@ attr_writer :controller
     def invoke(input=nil, &block)
       @invoke_block = block ### DISCUSS: store block so we don't have to pass it 10 times?
       puts "\ninvoke on #{name} with #{input.inspect}"
-
+      
+      ### TODO: remove the * propagation.
       if input.to_s == "*"
         @is_f5_fixme = true
         input= start_state_for_state(last_state)
@@ -147,7 +149,7 @@ attr_writer :controller
       
       process_input(input)
     end
-
+    
     # Initiates the rendering cycle of the widget:
     # - if <tt>state</tt> isn't a start state, the environment of the widget is restored
     #   using #thaw.
@@ -380,7 +382,8 @@ attr_writer :controller
     
     
     def controller
-      @controller || root.controller
+      return @controller if isRoot?
+      root.controller
     end
     
     # Sets the widget to invisible, which will usually suppress executing the 
@@ -454,7 +457,7 @@ attr_writer :controller
           ###@ name, klass, parent, content_str = line.split(@@fieldSep)
           name, klass, parent = line.split(@@fieldSep)
           #puts "thawing #{name}->#{parent}"
-          currentNode = klass.constantize.new(nil, name)
+          currentNode = klass.constantize.new(name)
           
           ###@ Marshal.load(content_str).each do |k,v|
           ###@   ###@ puts "setting "+k.inspect
