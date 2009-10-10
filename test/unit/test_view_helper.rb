@@ -28,7 +28,7 @@ class ViewHelperTest < ActionView::TestCase
     ###   of an internal API, and too many dependencies on instance vars instead of arguments
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
-    @controller = Class.new do
+    @controller = Class.new(ActionController::Base) do
       include Apotomo::ControllerMethods
       
       def url_for(options)

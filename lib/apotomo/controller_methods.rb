@@ -2,6 +2,7 @@
     module ControllerMethods
       include WidgetShortcuts
       
+      
       attr_writer :apotomo_default_url_options
       
       def apotomo_default_url_options
@@ -13,7 +14,7 @@
         return @apotomo_root if @apotomo_root # should be default, after first call.
         
         # this is executed once per request:
-        if thaw_tree? and session['apotomo_root']
+        if session['apotomo_root']
           puts "restoring *dynamic*  widget_tree from session."
           @apotomo_root = thaw_apotomo_root
         else
@@ -99,7 +100,10 @@
         session[:apotomo_bound_procs] ||= ProcHash.new  ### DISCUSS: the session dependency sucks.
       end
       
-          
+      def reset_bound_procs
+        session[:apotomo_bound_procs] = nil
+      end
+      
       
       def self.included(base) #:nodoc:
         base.class_eval do
@@ -108,9 +112,25 @@
           
           class_inheritable_array :has_widgets_blocks
           base.has_widgets_blocks = []
+          
+          before_filter :apotomo_handle_flushing
         end
       end
       
+    private
+      def apotomo_handle_flushing
+        ### TODO: check if flushing is allowed at all.
+        flush_widget_tree unless thaw_tree?
+      end
+      
+      def flush_widget_tree
+        reset_bound_procs   # make has_widgets blocks work again.
+        session['apotomo_widget_content'] = {}  ### TODO: implement #reset_widget_store
+        session['apotomo_root']           = nil ### TODO: implement #reset_widget_tree
+      end
+    
+      
+    public  ### FIXME: provide proper access levels for ALL methods.
       
       module ClassMethods
         # Same as #use_widgets but to be used in controller class context.
@@ -121,7 +141,7 @@
         #   class HunterController < ApplicationController::Base
         #     include Apotomo::ControllerMethods
         #     
-        #     use_widgets do |root|
+        #     has_widgets do |root|
         #       root << cell(:bear_trap, :charged, 'nasty_trap')
         #     end
         #     
@@ -194,9 +214,16 @@
     ### TODO: put it in WidgetTree or somewhere else, as it's not a controller 
     ###   helper.
     # Finds the widget named <tt>widget_id</tt> and renders it.
-    def render_widget_for(widget, opts={}, &block)      
+    def render_widget_for(widget_id, opts={}, &block)      
       ### DISCUSS: let user pass widget OR/and widget_id ?
-      widget = apotomo_root.find_by_path(widget) unless widget.kind_of? Apotomo::StatefulWidget
+      if widget_id.kind_of? Apotomo::StatefulWidget
+        widget = widget_id
+      else
+        widget = apotomo_root.find_by_id(widget_id)
+        raise "Couldn't render non-existant widget `#{widget_id}`" unless widget
+      end
+      
+      
       
       widget.opts = opts unless opts.empty?
       

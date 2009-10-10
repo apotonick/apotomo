@@ -40,7 +40,7 @@ class PersistenceTest < ActionController::TestCase
     assert_state s, :read_shared
   end
   
-  
+  def self.before_filter(*args);end
   include Apotomo::ControllerMethods ### TODO: move to UnitTest helper.
   # tests if variable referencing is frozen/thawed correctly, especially if
   # some widget instance var points to a var in session and another widget 

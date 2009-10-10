@@ -58,6 +58,12 @@ class ControllerMethodsTest < ActionController::TestCase
     WidgetController.instance_eval do @has_widgets_blocks = [] end
   end
   
+  def controller_class_mock(&block)
+    controller_class = Class.new(ActionController::Base)
+    controller_class.instance_eval{ include Apotomo::ControllerMethods }
+    controller_class
+  end
+  
   # Creates the test root widget and sets it in @controller.apotomo_root for you.
   ### DISCUSS: move to test_helper?
   def init_apotomo_root_mock!
@@ -184,6 +190,16 @@ class ControllerMethodsTest < ActionController::TestCase
     
     assert_equal 1,   controller.bound_procs.size
     assert_equal 1,   root.children.size
+  end
+  
+  def test_reset_bound_procs
+    controller = controller_class_mock.new
+    controller.session = {}
+    controller.bound_procs << "bla"
+    
+    assert_equal 1, controller.bound_procs.size
+    controller.reset_bound_procs  # clear ProcHash.
+    assert_equal 0, controller.bound_procs.size
   end
   
   def test_proc_hash
@@ -360,6 +376,7 @@ class ControllerMethodsTest < ActionController::TestCase
     assert_selekt c, "#wigald"
   end
   
+  
   def test_render_widget_with_object
     r = init_apotomo_root_mock!
     w = cell(:rendering_test, :widget_content, 'wigald')
@@ -368,6 +385,13 @@ class ControllerMethodsTest < ActionController::TestCase
     
     assert ! r.find_by_id(w.name)
     assert_selekt c, "#wigald"
+  end
+  
+  
+  def test_render_widget_with_nonexistant_widget_id
+    assert_raise RuntimeError do
+      c = @controller.render_widget('not here')
+    end
   end
   
   
