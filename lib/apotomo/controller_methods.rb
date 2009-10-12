@@ -280,7 +280,7 @@
     
     def process_event_request(action)
       source  = apotomo_root.find_by_id(params[:source])
-      evt     = Event.new(params[:type], source) # type is :invoke per default.
+      evt     = Apotomo::Event.new(params[:type], source) # type is :invoke per default.
       ### FIXME: let trigger handle event creation!!!
       #tree.find_by_id(params[:source]).fire(evt)
       
