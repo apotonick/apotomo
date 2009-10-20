@@ -228,6 +228,16 @@ module Apotomo
       frame_content(content)
     end
     
+    
+    ### DISCUSS: move to Cell::Base?
+    def render(opts={})
+      ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
+      if js = opts[:js]
+        opts = ActiveSupport::JSON::Variable.new(js)
+      end
+      
+      super(opts)
+    end
 
     # Wrap the widget's current state content into a div frame.
     def frame_content(content)

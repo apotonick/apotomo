@@ -37,7 +37,7 @@
       
       
       def executable_javascript?(content)
-        content.kind_of? JavascriptSource
+        content.kind_of? ActiveSupport::JSON::Variable
       end
       
       

@@ -397,7 +397,7 @@ class ControllerMethodsTest < ActionController::TestCase
   
   def test_executable_javascript?
     assert !  @controller.executable_javascript?("output from widget")
-    assert    @controller.executable_javascript?(Apotomo::JavascriptSource.new)
+    assert    @controller.executable_javascript?(ActiveSupport::JSON::Variable.new)
   end
   
 end

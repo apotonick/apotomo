@@ -64,6 +64,18 @@ class ApotomoRenderingTest < ActionController::TestCase
     c = cell(:rendering_test, :call_render, 'my_cell').invoke
     assert_selekt c,  "div#my_cell", "different"
   end
+  
+  def test_render_js
+    RenderingTestCell.class_eval do
+      def call_render
+        render :js => "alert();"
+      end
+    end
+    
+    c = cell(:rendering_test, :call_render, 'my_cell').invoke
+    assert_kind_of  ActiveSupport::JSON::Variable, c
+    assert_equal    "alert();", c.to_s
+  end
 
   
 
