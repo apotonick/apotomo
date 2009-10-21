@@ -202,7 +202,7 @@ module Apotomo
     # called in Cell::Base#render_state
     def dispatch_state(state)
       reset_rendering_ivars!
-      content = send(state, &@invoke_block)  # maybe there's a state jump in here and we're out.
+      content = send(state, &@invoke_block) || {} # maybe there's a state jump in here and we're out.
       
       
       puts @brain.inspect
@@ -222,16 +222,51 @@ module Apotomo
       ### FIXME: we need to expose @controller here for several helper method. that sucks!
       @controller =root.controller
       
+      html_options = content[:html_options] || {} ### DISCUSS: move to #defaultize_render_options_for.
+      html_options[:id] ||= name
       
       content = render_view_for(content, state)  # defined in Cell::Base.
       
-      frame_content(content)
+      frame_content_for(content, html_options)
     end
     
     
-    ### DISCUSS: move to Cell::Base?
+    # Render the view for the current state. Usually called at the end of a state method.
+    #
+    # ==== Options
+    # * <tt>:view</tt> - Specifies the name of the view file to render. Defaults to the current state name.
+    # * <tt>:template_format</tt> - Allows using a format different to <tt>:html</tt>.
+    # * <tt>:layout</tt> - If set to a valid filename inside your cell's view_paths, the current state view will be rendered inside the layout (as known from controller actions). Layouts should reside in <tt>app/cells/layouts</tt>.
+    # * <tt>:html_options</tt> - Pass a hash to add html attributes like +class+ or +style+ to the widgets' surrounding div.
+    # * <tt>:js</tt> - Executes the string as JavaScript on the page. If set, no view will be rendered.
+    #
+    # Example:
+    #  class MouseCell < Apotomo::StatefulWidget
+    #    def eating
+    #      # ... do something
+    #      render 
+    #    end
+    #
+    # will just render the view <tt>eating.html</tt>.
+    # 
+    #    def eating
+    #      # ... do something
+    #      render :view => :bored, :layout => "metal"
+    #    end
+    #
+    # will use the view <tt>bored.html</tt> as template and even put it in the layout
+    # <tt>metal</tt> that's located at <tt>$RAILS_ROOT/app/cells/layouts/metal.html.erb</tt>.
+    #
+    #  render :js => "alert('SQUEAK!');"
+    #
+    # issues a squeaking alert dialog on the page.
+    #
+    #  render :html_options => {:class => :highlighted}
+    # will result in
+    #  <div id="mouse" class="highlighted"...>
     def render(opts={})
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
+      ### DISCUSS: move to Cell::Base?
       if js = opts[:js]
         opts = ActiveSupport::JSON::Variable.new(js)
       end
@@ -240,8 +275,9 @@ module Apotomo
     end
 
     # Wrap the widget's current state content into a div frame.
-    def frame_content(content)
-      '<div id="' + name.to_s + '">'+content+"</div>"
+    def frame_content_for(content, html_options)
+      ### TODO: i'd love to see a real API for helpers in rails.
+      Object.new.extend(ActionView::Helpers::TagHelper).content_tag(:div, content, html_options)
     end
     
 

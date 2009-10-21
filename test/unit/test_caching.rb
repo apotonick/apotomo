@@ -7,7 +7,8 @@ class ApotomoCachingTest < Test::Unit::TestCase
   def setup
     super
     @controller.session= {}
-    @cc = CachingCell.new(@controller, 'caching_cell', :start)
+    @cc = CachingCell.new('caching_cell', :start)
+    @cc.controller = @controller
   end
   
   

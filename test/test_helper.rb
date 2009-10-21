@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper
 
 Cell::Base.view_paths << File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
+class MouseCell < Apotomo::StatefulWidget
+end
 
 class RenderingTestCell < Apotomo::StatefulWidget
   attr_reader :brain

@@ -78,5 +78,50 @@ class ApotomoRenderingTest < ActionController::TestCase
   end
 
   
+  # Provides a ready-to-use mouse widget instance.
+  def mouse_mock(id='mouse', start_state=:eating, &block)
+    mouse = mouse_class_mock.new(id, start_state)
+    mouse.instance_eval &block
+    mouse
+  end
+  
+  def mouse_class_mock
+    Class.new(MouseCell)
+  end
+  
+  
+  def test_html_options
+    # state rendering time:
+      # with class only:
+    c = mouse_mock do 
+      def eating
+        render :html_options => {:class => :highlighted}
+      end
+    end.invoke
+    assert_selekt c,  "div.highlighted#mouse", "burp!"
+    
+      # with id and class:
+    c = mouse_mock do 
+      def eating
+        render :html_options => {:class => :highlighted, :id => 'bear'}
+      end
+    end.invoke
+    assert_selekt c,  "div.highlighted#bear", "burp!"
+    
+    
+    return  ### DISCUSS: is it really necessary to define html_options in other places?
+    # widget definition time:
+    c = cell(:rendering_test, :call_render, 'my_cell', :class => :active).invoke
+    assert_selekt c,  "div.active#my_cell", "call_render"
+    
+    # class compile time:
+    klass = Class.new(RenderingTestCell)
+    klass.instance_eval do
+      html_options = {:class => :blinking}
+    end
+    
+    c = klass.new(:call_render, 'id').invoke
+    assert_selekt c,  "div.blinking#my_cell", "call_render"
+  end
 
 end
