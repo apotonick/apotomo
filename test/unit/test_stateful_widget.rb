@@ -3,6 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 # fixture:
 class MyTestCell < Apotomo::StatefulWidget
+  def widget_content
+    render
+  end
+  
   def a_state
     "a_state"
   end

@@ -12,9 +12,9 @@ class InterStateTest < ActionController::TestCase
     w = StateJumpCell.new('x', :one)
     w.controller = @controller
     
-    c = w.invoke  # :one -> :_two -> :_three
+    c = w.invoke  # :one -> :two -> :three
     
-    assert_state w, :_three
+    assert_state w, :three
     puts "brain dump:"
     puts w.brain.inspect
     
@@ -22,6 +22,31 @@ class InterStateTest < ActionController::TestCase
     assert w.brain.include?("@one");
     assert_equal "three,one", c
   end
+  
+  
+  def test_brain_reset_when_invoking_a_start_state
+    w = StateJumpCell.new('x', :counter)
+    w.controller = @controller
+    
+    assert_equal "1", w.invoke
+    # another #invoke will flush brain:
+    assert_equal "1", w.invoke
+  end
+  
+  def test_brain_reset_when_jumping_to_a_start_state
+    w = StateJumpCell.new('x', :counter)
+    w.controller = @controller
+    w.instance_eval do
+      def back_to_start
+        jump_to_state :counter  # :counter is a start state.
+      end
+    end
+    
+    assert_equal "1", w.invoke
+    # if using #jump_to_state there should be NO brain flush:
+    assert_equal "2", w.invoke_state(:back_to_start)
+  end
+  
   
   def test_last_state
     w = StateJumpCell.new('x', :four)
@@ -38,21 +63,27 @@ class StateJumpCell < Apotomo::StatefulWidget
   def one
     @var = "one"
     @one = "one"
-    jump_to_state :_two
+    jump_to_state :two
   end
   
-  def _two
+  def two
     @var = "two"
-    jump_to_state :_three
+    jump_to_state :three
   end
   
-  def _three
+  def three
     @var = "three"
-    "#{@var},#{@one}"
+    render :text => "#{@var},#{@one}"
   end
   
   def four
-    ""
+    render :text => ""
+  end
+  
+  def counter
+    @counter ||= 0
+    @counter += 1
+    render :text => @counter.to_s
   end
   
 end

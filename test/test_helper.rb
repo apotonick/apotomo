@@ -11,7 +11,7 @@ class RenderingTestCell < Apotomo::StatefulWidget
   
   def check_state   # view resides in fixtures/apotomo/stateful_widget/
     @ivar = "#{@name} is cool."
-    nil
+    render
   end
   
   def jump

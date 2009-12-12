@@ -11,7 +11,6 @@ class ApotomoRenderingTest < ActionController::TestCase
     
     # there should be exactly two variables exposed in the view, 
     # the state ivars and @rendered_children:
-    puts "content: #{c}"
     assert_selekt c, "#my_widget", "my_widget is cool."
     assert_equal 1, w.brain.size
     assert w.brain.include?('@ivar')
@@ -20,11 +19,15 @@ class ApotomoRenderingTest < ActionController::TestCase
   
   # is @rendered_children in views a ordered hash?
   def test_rendered_children
-    ### TODO: move to abc_tree.
+    RenderingTestCell.class_eval do
+      def widget_content; render; end
+    end
     w = cell(:rendering_test, :widget_content, 'a')
     w << cell(:rendering_test, :widget_content, 'b')
     w << cell(:rendering_test, :widget_content, 'c')
     c = w.invoke
+    
+    
     
     r = w.rendered_children.to_a
     assert_equal 'b',   r[0].first
@@ -33,6 +36,10 @@ class ApotomoRenderingTest < ActionController::TestCase
   
   # the default view "widget_content.html.erb" should just concat itself and its children.
   def test_default_widget_content_view
+    RenderingTestCell.class_eval do
+      def widget_content; render; end
+    end
+    
     ### TODO: move to abc_tree.
     w = cell(:rendering_test, :widget_content, 'a')
     w << cell(:rendering_test, :widget_content, 'b')

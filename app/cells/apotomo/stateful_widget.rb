@@ -54,7 +54,7 @@ module Apotomo
   class StatefulWidget < Cell::Base
     attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
     
-    attr_reader :last_state
+    #attr_reader :last_state
     
     include TreeNode
     include EventMethods   ### TODO: set a "see also" link in the docs.
@@ -77,23 +77,20 @@ module Apotomo
       @child_params = {}
       @visible      = true
       @version      = 0
-      @last_state   = nil
       @ivars_before = nil
       @invoke_block = nil
             
       reset_rendering_ivars!    ### DISCUSS: called twice, see #render_content_for_state.
       
       @brain        = []        # ivars set during state execution(s).
+      @cell         = self
+      @state_name   = nil
       
       init_tree_node(id)
     end
-
-
-
-### DISCUSS: 2BRM.
-    # Default start state for any widget. Do not overwrite this, better define a new
-    # state method and set it as start state when creating the instance.
-    def widget_content
+    
+    def last_state
+      @state_name
     end
 
 
@@ -173,6 +170,7 @@ module Apotomo
     
     # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
     # This might lead us to some other state since the state method could call #jump_to_state.
+    ### DISCUSS: should be public.
     def invoke_state(state)
       puts "#{name}: transition: #{last_state} to #{state}"
       puts "                                    ...#{state}"
@@ -184,20 +182,9 @@ module Apotomo
       flush_brain if start_state?(state)
       @ivars_before = instance_variables
       
-      run(state)
+      render_state(state)
     end
     
-    # This freaky method is dedicated to Lance Ivy.
-    def run(state)
-      while true
-        state = catch(:state_jump) do
-          content = render_state(state)  # calls Cell::render_state, which is caching-aware.
-          
-          @last_state = state
-          return content
-        end
-      end
-    end
     
     # either jump out due to a state_jump, or return the complete widget content,
     # including rendered children.
@@ -205,31 +192,6 @@ module Apotomo
     def dispatch_state(state)
       reset_rendering_ivars!
       content = send(state, &@invoke_block) || {} # maybe there's a state jump in here and we're out.
-      
-      
-      puts @brain.inspect
-      puts "state ivars:"  
-      @brain |= (instance_variables - @ivars_before)
-      puts @brain.inspect
-      
-      
-      
-      # instantly return content, without further view rendering or framing:
-      return content if content.kind_of? String
-      
-      
-      render_children_for_state(state)
-      
-      
-      ### FIXME: we need to expose @controller here for several helper method. that sucks!
-      @controller =root.controller
-      
-      html_options = content[:html_options] || {} ### DISCUSS: move to #defaultize_render_options_for.
-      html_options[:id] ||= name
-      
-      content = render_view_for(content, state)  # defined in Cell::Base.
-      
-      frame_content_for(content, html_options)
     end
     
     
@@ -267,13 +229,50 @@ module Apotomo
     # will result in
     #  <div id="mouse" class="highlighted"...>
     def render(opts={})
+      state = @state_name
+      
+      puts @brain.inspect
+      puts "state ivars:"  
+      @brain |= (instance_variables - @ivars_before)
+      puts @brain.inspect
+      
+      
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
       ### DISCUSS: move to Cell::Base?
       if js = opts[:js]
-        opts = ActiveSupport::JSON::Variable.new(js)
+        return ActiveSupport::JSON::Variable.new(js)
       end
       
-      super(opts)
+      
+      
+      
+      
+      if content = opts[:text]
+        return content
+      end
+      
+      
+      # instantly return content, without further view rendering or framing:
+      #return content if content.kind_of? String
+      
+      
+      ### TODO: test :render_children => false
+      ### TODO: get child states from opts.
+      render_children_for_state(state)
+      
+      
+      ### FIXME: we need to expose @controller here for several helper method. that sucks!
+      @controller =root.controller
+      
+      html_options = opts[:html_options] || {} ### DISCUSS: move to #defaultize_render_options_for.
+      html_options[:id] ||= name
+      
+      content = render_view_for(opts, state)
+      #content = render_view_for(content, state)  # defined in Cell::Base.
+      
+      frame_content_for(content, html_options)
+      
+      
     end
 
     # Wrap the widget's current state content into a div frame.
@@ -285,10 +284,14 @@ module Apotomo
 
     # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 
     # transition or not.
+    ### TODO: document the need for return.
+    ### TODO: document that there is no state check or brain erase.
     def jump_to_state(state)
       puts "STATE JUMP! to #{state}"
-
-      throw :state_jump, state
+      ###@ invoke_state(state)
+      render_state(state)
+      
+      #throw :state_jump, state
     end
     
     

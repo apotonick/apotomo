@@ -103,6 +103,7 @@ class PersistenceTest < ActionController::TestCase
     #assert session['apotomo_widget_content'].reject?('b')
   end
   
+  ### ALSO TESTED IN test_jump_to_state.rb#test_brain_reset_when_invoking_a_start_state:
   def test_widget_start_state_cleanup
     r = cell(:my_test, :start, 'root')
     # :start will set a state variable.
@@ -111,7 +112,7 @@ class PersistenceTest < ActionController::TestCase
     assert_equal "value", r.ivar
     
     # if going to a start state, there shouldn't be anything left in the widget.
-    r.instance_eval { def start; ""; end; }
+    r.instance_eval { def start; render :text=>""; end; }
     r.invoke
     assert_state r, :start
     assert_equal nil, r.ivar
@@ -124,6 +125,10 @@ class PersistenceTest < ActionController::TestCase
     r.invoke
     assert_state r, :start
     assert_equal "value", r.ivar
+    
+    
+    puts (r.instance_variables - r.unfreezeable_ivars).inspect
+    
     assert_equal ['@ivar'], r.brain
     
     # next, go to :one and set another state variable.
@@ -218,9 +223,11 @@ class MyTestCell < Apotomo::StatefulWidget
   
   def start
     @ivar = "value"
+    render :text => ""
   end
   
   def one
     @one  = "1"
+    render :text => "#{@one}"
   end
 end
