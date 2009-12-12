@@ -79,8 +79,6 @@ module Apotomo
       @version      = 0
       @ivars_before = nil
       @invoke_block = nil
-            
-      reset_rendering_ivars!    ### DISCUSS: called twice, see #render_content_for_state.
       
       @brain        = []        # ivars set during state execution(s).
       @cell         = self
@@ -113,12 +111,6 @@ module Apotomo
     # Defines the ivars which should be copied to and accessable in the view.
     def ivars_to_expose
       @brain + ['@rendered_children']
-    end
-
-    
-    def reset_rendering_ivars!
-      ### TODO: implementation decision, move outside!
-      @rendered_children  = ActiveSupport::OrderedHash.new
     end
 
     #--
@@ -186,12 +178,9 @@ module Apotomo
     end
     
     
-    # either jump out due to a state_jump, or return the complete widget content,
-    # including rendered children.
     # called in Cell::Base#render_state
     def dispatch_state(state)
-      reset_rendering_ivars!
-      content = send(state, &@invoke_block) || {} # maybe there's a state jump in here and we're out.
+      send(state, &@invoke_block)
     end
     
     
@@ -258,7 +247,7 @@ module Apotomo
       
       ### TODO: test :render_children => false
       ### TODO: get child states from opts.
-      render_children_for_state(state)
+      rendered_children = render_children_for_state(state)
       
       
       ### FIXME: we need to expose @controller here for several helper method. that sucks!
@@ -267,12 +256,21 @@ module Apotomo
       html_options = opts[:html_options] || {} ### DISCUSS: move to #defaultize_render_options_for.
       html_options[:id] ||= name
       
+      
+      opts[:locals] = prepare_locals_for(opts[:locals], rendered_children)
+      
+      
       content = render_view_for(opts, state)
       #content = render_view_for(content, state)  # defined in Cell::Base.
       
       frame_content_for(content, html_options)
       
       
+    end
+    
+    def prepare_locals_for(locals, rendered_children)
+      locals ||= {}
+      locals = {:rendered_children => rendered_children}.merge(locals)
     end
 
     # Wrap the widget's current state content into a div frame.
@@ -302,17 +300,22 @@ module Apotomo
     end
 
     def render_children_for_state(state)
+      rendered_children  = ActiveSupport::OrderedHash.new
+      
       children_to_render.each do |cell|
         child_state = decide_child_state_for(cell, state.to_sym)
 
         puts "    #{cell.name} -> #{child_state}"
-        render_child(cell, child_state)
+        rendered_children[cell.name] = render_child(cell, child_state)
       end
+      
+      rendered_children
     end
 
     def render_child(cell, state)
-      view = cell.invoke(state)
-      @rendered_children[cell.name] = view
+     # view = cell.invoke(state)
+     # @rendered_children[cell.name] = view
+     cell.invoke(state)
     end
 
     def decide_child_state_for(child, state)

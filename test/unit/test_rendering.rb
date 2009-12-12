@@ -18,24 +18,25 @@ class ApotomoRenderingTest < ActionController::TestCase
   end
   
   # is @rendered_children in views a ordered hash?
-  def test_rendered_children
+  def test_render_children_for_state
     RenderingTestCell.class_eval do
       def widget_content; render; end
     end
     w = cell(:rendering_test, :widget_content, 'a')
     w << cell(:rendering_test, :widget_content, 'b')
     w << cell(:rendering_test, :widget_content, 'c')
-    c = w.invoke
+    
+    rendered_children = w.render_children_for_state(:widget_content)
     
     
     
-    r = w.rendered_children.to_a
+    r = rendered_children.to_a
     assert_equal 'b',   r[0].first
     assert_equal 'c',   r[1].first
   end
   
   # the default view "widget_content.html.erb" should just concat itself and its children.
-  def test_default_widget_content_view
+  def test_rendered_children_in_view
     RenderingTestCell.class_eval do
       def widget_content; render; end
     end

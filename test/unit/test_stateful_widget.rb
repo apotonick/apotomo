@@ -29,4 +29,18 @@ class StatefulWidgetTest < ActionController::TestCase
     assert_selekt c, "#my_test>#my_test3"
     assert_selekt c, "#my_test>#my_test2", 0
   end
+  
+  
+  def test_merge_rendered_children_with_locals
+    w = cell(:my_test, :widget_content, 'my_test')
+    
+    assert_equal( {:rendered_children => []},
+                  w.prepare_locals_for(nil, []) )
+                  
+    assert_equal( {:key => :value, :rendered_children => []},
+                  w.prepare_locals_for({:key => :value}, []) )
+    
+    assert_equal( {:rendered_children => ""},
+                  w.prepare_locals_for({:rendered_children => ""}, []) )
+  end
 end
