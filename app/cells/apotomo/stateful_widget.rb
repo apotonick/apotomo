@@ -89,6 +89,8 @@ module Apotomo
     end
 
 
+
+### DISCUSS: 2BRM.
     # Default start state for any widget. Do not overwrite this, better define a new
     # state method and set it as start state when creating the instance.
     def widget_content

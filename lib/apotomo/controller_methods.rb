@@ -220,7 +220,7 @@
         widget = widget_id
       else
         widget = apotomo_root.find_by_id(widget_id)
-        raise "Couldn't render non-existant widget `#{widget_id}`" unless widget
+        raise "Couldn't render non-existent widget `#{widget_id}`" unless widget
       end
       
       
