@@ -126,9 +126,6 @@ class PersistenceTest < ActionController::TestCase
     assert_state r, :start
     assert_equal "value", r.ivar
     
-    
-    puts (r.instance_variables - r.unfreezeable_ivars).inspect
-    
     assert_equal ['@ivar'], r.brain
     
     # next, go to :one and set another state variable.

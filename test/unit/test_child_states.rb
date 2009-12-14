@@ -4,42 +4,50 @@ require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 class ChildStatesTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
-  def setup
-    super
-    @controller.session = {}
-    @w  = MyWidget.new('my_widget')
-    @w.controller = @controller
-    @c1 = MyWidget.new('child_1')
-    @c2 = MyWidget.new('child_2')
-    @c3 = MyWidget.new('child_3')
+  def test_invoke_in_render_opts
+    @w  = MouseCell.new('mommy')
+    @c  = MouseCell.new('bubi')
+    
+    assert_equal :eat,  @w.decide_child_state_for(@c, {'bubi'  => :eat})
+    assert_equal :eat,  @w.decide_child_state_for(@c, {:bubi   => :eat})
+    
+    assert_equal nil,   @w.decide_child_state_for(@c, {})
+    assert_equal nil,   @w.decide_child_state_for(@c, nil)
   end
   
   
-  def test_explicitly_set_state_for_child
-    assert_equal @w.decide_child_state_for(@c1, :top_state), :explicit_state
-  end
-  
-  
-  def test_default_state_for_child
-    assert_equal @w.decide_child_state_for(@c2, :top_state), "_"
-    assert_equal @w.decide_child_state_for(@c1, :unknown_state), "_"
-  end
-  
-  
-  def test_explicit_state_for_all_childs
-    assert_equal @w.decide_child_state_for(@c1, :second_state), "*"
-    assert_equal @w.decide_child_state_for(@c3, :second_state), :second_state_for_child_3
-  end
-  
-  
-end
-
-
-class MyWidget < Apotomo::StatefulWidget
-  def child_states
-    { :top_state    => {'child_1' => :explicit_state},
-      :second_state => {nil       => "*", 
-                        'child_3' => :second_state_for_child_3}
-    }
+  def test_render_children_for_with_options
+    local_class = Class.new(MouseCell) 
+    m  = local_class.new('mommy', :feed)
+    m.instance_eval do
+      self.class.transition :from => :feed, :to => :sleep
+      
+      #def feed;   render :invoke => {'bubi' => :sleep};    end
+      def feed;   render;                       end
+    end
+    
+    b  = local_class.new('bubi', [:eat, :sleep])
+    b.instance_eval do
+      self.class.transition :from => :eat, :to => :sleep
+      
+      def eat;    render :text => "eating";     end
+      def sleep;  render :text => "sleeping";   end
+    end
+    
+    m << b
+    
+    # both widgets will go to their (first) start state:
+    m.invoke
+    assert_state m, :feed
+    assert_state b, :eat
+    
+    
+    m.instance_eval do
+      def feed;   render :invoke => {'bubi' => :sleep};    end
+    end
+    # now bubi will be sent to :sleep instead of :feed:
+    m.invoke :feed
+    assert_state m, :feed
+    assert_state b, :sleep
   end
 end

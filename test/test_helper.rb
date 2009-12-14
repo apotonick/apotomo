@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
 
-Cell::Base.view_paths << File.expand_path(File.dirname(__FILE__) + "/fixtures")
+Cell::Base.view_paths.unshift File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
 class MouseCell < Apotomo::StatefulWidget
 end

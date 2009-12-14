@@ -17,7 +17,7 @@ class ApotomoRenderingTest < ActionController::TestCase
     assert ! w.ivars_to_ignore.include?('@rendered_children') # we want that in the view!
   end
   
-  # is @rendered_children in views a ordered hash?
+  # is rendered_children an ordered hash?
   def test_render_children_for_state
     RenderingTestCell.class_eval do
       def widget_content; render; end
@@ -26,7 +26,7 @@ class ApotomoRenderingTest < ActionController::TestCase
     w << cell(:rendering_test, :widget_content, 'b')
     w << cell(:rendering_test, :widget_content, 'c')
     
-    rendered_children = w.render_children_for_state(:widget_content)
+    rendered_children = w.render_children_for(:widget_content, {})
     
     
     

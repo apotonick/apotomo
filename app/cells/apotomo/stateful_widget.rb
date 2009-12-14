@@ -54,8 +54,6 @@ module Apotomo
   class StatefulWidget < Cell::Base
     attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
     
-    #attr_reader :last_state
-    
     include TreeNode
     include EventMethods   ### TODO: set a "see also" link in the docs.
     include Transitions
@@ -155,7 +153,7 @@ module Apotomo
         state = find_next_state_for(last_state, input)
       end 
       
-      
+
       
       invoke_state(state)
     end
@@ -192,6 +190,7 @@ module Apotomo
     # * <tt>:layout</tt> - If set to a valid filename inside your cell's view_paths, the current state view will be rendered inside the layout (as known from controller actions). Layouts should reside in <tt>app/cells/layouts</tt>.
     # * <tt>:html_options</tt> - Pass a hash to add html attributes like +class+ or +style+ to the widgets' surrounding div.
     # * <tt>:js</tt> - Executes the string as JavaScript on the page. If set, no view will be rendered.
+    # * <tt>:invoke</tt> - Explicitly define the state to be invoked on a child when rendering.
     #
     # Example:
     #  class MouseCell < Apotomo::StatefulWidget
@@ -228,8 +227,8 @@ module Apotomo
       
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
       ### DISCUSS: move to Cell::Base?
-      if js = opts[:js]
-        return ActiveSupport::JSON::Variable.new(js)
+      if content = opts[:js]
+        return ActiveSupport::JSON::Variable.new(content)
       end
       
       
@@ -241,13 +240,8 @@ module Apotomo
       end
       
       
-      # instantly return content, without further view rendering or framing:
-      #return content if content.kind_of? String
-      
-      
       ### TODO: test :render_children => false
-      ### TODO: get child states from opts.
-      rendered_children = render_children_for_state(state)
+      rendered_children = render_children_for(state, opts)
       
       
       ### FIXME: we need to expose @controller here for several helper method. that sucks!
@@ -286,54 +280,41 @@ module Apotomo
     ### TODO: document that there is no state check or brain erase.
     def jump_to_state(state)
       puts "STATE JUMP! to #{state}"
-      ###@ invoke_state(state)
-      render_state(state)
       
-      #throw :state_jump, state
+      render_state(state)
     end
     
     
     def children_to_render
-      children.find_all do |w|
-        w.visible?
-      end
+      children.find_all { |w| w.visible? }
     end
 
-    def render_children_for_state(state)
+    def render_children_for(state, opts)
       rendered_children  = ActiveSupport::OrderedHash.new
       
       children_to_render.each do |cell|
-        child_state = decide_child_state_for(cell, state.to_sym)
-
+        child_state = decide_child_state_for(cell, opts[:invoke])
         puts "    #{cell.name} -> #{child_state}"
+        
         rendered_children[cell.name] = render_child(cell, child_state)
       end
       
-      rendered_children
+      return rendered_children
     end
 
     def render_child(cell, state)
-     # view = cell.invoke(state)
-     # @rendered_children[cell.name] = view
      cell.invoke(state)
     end
 
-    def decide_child_state_for(child, state)
-      next_state = "_"
-      next_state = "*" if @is_f5_fixme
-
-      child_state_for(child.name, state) || next_state
-      ### DISCUSS: this changes the "child thawing policy" from thaw-by-default to start-over.
-      #child_states.fetch(state, {})[child.name]
+    def decide_child_state_for(child, invoke_opts)
+      invoke_opts ||= {}
+      next_state    = nil
+      next_state    = "*" if @is_f5_fixme
+      
+      invoke_opts.stringify_keys[child.name.to_s] || next_state
     end
-
-    def child_states; {}; end
-
-    def child_state_for(child_name, state)
-      child_states.fetch(state, {})[child_name] || child_states.fetch(state, {})[nil]
-    end
-
-
+    
+    
     # is only called when the whole page is reloaded (F5).
     def render_content &block
       invoke("*", &block)
