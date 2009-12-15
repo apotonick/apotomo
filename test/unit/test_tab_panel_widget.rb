@@ -1,33 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 
-# fixture:
-class MyTestCell < Apotomo::StatefulWidget
-  def a_state
-    "a_state"
-  end
-end
-
-class TestWidgetTree < Apotomo::WidgetTree  
-  def draw(root)
-    root << tab_panel = Apotomo::TabPanelWidget.new('my_tab_panel', :switch)
-      tab_panel << Apotomo::TabWidget.new('tab_one', :widget_content, 
-        :title => "Tab One")
-  end
-end
-
-
-class SwitchTestWidgetTree < Apotomo::WidgetTree  
-  def draw(root)
-    root << first = Apotomo::ChildSwitchWidget.new('first_switch', :switch)
-      first << second = Apotomo::ChildSwitchWidget.new('second_switch', :switch)
-       second << cell(:my_test, :a_state, 'first_child')
-       second << cell(:my_test, :a_state, 'second_child')
-  end
-end
-
-
-
 class TabPanelTest < ActionController::TestCase
   include Apotomo::UnitTestCase
   

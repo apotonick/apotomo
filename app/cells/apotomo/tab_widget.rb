@@ -3,10 +3,15 @@ module Apotomo
     
     attr_accessor :title
     
-    def initialize(id, start_states=:widget_content, opts={})
-      super(id, start_states, opts)
+    def initialize(*args)
+      super(*args)
       
-      @title = opts[:title] || name.to_s
+      @title = @opts[:title] || self.name.to_s
+    end
+    
+    
+    def display
+      render
     end
     
   end

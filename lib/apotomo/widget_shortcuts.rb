@@ -13,20 +13,12 @@ module Apotomo
       widget(base_name.to_s + '_cell', states, id, *args)
     end
     
-    def switch(id, *args)
-      widget('apotomo/child_switch_widget', :switch, id, *args)
-    end
-    
     def tab_panel(id, *args)
-      widget('apotomo/tab_panel_widget', :switch, id, *args)
+      widget('apotomo/tab_panel_widget', :display, id, *args)
     end
     
     def tab(id, *args)
-      widget('apotomo/tab_widget', :widget_content, id, *args)
-    end
-    
-    def domain(id, *args)
-      widget('apotomo/domain_widget', :widget_content, id, *args)
+      widget('apotomo/tab_widget', :display, id, *args)
     end
   end
 end

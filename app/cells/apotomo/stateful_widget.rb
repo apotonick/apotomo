@@ -319,66 +319,28 @@ module Apotomo
     def render_content &block
       invoke("*", &block)
     end
-
-
-    
-    #--
-    ### parameter accessing -------------------------------------------------------
     
     
-    ### DISCUSS: do we really need specific params for specific childs? isn't one
-    ### local param enough?
-    #--
-    def set_child_param(child_name, param, value)
-      @child_params[child_name] ||= {}
-      @child_params[child_name][param] = value  ### needed for #param.
-    end
-
-    # sets a persisting param value for _any_ child widget.
+    ### TODO: discuss the need for recursive params?
     def set_local_param(param, value)
-      set_child_param(nil, param, value)
+      @child_params[param] = value  ### needed for #param.
     end
-
+    
     # Retrieve the param value for child. This parameter has to be explicitly set 
     # with #set_child_param prior to this call.
-    def child_param(child_name, param)
-      @child_params[child_name][param] if @child_params.has_key?(child_name)
-    end
-
-    
     def local_param(param)
-      child_param(nil, param)
+      @child_params[param]
     end
-
-    ### NOTE: @opts aren't frozen, so this really ensures we get explicitly*
-    ### set options from the parent widget.
-    ### * explicitly means here: set only for the next invocation.
-    def param(name, cell=self)
-      # if called outside #invoke, get child params from last invocation:
-      
-      ###@ unless hot?
-      ###@   @child_params = thaw_child_params || {}
-      ###@ end
-
-      ### opts -> param_for (in both frozen/thawed) -> child_params -> parent?
-      return @opts[name] || param_for(name, cell) || child_param(cell.name, name) || local_param(name) || find_param(name, cell)
+    
+    
+    ### DISCUSS: use #param only for accessing request data.
+    def param(name)
+      params[name]
     end
-
-    def find_param(name, cell=self)
-      if isRoot?
-        return params[name]
-      end
-
-      parent.param(name, cell)
-    end
-
-
-    # Override this to provide your own parameter value.
-    # If you want to be sure the param-retrieving stops here, always return something 
-    # that does NOT evaluate to false, otherwise the pvf will travel further up.
-    # You have to find out yourself if you want to return a remembered value or look it up
-    # in the request.
-    def param_for(name, cell)
+    
+    ### DISCUSS: use #find_param to retrieve objects from ascendents.
+    def find_param(name)
+      local_param(name) || parent.find_param(name)
     end
 
     #--

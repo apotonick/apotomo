@@ -52,7 +52,7 @@ class PersistenceTest < ActionController::TestCase
     m.controller = @controller
     m.invoke
     
-    assert_equal m.param(:shared).value, "value from session"
+    assert_equal m.find_param(:shared).value, "value from session"
     assert_state m, :set_shared_in_session
     assert_equal s.my_shared.value, "value from session"
     assert_state s, :read_shared
@@ -66,7 +66,7 @@ class PersistenceTest < ActionController::TestCase
     
     
     
-    assert_equal m.param(:shared).value, "value from child"
+    assert_equal m.find_param(:shared).value, "value from child"
     assert_state m, :set_shared_in_session
     assert_equal s.my_shared.value, "value from child"
     assert_state s, :set_shared
@@ -199,7 +199,7 @@ class SlaveCell < Apotomo::StatefulWidget
   end
   
   def read_shared
-    @my_shared = param(:shared)
+    @my_shared = find_param(:shared)
      
     ""
   end
