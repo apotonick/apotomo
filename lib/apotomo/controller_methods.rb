@@ -308,13 +308,9 @@
     def render_page_update_for(processed_handlers)
       render :update do |page|
         
-        processed_handlers.each do |item|
-        (handler, content) = item
-          ### DISCUSS: i don't like that switch, but moving this behaviour into the
-          ###   actual handler is too complicated, as we just need replace and exec.
-          #content = handler.content
-          next unless content ### DISCUSS: move this decision into EventHandler#process_event_for(page).
-
+        processed_handlers.each do |handler, content|
+          next if content.blank?
+          
           if controller.executable_javascript?(content)
             page << content
           else
