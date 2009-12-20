@@ -80,7 +80,7 @@ module Apotomo
       # attach invoke handler to target:
       target.peek(type_uid, target.name, way[:state])
 
-      #logger.debug target.evt_table.inspect
+      #Rails.logger.debug target.evt_table.inspect
       way[:type] = type_uid
       way.delete(:state)  ### DISCUSS: do that in type_uid_for ?
     end

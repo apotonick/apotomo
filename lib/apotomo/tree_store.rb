@@ -5,7 +5,7 @@ class Apotomo::TreeStore < Hash
   def items_for_node_id(node_id)  
     node_id = node_id.to_sym
      if node_id == :root
-      logger.debug "yo!!!! asking for :root"
+      Rails.logger.debug "yo!!!! asking for :root"
       return fetch(:root).collect do |k,v|
         {:text => k, :leaf => v.size > 0 ? false : true, :id => k}
       end  

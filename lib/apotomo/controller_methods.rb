@@ -15,7 +15,7 @@
         
         # this is executed once per request:
         if session['apotomo_root']
-          logger.debug "restoring *dynamic*  widget_tree from session."
+          Rails.logger.debug "restoring *dynamic*  widget_tree from session."
           @apotomo_root = thaw_apotomo_root
         else
           @apotomo_root = widget('apotomo/stateful_widget', :widget_content, '__root__')
@@ -296,7 +296,7 @@
       if action == :event
         render_page_update_for(processed_handlers)      
       elsif action == :iframe2event
-        #logger.debug "IFRAME2EVENT happened!"
+        #Rails.logger.debug "IFRAME2EVENT happened!"
         render_iframe_update_for(processed_handlers)
       elsif action == :data
         render_data_for(processed_handlers)
@@ -328,8 +328,8 @@
     
     def render_data_for(processed_handlers)
       ### TODO: what if more events have been attached, smart boy?
-      logger.debug "  +++++++++ page updates:"
-      logger.debug processed_handlers.inspect
+      Rails.logger.debug "  +++++++++ page updates:"
+      Rails.logger.debug processed_handlers.inspect
       (handler, content) = processed_handlers.find {|i| i.last.size > 0}  ### FIXME: how do we know which handler to return? better check for kind_of? Data
       
       render :text => content
