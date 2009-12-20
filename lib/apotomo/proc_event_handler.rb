@@ -7,7 +7,7 @@ module Apotomo
     end
     
     def process_event(event)
-      puts "ProcEventHandler: calling #{@proc}"
+      logger.debug "ProcEventHandler: calling #{@proc}"
       #@proc.call(event)
       event.source.controller.send(@proc, event)
       nil ### DISCUSS: needed so that controller doesn't evaluate the "content".
