@@ -111,6 +111,17 @@ module Apotomo::UnitTestCase
   
   # test utils ------------------------------------------------------------------
   
+  # Provides a ready-to-use mouse widget instance.
+  def mouse_mock(id='mouse', start_state=:eating, &block)
+    mouse = mouse_class_mock.new(id, start_state)
+    mouse.instance_eval &block if block_given?
+    mouse
+  end
+  
+  def mouse_class_mock
+    Class.new(MouseCell)
+  end
+  
   def re(str)
     Regexp.new(Regexp.escape(str))
   end

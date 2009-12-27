@@ -84,18 +84,6 @@ class ApotomoRenderingTest < ActionController::TestCase
     assert_kind_of  ActiveSupport::JSON::Variable, c
     assert_equal    "alert();", c.to_s
   end
-
-  
-  # Provides a ready-to-use mouse widget instance.
-  def mouse_mock(id='mouse', start_state=:eating, &block)
-    mouse = mouse_class_mock.new(id, start_state)
-    mouse.instance_eval &block
-    mouse
-  end
-  
-  def mouse_class_mock
-    Class.new(MouseCell)
-  end
   
   
   def test_html_options

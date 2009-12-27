@@ -31,6 +31,15 @@ class StatefulWidgetTest < ActionController::TestCase
   end
   
   
+  def test_find_widget
+    r = cell(:mouse, :eating, 'root')
+      r << b= cell(:mouse, :eating, 'billy')
+      r << s= cell(:mouse, :eating, 'snoopy')
+    
+    assert_equal b, s.find_widget('billy')
+  end
+  
+  
   def test_merge_rendered_children_with_locals
     w = cell(:my_test, :widget_content, 'my_test')
     

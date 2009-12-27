@@ -14,7 +14,7 @@
     float: left;
     margin: 0;
     padding: 5px;
-    background-color: #f2f2f2;
+    background-color: #dbdbdb;
     color: #888888;
     border-top: 1px solid #888888;
     border-right: 1px solid #888888;
@@ -36,16 +36,16 @@
 
 <div class="TabPanel">
   <ul>
-    <% @tabs.each do |tab|      
-          html_opts = {}
-          html_opts[:class] = 'active' if tab.first == @current_child_title
-          html_opts[:title] = tab.first || tab.first
-          tab_class = (tab.first == @current_child_title) ? "active" : ""
+    <% tabs.each do |tab|
+  	  tab_class = ""   
+	  tab_class = "active" if tab.name == @current_child_id
     %>
     <li class="<%= tab_class %>">
-      <%### TODO: let the user switch between these two approaches (site reload<->AJAX). %>
-      <%# = link_to_widget tab.first, tab.last %>
-      <%= link_to_event tab.first, {:type => :switchChild}.merge!(tab[1]) %>
+      <%- if @cell.adds_deep_link? %>
+      	<%= link_to_function tab.title, 'SWFAddress.setValue("' + @cell.url_fragment_for_tab(tab) + '")' %>
+      <%- else %>
+		<%= link_to_event tab.title, {:type => :switchChild, @cell.param_name => tab.name} %>
+      <% end %>
     </li>
     <% end -%>
     

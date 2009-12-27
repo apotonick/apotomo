@@ -59,6 +59,7 @@ module Apotomo
     include Transitions
     include Caching
     
+    include DeepLinkMethods
     
     helper Apotomo::ViewHelper
     
@@ -238,6 +239,9 @@ module Apotomo
       if content = opts[:text]
         return content
       end
+      if opts[:nothing]
+        return "" 
+      end
       
       
       ### TODO: test :render_children => false
@@ -361,7 +365,7 @@ module Apotomo
 
       return parent.address(way, target)
     end
-
+    
       
     # Override this if the widget needs to set state recovery information for a 
     # bookmarkable link.
@@ -374,6 +378,9 @@ module Apotomo
       return find {|node| node.name.to_s == widget_id.to_s}
     end
     
+    def find_widget(widget_id)
+      root.find_by_id(widget_id)
+    end
     
     
     
