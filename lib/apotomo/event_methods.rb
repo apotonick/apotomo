@@ -87,7 +87,7 @@ module Apotomo
     #   trigger(:click, 'username')
     
     def trigger(event_type, source_id=self.name)
-      puts "triggered #{event_type.inspect} in #{source_id.inspect}"
+      Rails.logger.debug "triggered #{event_type.inspect} in #{source_id.inspect}"
       
       event         = Event.new
       event.type    = event_type
@@ -103,7 +103,7 @@ module Apotomo
     
     ### DISCUSS: rename to #bubble_event or #collect_handlers_for_bubbling_event.
     def bubble_handlers_for(event, handlers=[])
-      puts "looking up callback for #{event.type}: #{event.source.name} [#{name}]"
+      Rails.logger.debug "looking up callback for #{event.type}: #{event.source.name} [#{name}]"
       local_handlers = evt_table.all_handlers_for(event.type, event.source.name)
       ### DISCUSS: rename to #event_handlers_for_event(event)?
       

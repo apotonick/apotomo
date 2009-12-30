@@ -105,7 +105,7 @@ module Apotomo::Transitions
   #   => :amazing_start_state
   def start_state_for_state(state)
     s= (@start_states & transitions.fetch(state, [])).first || default_start_state
-    puts "start_state: #{s}"
+    Rails.logger.debug "start_state: #{s}"
     return s
   end
   

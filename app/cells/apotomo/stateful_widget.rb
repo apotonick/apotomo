@@ -128,13 +128,13 @@ module Apotomo
     ### DISCUSS: state is input in FSM speech, or event.
     def invoke(input=nil, &block)
       @invoke_block = block ### DISCUSS: store block so we don't have to pass it 10 times?
-      puts "\ninvoke on #{name} with #{input.inspect}"
+      logger.debug "\ninvoke on #{name} with #{input.inspect}"
       
       ### TODO: remove the * propagation.
       if input.to_s == "*"
         @is_f5_fixme = true
         input= start_state_for_state(last_state)
-        puts "F5, going back to #{input}"
+        logger.debug "F5, going back to #{input}"
       end
       
       process_input(input)
@@ -163,8 +163,8 @@ module Apotomo
     # This might lead us to some other state since the state method could call #jump_to_state.
     ### DISCUSS: should be public.
     def invoke_state(state)
-      puts "#{name}: transition: #{last_state} to #{state}"
-      puts "                                    ...#{state}"
+      logger.debug "#{name}: transition: #{last_state} to #{state}"
+      logger.debug "                                    ...#{state}"
       
       ### DISCUSS: at this point, we finally know the concrete next state.
       ### this is the next state we go to, all prior references to state where input.
@@ -220,10 +220,10 @@ module Apotomo
     def render(opts={})
       state = @state_name
       
-      puts @brain.inspect
-      puts "state ivars:"  
+      logger.debug @brain.inspect
+      logger.debug "state ivars:"
       @brain |= (instance_variables - @ivars_before)
-      puts @brain.inspect
+      logger.debug @brain.inspect
       
       
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
@@ -283,7 +283,7 @@ module Apotomo
     ### TODO: document the need for return.
     ### TODO: document that there is no state check or brain erase.
     def jump_to_state(state)
-      puts "STATE JUMP! to #{state}"
+      logger.debug "STATE JUMP! to #{state}"
       
       render_state(state)
     end
@@ -298,7 +298,7 @@ module Apotomo
       
       children_to_render.each do |cell|
         child_state = decide_child_state_for(cell, opts[:invoke])
-        puts "    #{cell.name} -> #{child_state}"
+        logger.debug "    #{cell.name} -> #{child_state}"
         
         rendered_children[cell.name] = render_child(cell, child_state)
       end
@@ -358,8 +358,8 @@ module Apotomo
     #def address(way=HashWithIndifferentAccess.new, target=self, state=nil)
       way.merge!( local_address(target, way, state) )
       
-      #puts "address: #{name}"
-      #puts way.inspect
+      #logger.debug "address: #{name}"
+      #logger.debug way.inspect
 
       return way if isRoot?
 
@@ -412,20 +412,20 @@ module Apotomo
   ### DISCUSS: taking the path as key slightly blows up the session.
   #--
   def freeze_instance_vars_to_storage(storage)
-    #puts "freezing in #{path}"
+    #logger.debug "freezing in #{path}"
     storage[path] = {}  ### DISCUSS: check if we overwrite stuff?
     (self.instance_variables - ivars_to_forget).each do |var|
       storage[path][var] = instance_variable_get(var)
-      #puts "  #{var}: #{storage[path][var]}"
+      #logger.debug "  #{var}: #{storage[path][var]}"
     end
     
     children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }
   end
   def thaw_instance_vars_from_storage(storage)
-    #puts "thawing in #{path}"
+    #logger.debug "thawing in #{path}"
     storage[path].each do |k, v|
       instance_variable_set(k, v)
-      #puts "  set #{k}: #{v}"
+      #logger.debug "  set #{k}: #{v}"
     end
     
     children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }
@@ -460,11 +460,11 @@ module Apotomo
         
           ###@ name, klass, parent, content_str = line.split(@@fieldSep)
           name, klass, parent = line.split(@@fieldSep)
-          #puts "thawing #{name}->#{parent}"
+          #logger.debug "thawing #{name}->#{parent}"
           currentNode = klass.constantize.new(name)
           
           ###@ Marshal.load(content_str).each do |k,v|
-          ###@   ###@ puts "setting "+k.inspect
+          ###@   ###@ logger.debug "setting "+k.inspect
           ###@   currentNode.instance_variable_set(k, v)
           ###@ end
           

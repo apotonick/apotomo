@@ -31,7 +31,7 @@ module Apotomo
     def processed; processed_handlers;end
     
     def process_handler_for_event(handler, event)
-      puts "processing EVENT HANDLER: #{handler}"
+      Rails.logger.debug "processing EVENT HANDLER: #{handler}"
       
       content = handler.process_event(event)
       
@@ -39,7 +39,7 @@ module Apotomo
     end
     
     def queue_handler_with_event(handler, event)
-      puts "queueing... #{event.type}: #{handler.to_s}"
+      Rails.logger.debug "queueing... #{event.type}: #{handler.to_s}"
       self.queue << [handler, event]
     end
     

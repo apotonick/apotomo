@@ -87,7 +87,7 @@ module TreeNode
   end
   
   def move_children_to(target)
-    children.clone.each {|c|# puts "adding child #{c}";  
+    children.clone.each {|c|# Rails.logger.debug "adding child #{c}";
       @childrenHash.delete(c.name)
       @children.delete(c)
       target << c
@@ -209,8 +209,8 @@ module TreeNode
       instance_content = String.new
       
       (self.instance_variables - ivars_to_forget).each do |var|
-        #puts var
-        #puts instance_variable_get(var).inspect
+        #Rails.logger.debug var
+        #Rails.logger.debug instance_variable_get(var).inspect
         instance_content << var << ":" << Marshal.dump(instance_variable_get(var)) << "^"
       end
       #strRep << @@fieldSep << Marshal.dump(@content) << @@recordSep
