@@ -18,6 +18,8 @@ class AddressingTest < Test::Unit::TestCase
     t << b
       b << j = cell(:mouse, :eating, 'jerry')
     
+    t.controller = @controller
+    
     t.invoke
     b.invoke
     
@@ -61,6 +63,7 @@ class AddressingTest < Test::Unit::TestCase
     end
     
     assert_equal "mouse=", m.local_fragment
+    m.controller = @controller
     m.invoke
     assert_equal "mouse=eating", m.local_fragment
   end

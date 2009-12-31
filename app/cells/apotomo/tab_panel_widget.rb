@@ -1,6 +1,5 @@
 module Apotomo
   class TabPanelWidget < StatefulWidget
-    
     transition :from => :display, :to => :switch
     transition                    :in => :switch
     
@@ -75,16 +74,13 @@ module Apotomo
 
       return parent.address(way, target)
     end
-
-      
-    # Override this if the widget needs to set state recovery information for a 
-    # bookmarkable link.
-    # Must return a Hash with the local state recovery information.
+    
     def local_fragment
       "#{name}=#{current_child_id}"
     end
     
     
+    # Used in view to create the tab link in deep-linking mode.
     def url_fragment_for_tab(tab)
       url_fragment_with("#{param_name}=#{tab.name}")
     end

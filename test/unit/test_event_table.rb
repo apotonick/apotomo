@@ -16,26 +16,6 @@ class TestWidget < Apotomo::StatefulWidget
   end
 end
 
-# fixture:
-class EventTableWidgetTree < Apotomo::WidgetTree
-  
-  def draw(root)
-    root.watch(:onWidget, :widget_one, :widget_two, :some_state)
-    
-    root << widget('test_widget', :widget_content, :test_widget_id)
-    root << widget('test_widget', :widget_content, :target_widget_id)
-    root << widget('test_widget', :widget_content, :target2_widget_id)
-    root << widget('test_widget', :widget_content, :widget_one)
-    root << widget('test_widget', :widget_content, :widget_two)
-    root << widget('test_widget', :widget_content, :widget_three)
-    root
-    
-    root << widget('test_widget', :fireing_state, :fireing)
-    root << widget('test_widget', :fireman_state, :fireman)
-    root.watch(:click, :fireman, :fireman_state, :fireing)
-  end
-end
-
 
 
 class EventTableTest < Test::Unit::TestCase
@@ -44,13 +24,6 @@ class EventTableTest < Test::Unit::TestCase
   def setup
     super
     @processor = Apotomo::EventProcessor.instance.init!
-  end
-  
-  
-  def tree
-    r = apotomo_root_mock
-    EventTableWidgetTree.new.draw(r)
-    r
   end
   
   
@@ -112,14 +85,26 @@ class EventTableTest < Test::Unit::TestCase
   
   ### TODO: move to test_triggering/test_event_processor.
   def test_handler_queueing_when_triggered_in_cell_state
-    f = tree.find_by_id(:fireing)
-    f.invoke  # trigger :click
+    m = mouse_mock('mommy')
+      m << s= mouse_mock('sender', :fire_event) do
+        def fire_event
+          trigger :click 
+          render :nothing => true
+        end
+      end
+      
+      m << r= mouse_mock('receiver', :receive_event) do
+        def receive_event; render :text => "gotcha!"; end
+      end
+    m.respond_to_event :click, :on => 'receiver', :with => :receive_event
+    
+    s.invoke  # trigger :click
     
     assert_equal 1, @processor.queue.size
     a = @processor.queue.first
     # test [handler, event]:
-    assert_equal "InvokeEventHandler:fireman#fireman_state", a.first.to_s
-    assert_equal f, a.last.source
+    assert_equal "InvokeEventHandler:receiver#receive_event", a.first.to_s
+    assert_equal s.name, a.last.source.name
   end
   
 end

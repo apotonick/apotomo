@@ -17,31 +17,31 @@ class StatefulWidgetTest < ActionController::TestCase
   include Apotomo::UnitTestCase
   
   def test_visibility
-    p= cell(:my_test, :widget_content, 'my_test')
-      p << cell(:my_test, :widget_content, 'my_test1')
-      p << w= cell(:my_test, :widget_content, 'my_test2')
-      p << cell(:my_test, :widget_content, 'my_test3')
+    p= mouse_mock('mommy', :posing) { def posing; render; end }
+      p <<    mouse_mock('jerry')
+      p << w= mouse_mock('berry')
+      p <<    mouse_mock('larry')
     
     w.invisible!
     
     c = p.invoke
-    assert_selekt c, "#my_test>#my_test1"
-    assert_selekt c, "#my_test>#my_test3"
-    assert_selekt c, "#my_test>#my_test2", 0
+    assert_selekt c, "#mommy>#jerry"
+    assert_selekt c, "#mommy>#larry"
+    assert_selekt c, "#mommy>#berry", 0
   end
   
   
   def test_find_widget
-    r = cell(:mouse, :eating, 'root')
-      r << b= cell(:mouse, :eating, 'billy')
-      r << s= cell(:mouse, :eating, 'snoopy')
+    r = mouse_mock('root')
+      r << b= mouse_mock('berry')
+      r << s= mouse_mock('larry')
     
-    assert_equal b, s.find_widget('billy')
+    assert_equal b, s.find_widget('berry')
   end
   
   
   def test_merge_rendered_children_with_locals
-    w = cell(:my_test, :widget_content, 'my_test')
+    w = mouse_mock
     
     assert_equal( {:rendered_children => []},
                   w.prepare_locals_for(nil, []) )

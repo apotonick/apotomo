@@ -5,7 +5,7 @@ class PersistenceTest < ActionController::TestCase
   include Apotomo::UnitTestCase
   
   def test_dump
-    t = cell(:my_test, :widget_content, 'my_id')
+    t = cell(:mouse, :eating, 'mommy')
     
     d = Marshal::dump(t)
     t = Marshal::load(d)
@@ -18,6 +18,8 @@ class PersistenceTest < ActionController::TestCase
   def test_instance_variable_referencing_between_different_widgets
     m = cell(:master, :set_shared, 'master')
       s = m << cell(:slave, :read_shared, 'slave')
+    
+    m.controller = @controller
     
     m.invoke
     
@@ -76,10 +78,10 @@ class PersistenceTest < ActionController::TestCase
   
   # test if each widget has it's own namespaced session container:
   def test_widget_session_encapsulation
-    r = cell(:my_test, :some, 'root')
-      r << a= cell(:my_test, :some, 'a')
-      r << b1= cell(:my_test, :some, 'b')
-        a << b2= cell(:my_test, :some, 'b')
+    r = cell(:mouse, :eating, 'root')
+      r << a= cell(:mouse, :eating, 'a')
+      r << b1= cell(:mouse, :eating, 'b')
+        a << b2= cell(:mouse, :eating, 'b')
     
     hibernate_widget(r)
     
@@ -88,10 +90,10 @@ class PersistenceTest < ActionController::TestCase
   
   # test if removed widgets are removed from the session container:
   def test_widget_session_cleanup
-    r = cell(:my_test, :some, 'root')
-      r << a= cell(:my_test, :some, 'a')
-      r << b1= cell(:my_test, :some, 'b')
-        a << b2= cell(:my_test, :some, 'b')
+    r = cell(:mouse, :eating, 'root')
+      r << a= cell(:mouse, :eating, 'a')
+      r << b1= cell(:mouse, :eating, 'b')
+        a << b2= cell(:mouse, :eating, 'b')
     
     
     r = hibernate_widget(r)
@@ -105,7 +107,18 @@ class PersistenceTest < ActionController::TestCase
   
   ### ALSO TESTED IN test_jump_to_state.rb#test_brain_reset_when_invoking_a_start_state:
   def test_widget_start_state_cleanup
-    r = cell(:my_test, :start, 'root')
+    r = mouse_mock('root', :start) do
+      self.class.transition :in    => :start
+      #self.class.transition :from  => :start, :to => :one
+      
+      def ivar; @ivar; end
+      def start
+        @ivar = "value"
+        render :nothing => true
+      end
+    end
+    
+    
     # :start will set a state variable.
     r.invoke
     assert_state r, :start
@@ -120,7 +133,21 @@ class PersistenceTest < ActionController::TestCase
   
   # @brain should contain all ivars set during successive state executions.
   def test_brain
-    r = cell(:my_test, :start, 'root')
+    r = mouse_mock('root', :start) do
+      self.class.transition :from  => :start, :to => :one
+      
+      def ivar;   @ivar; end
+      def brain;  @brain; end
+      def start
+        @ivar = "value"
+        render :nothing => true
+      end
+      def one
+        @one  = "1"
+        render :text => "#{@one}"
+      end
+    end
+    
     # :start will set a state variable.
     r.invoke
     assert_state r, :start
@@ -145,7 +172,13 @@ class PersistenceTest < ActionController::TestCase
     
   # @state_view, @rendered_children shouldn't be remembered after state rendering.
   def test_reset_rendering_ivars
-    r = cell(:my_test, :one, 'a')
+    r = mouse_mock('root', :one) do
+      def rendered_children; @rendered_children; end
+      def one
+        @one  = "1"
+        render :nothing => true
+      end
+    end
     
     r.invoke
     assert_state r, :one
@@ -207,24 +240,5 @@ class SlaveCell < Apotomo::StatefulWidget
   def set_shared
     @my_shared.value = "value from child"
     ""
-  end
-end
-
-class MyTestCell < Apotomo::StatefulWidget
-  attr_reader :ivar, :one
-  # allow testing library ivars from outside:
-  attr_reader :brain, :rendered_children
-  
-  transition :in    => :start
-  transition :from  => :start, :to => :one
-  
-  def start
-    @ivar = "value"
-    render :text => ""
-  end
-  
-  def one
-    @one  = "1"
-    render :text => "#{@one}"
   end
 end

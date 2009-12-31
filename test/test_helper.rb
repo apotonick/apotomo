@@ -3,16 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper
 Cell::Base.view_paths.unshift File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
 class MouseCell < Apotomo::StatefulWidget
+  def eating; render; end
 end
 
 class RenderingTestCell < Apotomo::StatefulWidget
   attr_reader :brain
   attr_reader :rendered_children
   
-  def check_state   # view resides in fixtures/apotomo/stateful_widget/
-    @ivar = "#{@name} is cool."
-    render
-  end
+  
   
   def jump
     jump_to_state :check_state
@@ -115,11 +113,14 @@ module Apotomo::UnitTestCase
   def mouse_mock(id='mouse', start_state=:eating, &block)
     mouse = mouse_class_mock.new(id, start_state)
     mouse.instance_eval &block if block_given?
+    mouse.controller = @controller
     mouse
   end
   
-  def mouse_class_mock
-    Class.new(MouseCell)
+  def mouse_class_mock(&block)
+    klass = Class.new(MouseCell)
+    klass.instance_eval &block if block_given?
+    klass
   end
   
   def re(str)

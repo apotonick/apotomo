@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
+### FIXME: clean me up, use respond_to_event and remove peek.
+
 
 class TestWidget < Apotomo::StatefulWidget
   def transition_map
@@ -38,10 +40,6 @@ class MyTestWidget < Apotomo::StatefulWidget
   end
 end
 
-class ApplicationWidgetTree < Apotomo::WidgetTree
-  
-  
-end
 
 
 
@@ -58,7 +56,7 @@ class EventSystemTest < Test::Unit::TestCase
     w.watch(:invoke, w.name, :simple_state)
     
     evt = Apotomo::Event.new(:invoke, w)
-      
+    w.controller = @controller  
     w.invoke_for_event(evt)
     
     assert_state w, :simple_state
@@ -78,6 +76,7 @@ class EventSystemTest < Test::Unit::TestCase
     w1.watch(:invoke, w1.name, :simple_state)
     
     evt = Apotomo::Event.new(:invoke, w1)      
+    w1.controller = @controller
     w1.invoke_for_event(evt)
     
     assert_state w1, :fireing_state
@@ -92,6 +91,7 @@ class EventSystemTest < Test::Unit::TestCase
     w1  = widget(:test_widget, :simple_state, 'w1')
     w1.watch(:invoke, w1.name, :simple_state)
     evt = Apotomo::Event.new(:invoke, w1)      
+    w1.controller = @controller
     w1.invoke_for_event(evt)
     assert_equal 1, @processor.processed_handlers.size
     
@@ -104,6 +104,7 @@ class EventSystemTest < Test::Unit::TestCase
   
   def test_peek
     w1  = widget(:my_test_widget, [:state_1, :state_2], 'w1')
+    w1.controller = @controller
     w1.invoke(:state_1)
     assert_equal 1, w1.evt_table.handlers_for(:invoke, w1.name).size
     
@@ -113,6 +114,7 @@ class EventSystemTest < Test::Unit::TestCase
   
   def test_invoke!
     w1  = widget(:my_test_widget, [:state_1, :state_2], 'w1')
+    w1.controller = @controller
     w1.invoke!(:state_1)
     
     assert_state w1, :state_1

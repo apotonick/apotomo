@@ -6,12 +6,18 @@ class ApotomoRenderingTest < ActionController::TestCase
   
   # we only want a small set of ivars exposed in the view.
   def test_assigns_in_view
-    w = cell(:rendering_test, :check_state, 'my_widget')
-    c = w.invoke
+    w = mouse_mock('my_widget', :check_state) do
+      def brain; @brain; end
+      
+      def check_state
+        @ivar = "#{@name} is cool."
+        render
+      end
+    end
     
     # there should be exactly two variables exposed in the view, 
     # the state ivars and @rendered_children:
-    assert_selekt c, "#my_widget", "my_widget is cool."
+    assert_selekt w.invoke, "#my_widget", "my_widget is cool."
     assert_equal 1, w.brain.size
     assert w.brain.include?('@ivar')
     assert ! w.ivars_to_ignore.include?('@rendered_children') # we want that in the view!
@@ -19,12 +25,9 @@ class ApotomoRenderingTest < ActionController::TestCase
   
   # is rendered_children an ordered hash?
   def test_render_children_for_state
-    RenderingTestCell.class_eval do
-      def widget_content; render; end
-    end
-    w = cell(:rendering_test, :widget_content, 'a')
-    w << cell(:rendering_test, :widget_content, 'b')
-    w << cell(:rendering_test, :widget_content, 'c')
+    w = mouse_mock('a')
+    w << mouse_mock('b')
+    w << mouse_mock('c')
     
     rendered_children = w.render_children_for(:widget_content, {})
     
@@ -45,6 +48,7 @@ class ApotomoRenderingTest < ActionController::TestCase
     w = cell(:rendering_test, :widget_content, 'a')
     w << cell(:rendering_test, :widget_content, 'b')
     w << cell(:rendering_test, :widget_content, 'c')
+    w.controller = @controller
     c = w.invoke
     
     assert_selekt c, "#a>#b:nth-child(1)"
@@ -52,35 +56,27 @@ class ApotomoRenderingTest < ActionController::TestCase
   end
   
   def test_render
-    RenderingTestCell.class_eval do
-      def call_render
-        render
-      end
-    end
-    
-    c = cell(:rendering_test, :call_render, 'my_cell').invoke
-    assert_selekt c,  "div#my_cell", "call_render"
+    assert_selekt mouse_mock.invoke,  "div#mouse", "burp!"
   end
   
   def test_render_with_different_view
-    RenderingTestCell.class_eval do
-      def call_render
-        render :view => :different
+    w = mouse_mock('mouse', :drinking) do
+      def drinking
+        render :view => :eating
       end
     end
     
-    c = cell(:rendering_test, :call_render, 'my_cell').invoke
-    assert_selekt c,  "div#my_cell", "different"
+    assert_selekt w.invoke,  "div#mouse", "burp!"
   end
   
   def test_render_js
-    RenderingTestCell.class_eval do
-      def call_render
+    w = mouse_mock do
+      def eating
         render :js => "alert();"
       end
     end
     
-    c = cell(:rendering_test, :call_render, 'my_cell').invoke
+    c = w.invoke
     assert_kind_of  ActiveSupport::JSON::Variable, c
     assert_equal    "alert();", c.to_s
   end

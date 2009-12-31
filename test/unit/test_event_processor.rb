@@ -8,16 +8,16 @@ class EventProcessorTest < Test::Unit::TestCase
     p = Apotomo::EventProcessor.instance.init!
     
     h = Apotomo::InvokeEventHandler.new
-    h.widget_id = :test_widget
-    h.state     = :widget_content
+    h.widget_id = 'mouse'
+    h.state     = :eating
     
     h2 = Apotomo::InvokeEventHandler.new
-    h2.widget_id = :test_widget
-    h2.state     = :check_state
+    h2.widget_id = 'mouse'
+    h2.state     = :feeding
     
-    # queue handlers, this usually happens in #peek and #fire:
+    # queue handlers, this usually happens in #peek and #trigger:
     e = Apotomo::Event.new
-    e.source = cell(:rendering_test, :widget_content, 'test_widget')
+    e.source = mouse_mock
     
     p.queue_handler_with_event h, e
     
@@ -33,16 +33,16 @@ class EventProcessorTest < Test::Unit::TestCase
     p = Apotomo::EventProcessor.instance.init!
     
     h = Apotomo::InvokeEventHandler.new
-    h.widget_id = :test_widget
-    h.state     = :widget_content
+    h.widget_id = 'mouse'
+    h.state     = :eating
     
     h2 = Apotomo::InvokeEventHandler.new
-    h2.widget_id = :test_widget
-    h2.state     = :check_state
+    h2.widget_id = 'mouse'
+    h2.state     = :feeding
     
     # queue handlers, this usually happens in #peek and #fire:
     e = Apotomo::Event.new
-    e.source = cell(:rendering_test, :widget_content, 'test_widget')
+    e.source = mouse_mock
     
     p.queue_handlers_with_event [h, h2, h], e
     processed = p.process_queue

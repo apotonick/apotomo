@@ -5,29 +5,26 @@ class ChildStatesTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
   def test_invoke_in_render_opts
-    @w  = MouseCell.new('mommy')
-    @c  = MouseCell.new('bubi')
+    w  = mouse_mock('mommy')
+    c  = mouse_mock('bubi')
     
-    assert_equal :eat,  @w.decide_child_state_for(@c, {'bubi'  => :eat})
-    assert_equal :eat,  @w.decide_child_state_for(@c, {:bubi   => :eat})
+    assert_equal :eat,  w.decide_child_state_for(c, {'bubi'  => :eat})
+    assert_equal :eat,  w.decide_child_state_for(c, {:bubi   => :eat})
     
-    assert_equal nil,   @w.decide_child_state_for(@c, {})
-    assert_equal nil,   @w.decide_child_state_for(@c, nil)
+    assert_equal nil,   w.decide_child_state_for(c, {})
+    assert_equal nil,   w.decide_child_state_for(c, nil)
   end
   
   
-  def test_render_children_for_with_options
-    local_class = Class.new(MouseCell) 
-    m  = local_class.new('mommy', :feed)
-    m.instance_eval do
+  def test_render_children_for_with_options  
+    m = mouse_mock('mommy', :feed) do
       self.class.transition :from => :feed, :to => :sleep
       
-      #def feed;   render :invoke => {'bubi' => :sleep};    end
       def feed;   render;                       end
     end
     
-    b  = local_class.new('bubi', [:eat, :sleep])
-    b.instance_eval do
+    
+    b = mouse_mock('bubi', [:eat, :sleep]) do
       self.class.transition :from => :eat, :to => :sleep
       
       def eat;    render :text => "eating";     end
