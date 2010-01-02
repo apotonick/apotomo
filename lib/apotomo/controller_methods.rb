@@ -115,6 +115,7 @@
           
           before_filter :apotomo_handle_flushing
         end
+        
       end
       
     private

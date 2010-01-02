@@ -1,4 +1,4 @@
-#  Copyright (c) 2007,2008 Nick Sutterer <nick@tesbo.com>
+#  Copyright (c) 2007-2010 Nick Sutterer <apotonick@gmail.com>
 #  
 #  The MIT License
 #  

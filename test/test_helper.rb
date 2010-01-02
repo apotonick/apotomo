@@ -109,6 +109,15 @@ module Apotomo::UnitTestCase
   
   # test utils ------------------------------------------------------------------
   
+  # Creates the test root widget and sets it in @controller.apotomo_root for you.
+  def init_apotomo_root_mock!
+    r = apotomo_root_mock
+    r.root.controller = @controller
+    @controller.instance_eval do
+      @apotomo_root = r
+    end
+  end
+  
   # Provides a ready-to-use mouse widget instance.
   def mouse_mock(id='mouse', start_state=:eating, &block)
     mouse = mouse_class_mock.new(id, start_state)

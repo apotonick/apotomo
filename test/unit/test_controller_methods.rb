@@ -64,15 +64,6 @@ class ControllerMethodsTest < ActionController::TestCase
     controller_class
   end
   
-  # Creates the test root widget and sets it in @controller.apotomo_root for you.
-  ### DISCUSS: move to test_helper?
-  def init_apotomo_root_mock!
-    r = apotomo_root_mock
-    r.root.controller = @controller
-    @controller.instance_eval do
-      @apotomo_root = r
-    end
-  end
   
   def test_custom_apotomo_accessors
     @controller = WidgetController.new
@@ -399,7 +390,6 @@ class ControllerMethodsTest < ActionController::TestCase
     assert !  @controller.executable_javascript?("output from widget")
     assert    @controller.executable_javascript?(ActiveSupport::JSON::Variable.new)
   end
-  
 end
 
 # render_widget w, :user => user do..end
