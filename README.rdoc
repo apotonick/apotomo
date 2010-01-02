@@ -2,206 +2,80 @@
 
 Apotomo is a stateful widget component framework for Rails.
 
-Its event-driven concept introduces a GUI-like development style for Rich Web
-Applications. The event handling with callbacks moves away from the one-big-view 
-thinking to a modular component-oriented approach.
+A stateful WHAT?
 
-Persistent widgets can be embedded into existing controllers and implement only parts of a page, or they can model a complete application, leaving it open to the Rails developer how much Apotomo he wants.
+Well, you know that. In Rails, people tend to have fat controllers. One controller action renders the complete page. While many programmers try to separate their code into helpers, controller actions, RJS logic and partials, it is still the controller that has to care about when to update what, and how!
 
 
-== What are widgets?
+In Apotomo, it is the opposite. Widgets are small, autonomous components that look and feel like controllers. These tiny monsters listen to events and thus keep updating themselves on the page via AJAX. However, there's no JavaScript for you - they're pure Ruby.
 
-Apotomo::StatefulWidget is the base class for any widget in Apotomo. Widgets are derived cells[http://cells.rubyforge.org/rdoc], meaning
-they basically look and behave like super-fast mini-controllers known from Rails.
-State actions in a widget are like controller actions - they implement
-the business logic in a method and can render a corresponding view.
 
-I will demonstrate Apotomo's key concepts using the famous and tiresome counter 
-example:
+== Man, gimme code!
 
- class MyCounterCell < Apotomo::StatefulWidget
-   def transition_map
-     { :counter => [:_increment]
-     }
+Let's use the famous and tiresome counter example.
+
+  class CounterCell < Apotomo::StatefulWidget
+   	transition :from => :setup, :to => :increment
+
+  	def display
+  	  respond_to_event :counterClick, :with => :increment
+  	  
+      @count = 0
+      render		# renders display.html.erb
+  	end
+
+  	def increment
+      @count += 1	# @count is simply there - that's stateful.
+      render :view => :display
+    end
   end
+  
+Since this widget calls <tt>render</tt> it surely needs a view.
 
-  def counter
-    @count = 0
-    nil
-  end
+  <!-- I'm display.html.erb -->
+  Here's the count: <h1><%= @count %></h1>
+  <%= link_to_event "Increment me!", :type => :counterClick %>
 
-  def _increment
-    @count += 1
-    state_view :counter
-  end
-end
 
-This widget could be embedded into an existing Rails controller using the 
-Apotomo::ControllerHelper#act_as_widget method.
+We now plug the widget in a page.
 
  class ExistingController < ApplicationController
    include Apotomo::ControllerHelper
 
-   def counter_action
-     act_as_widget('nicks_counter')
+   def some_action
+   	 # do what you want...
+     
+     use_widgets do |root|
+       root << cell(:counter, :display, 'my_first_counter')
+     end
    end
  end
 
-A call to Apotomo::ControllerHelper#act_as_widget instructs Apotomo to look in the
-ApplicationWidgetTree for
-a widget named <tt>nicks_counter</tt>, render this widget and receive and process 
-apotomo events from now on.
-The ApplicationWidgetTree (currently it's "only" static) is located in the file 
-<tt>app/apotomo/application_widget_tree.rb</tt> and could look like this:
+As soon as the widget is rendered it will jump to its <tt>:display</tt> state which initializes the counter and renders itself. Speaking of rendering: how do we place the widget in our controller?
 
- class ApplicationWidgetTree < Apotomo::WidgetTree
-   def draw(root)
-     root << cell(:my_counter, :counter, 'nicks_counter')
-   end
- end
+  <!-- I'm some_action.html.erb -->
+  <p>
+  	<%= render_widget 'my_first_counter' %>
 
-This models the application. Our current demonstration app is quite small, but anyway
-we attach the MyCounterCell widget to the root and name it <tt>nicks_counter</tt>.
-As its start state is set to <tt>:counter</tt>, the widget will start in 
-this state when it is invoked by Apotomo::ControllerHelper#act_as_widget.
-
-The <tt>counter</tt> state method just resets the instance variable <tt>@count</tt>
-and automatically renders the corresponding view in
-<tt>app/cells/my_counter/counter.html.erb</tt>:
-
- I am a counter: <h1><%= @count %></h1>
- <%= link_to_event "Increment me!", :state => :_increment %>
+Ok, so this renders the widget in our controller page. When clicking the link it updates automatically on the screen showing the incremented value. Wow.
 
 
-So when browsing to <tt>http://localhost:3000/existing/counter_action</tt> the user will see a zero counter
-and a link. Being a curious user, he clicks on this link!
+== That's cool!
+Yes, it is.
 
+== Is there more?
+Apotomo got a load of features.
 
-== Transitions
-
-Such a curiousity is rewarded by triggering an Apotomo event. Some default event
-handler sends the widget <tt>nicks_counter</tt> to its <tt>:_increment</tt> state. 
-Looking at Apotomo::StatefulWidget#transition_map in our widget, this is an allowed transition.
-
-The <tt>_increment</tt> state method makes a small addition and - surprise! -
-increments the counter. By calling Apotomo::StatefulWidget#state_view it instructs 
-the rendering mechanism to render the view we already know. 
-
-
-== Persistence
-
-Where does the instance variable <tt>@count</tt> come from in the state method
-<tt>_increment</tt>? Remember, it's a <em>stateful</em> widget! They save their state between 
-requests and restore all instance variables in the next state as if there wouldn't have
-been any request at all.
-
-
-== Nesting
-
-Just for the sake of fun we write another widget with one state only. It will 
-simply display a small form. Right now, this doesn't make any sense. And it won't make 
-sense later.
-
-  class FormCell < Apotomo::StatefulWidget
-    def dumb_form
-    end
-  end
-
-When rendered the widget would just be a form with an input field and a submit button.
-Let's push it into our application in the ApplicationWidgetTree:
-
-  class ApplicationWidgetTree < Apotomo::WidgetTree
-    def draw(root)
-      root << form= cell(:form, :dumb_form, 'my_dumb_form')
-        form << cell(:my_counter, :counter, 'nicks_counter')  # we already know that.
-    end
-  end
-
-What's going on here? We <em>nested</em> the widgets! When rendered, we will see the
-simple form <em>containing</em> a counter widget .
-
-== Events
-
-Let's assume the corresponding view for <tt>:dumb_form</tt> would be
-<tt>app/cells/form/dumb_form.html.erb</tt>:
+  [Composability]	Widgets can range from small standalone components to nested widget trees like dashboards or forms. Remember that each widget can have any number of children.
   
-  <%= form_to_event :type => :dumb %>
-    <%= text_field_tag :some_text %>
-    <%= submit_tag %>
-  </form>
-
-  <%= @content.join("") %>
+  [Bubbling events]	Widgets can trigger events and watch out for them. While events bubble up from their triggering source to root they can be observed, providing a way to implement loosely coupled, distributable components.
   
-When submitted Apotomo::ViewHelper#form_to_event triggers an event, it's type will be
-<tt>:dumb</tt> and the event source is <tt>my_dumb_form</tt>. This is amazing, anyway,
-nothing will happen since there isn't an event <em>handler</em> for this event.
-
-== Event Handler
-
-It would be cool if the counter widget could observe this form. If the user entered an
-integer in the input field, it could be the new counter value. Instantly we extend 
-<tt>MyCounterCell</tt>:
-
-  class MyCounterCell < Apotomo::StatefulWidget
-    def transition_map
-      { :counter    => [:_increment],
-        :_increment => [:_increment, :_set],
-        :_set       => [:_increment, :_set],
-      }
-    end
-    
-    def _set
-      @count = param(:some_text) # I omit a type check! Shame on me!
-      state_view :counter
-    end
-    
-    ...
-    ...
-  end
-
-We <em>know</em> that the form fires a <tt>:dumb</tt> event when submitted, so we should
-watch out for this event. In the ApplicationWidgetTree, we add:
-
-    root.watch(:dumb, 'nicks_counter', :_set, nil)
-
-This attaches an event handler to the root widget with Apotomo::EventAware#watch. 
-It says "whenever a <tt>:dumb</tt> event is triggered, regardless of the event source,
-invoke the state <tt>:_set</tt> on the widget named <tt>nicks_counter</tt>.
-
-Ok, summarize this: 
-* the user enters some value in the input field
-* he submits the form thus firing an event
-* the event bubbles up from the source up to root, where it is catched
-* the counter widget is updated, having the value the user entered
-Cool!
+  [Deep Linking]	Apotomo deals with deep links (or url fragments) out-of-the-box while using SWFAddress. Components that register for deep linking will update as soon as the deep link changes. That makes your application back-button-safe!
+  
+  [Testing]			Needless to say that it is simply easier to test small components instead of fat do-it-all controllers.
 
 
-== Parameter accessing
-
-Widgets shouldn't access parameters from outside with <tt>#params</tt> anymore. They have a more
-sophisticated concept with Apotomo::StatefulWidget#param.
-
-Remember the <tt>_set</tt> method in our counter? It retrieves its new counter value by
-asking for it:
-  @count = param(:some_text) 
-
-This request <em>bubbles up</em> the wigdet hierarchy, asking every widget on its way if
-it knows the value for <tt>:some_text</tt>. The questioning finally ends up in looking into 
-<tt>params[]</tt> in the root widget.
-We could override this behaviour by overwriting Apotomo::StatefulWidget#param_for in an ascending widget.
-
-== Bookmarkable links
-
-Links in widget views can be made bookmarkable by adding <tt>:static => true</tt> 
-to the options in Apotomo::ViewHelper#link_to_widget. The link contains enough state
-information to restore the exact state the widget was in when it was invoked the last
-time.
-
-== File uploads with AJAX
-
-A programmer will never encounter the file upload problem with AJAX in an Apotomo widget.
-Apotomo automatically manages the upload and page update process as soon as there is 
-<tt>:multipart => :true</tt> in Apotomo::ViewHelper#form_to_event.
+Give it a try- you will love the power and simplicity of real stateful components!
 
 
 == Bugs, Community
@@ -211,7 +85,7 @@ here[http://apotomo.de/download].
 
 
 == License
-Copyright (c) 2007, 2008 Nick Sutterer <apotonick@gmail.com>
+Copyright (c) 2007-2010 Nick Sutterer <apotonick@gmail.com>
 
 The MIT License
 
