@@ -14,27 +14,29 @@ In Apotomo, it is the opposite. Widgets are small, autonomous components that lo
 
 Let's use the famous and tiresome counter example.
 
-  class CounterCell < Apotomo::StatefulWidget
-   	transition :from => :setup, :to => :increment
-
-  	def display
-  	  respond_to_event :counterClick, :with => :increment
+ class CounterCell < Apotomo::StatefulWidget
+   transition :from => :setup, :to => :increment
+   
+   def display
+     respond_to_event :counterClick, :with => :increment
   	  
-      @count = 0
-      render		# renders display.html.erb
-  	end
+     @count = 0
+     render		# renders display.html.erb
+   end
 
-  	def increment
-      @count += 1	# @count is simply there - that's stateful.
-      render :view => :display
-    end
-  end
+   def increment
+     @count += 1	# @count is simply there - that's stateful.
+     render :view => :display
+   end
+ end
   
 Since this widget calls <tt>render</tt> it surely needs a view.
 
-  <!-- I'm display.html.erb -->
-  Here's the count: <h1><%= @count %></h1>
-  <%= link_to_event "Increment me!", :type => :counterClick %>
+ <!-- I'm display.html.erb -->
+  
+ <h1><%= @count %></h1>
+ 
+ <%= link_to_event "Increment me!", :type => :counterClick %>
 
 
 We now plug the widget in a page.
@@ -43,7 +45,7 @@ We now plug the widget in a page.
    include Apotomo::ControllerHelper
 
    def some_action
-   	 # do what you want...
+     # do what you want...
      
      use_widgets do |root|
        root << cell(:counter, :display, 'my_first_counter')
@@ -51,13 +53,17 @@ We now plug the widget in a page.
    end
  end
 
-As soon as the widget is rendered it will jump to its <tt>:display</tt> state which initializes the counter and renders itself. Speaking of rendering: how do we place the widget in our controller?
+As soon as the widget is rendered it will jump to its <tt>:display</tt> state which initializes the counter and renders itself.
+
+Speaking of rendering: how do we place the widget in our controller?
 
   <!-- I'm some_action.html.erb -->
   <p>
   	<%= render_widget 'my_first_counter' %>
 
-Ok, so this renders the widget in our controller page. When clicking the link it updates automatically on the screen showing the incremented value. Wow.
+Ok, so this renders the widget in our controller page.
+
+When clicking the link it updates automatically on the screen showing the incremented value. Wow.
 
 
 == That's cool!
@@ -66,13 +72,13 @@ Yes, it is.
 == Is there more?
 Apotomo got a load of features.
 
-  [Composability]	Widgets can range from small standalone components to nested widget trees like dashboards or forms. Remember that each widget can have any number of children.
+[Composability]     Widgets can range from small standalone components to nested widget trees like dashboards or forms. Remember that each widget can have any number of children.
   
-  [Bubbling events]	Widgets can trigger events and watch out for them. While events bubble up from their triggering source to root they can be observed, providing a way to implement loosely coupled, distributable components.
+[Bubbling events]   Widgets can trigger events and watch out for them. While events bubble up from their triggering source to root they can be observed, providing a way to implement loosely coupled, distributable components.
   
-  [Deep Linking]	Apotomo deals with deep links (or url fragments) out-of-the-box while using SWFAddress. Components that register for deep linking will update as soon as the deep link changes. That makes your application back-button-safe!
+[Deep Linking]      Apotomo deals with deep links (or url fragments) out-of-the-box while using SWFAddress. Components that register for deep linking will update as soon as the deep link changes. That makes your application back-button-safe!
   
-  [Testing]			Needless to say that it is simply easier to test small components instead of fat do-it-all controllers.
+[Testing]           Needless to say that it is simply easier to test small components instead of fat do-it-all controllers.
 
 
 Give it a try- you will love the power and simplicity of real stateful components!
