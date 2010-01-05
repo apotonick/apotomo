@@ -52,7 +52,7 @@ class AddressingTest < Test::Unit::TestCase
     
     assert ! m.adds_deep_link?
     
-    m.add_deep_link
+    m = mouse_mock :mouse, :eating, :is_url_listener => true
     
     assert m.adds_deep_link?
   end

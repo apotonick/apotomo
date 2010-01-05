@@ -39,20 +39,18 @@ class TabPanelTest < Test::Unit::TestCase
     assert_equal 'micky', w.find_current_child.name
     
     # find child from fragment:
-    w.add_deep_link
+    w.send :add_deep_link
     assert_equal 'berry', w.find_current_child.name
   end
   
   def test_url_fragment_for_tab
-    w = tab_panel('mice')
+    w = tab_panel('mice', :is_url_listener => true)
       w << j= tab('jerry')
-        j << c= tab_panel('jerrys_kids')
+        j << c= tab_panel('jerrys_kids', :is_url_listener => true)
           c << r= tab('jerry_jr')
       w << b= tab('berry')
     
-    w.add_deep_link
     w.current_child_id = 'jerry'
-    c.add_deep_link
     
     assert_equal "mice=berry", w.url_fragment_for_tab(b)
     assert_equal "mice=jerry", w.url_fragment_for_tab(j)

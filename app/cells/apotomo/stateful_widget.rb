@@ -52,6 +52,10 @@ module Apotomo
   # #render_content_for_state, best place is the constructor.
   
   class StatefulWidget < Cell::Base
+    
+    class_inheritable_array :initialize_hooks, :instance_writer => false
+    self.initialize_hooks = []
+    
     attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
     
     include TreeNode
@@ -62,6 +66,7 @@ module Apotomo
     include DeepLinkMethods
     
     helper Apotomo::ViewHelper
+    
     
     attr_writer :controller
     attr_reader :last_brain
@@ -83,7 +88,11 @@ module Apotomo
       @cell         = self
       @state_name   = nil
       
-      init_tree_node(id)
+      process_initialize_hooks(id, start_states, opts)
+    end
+    
+    def process_initialize_hooks(*args)
+      self.class.initialize_hooks.each { |h| send(h, *args) }
     end
     
     def last_state

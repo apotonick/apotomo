@@ -3,6 +3,8 @@ module Apotomo
     
     def self.included(base)
       base.extend(ClassMethods)
+      
+      base.initialize_hooks << :initialize_deep_link_for
     end
     
     module ClassMethods
@@ -15,8 +17,9 @@ module Apotomo
       end
     end
     
-    def add_deep_link(portion=true)
-      @local_fragment = portion
+    # Called in StatefulWidget's constructor.
+    def initialize_deep_link_for(id, start_states, opts)
+      add_deep_link if opts[:is_url_listener] ### DISCUSS: remove #add_deep_link ?
     end
     
     def adds_deep_link?
@@ -44,5 +47,9 @@ module Apotomo
       url_fragment([], local_portion)
     end
     
+    private
+      def add_deep_link(portion=true)
+        @local_fragment = portion
+      end
   end
 end

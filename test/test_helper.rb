@@ -119,8 +119,8 @@ module Apotomo::UnitTestCase
   end
   
   # Provides a ready-to-use mouse widget instance.
-  def mouse_mock(id='mouse', start_state=:eating, &block)
-    mouse = mouse_class_mock.new(id, start_state)
+  def mouse_mock(id='mouse', start_state=:eating, opts={}, &block)
+    mouse = mouse_class_mock.new(id, start_state, opts)
     mouse.instance_eval &block if block_given?
     mouse.controller = @controller
     mouse

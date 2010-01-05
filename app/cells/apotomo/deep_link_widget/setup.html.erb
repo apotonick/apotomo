@@ -1,11 +1,12 @@
 <%= javascript_tag "
    	SWFAddress.onInternalChange = function() {
    		//alert('internalChange');
-   		#{remote_function :url => 'http://localhost:3000/deep_link/render_event_response?apotomo_action=event&source=deep_link&type=internalChange',  :with => '\'deep_link=\'+SWFAddress.getPath()'}
+   		#{remote_function :url => address_to_event(:type=>:internalChange),  :with => '\'deep_link=\'+SWFAddress.getPath()'}
    	}
+   	
    	SWFAddress.onExternalChange = function() {
    		//alert(SWFAddress.getPath()+SWFAddress.getQueryString());
-   		#{remote_function :url => 'http://localhost:3000/deep_link/render_event_response?apotomo_action=event&source=deep_link&type=externalChange',  :with => '\'deep_link=\'+SWFAddress.getPath()'}
+   		#{remote_function :url => address_to_event(:type=>:internalChange),  :with => '\'deep_link=\'+SWFAddress.getPath()'}
    	}
    	
    	

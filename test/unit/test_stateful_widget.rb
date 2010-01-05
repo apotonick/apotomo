@@ -52,4 +52,35 @@ class StatefulWidgetTest < ActionController::TestCase
     assert_equal( {:rendered_children => ""},
                   w.prepare_locals_for({:rendered_children => ""}, []) )
   end
+  
+  
+  def test_initialize_hooks
+    k = mouse_class_mock do
+      self.initialize_hooks << :initialize_mouse
+    end
+    
+    
+    assert_equal 2, Apotomo::StatefulWidget.initialize_hooks.size
+    assert_equal 3, k.initialize_hooks.size
+  end
+  
+  
+  def test_process_initialize_hooks
+    k = mouse_class_mock do
+      attr_accessor :counter
+      
+      self.initialize_hooks << :increment_counter
+      
+      define_method(:increment_counter){@counter ||= 0; @counter += 1}
+    end
+    
+    
+    assert_equal 1, k.new(nil, nil).counter, "#increment_counter should have been invoked only once"
+    
+    k.class_eval do
+      self.initialize_hooks << :increment_counter
+    end
+    
+    assert_equal 2, k.new(nil, nil).counter, "#increment_counter hasn't been invoked twice"
+  end
 end

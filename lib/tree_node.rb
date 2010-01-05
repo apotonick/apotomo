@@ -9,12 +9,16 @@ module TreeNode
 
   @@fieldSep = '|'
   @@recordSep = "\n.\n"
-
+  
+  def self.included(base)
+    base.initialize_hooks << :initialize_tree_node_for
+  end
+  
   # Constructor which expects the name of the node
   #
   # name of the node is expected to be unique across the
   # tree.
-  def init_tree_node(name)
+  def initialize_tree_node_for(name, *args)
     @name = name
     self.setAsRoot!
 
