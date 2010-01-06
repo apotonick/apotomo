@@ -385,6 +385,22 @@ class ControllerMethodsTest < ActionController::TestCase
     end
   end
   
+  def test_respond_to_url_change
+    r = init_apotomo_root_mock!
+    
+    assert ! r.find_by_id('deep_link'), "deep_link widget shouldn't exist, yet"
+    
+    @controller.instance_eval {
+      respond_to_url_change
+    }
+    
+    assert r.find_by_id('deep_link'),   "couldn't find deep_link widget"
+    
+    # call it again, nothing should happen:
+    @controller.instance_eval {
+      respond_to_url_change
+    }
+  end
   
   def test_executable_javascript?
     assert !  @controller.executable_javascript?("output from widget")

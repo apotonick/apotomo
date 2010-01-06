@@ -104,6 +104,13 @@
         session[:apotomo_bound_procs] = nil
       end
       
+      ### DISCUSS: rename? should say "this controller action wants apotomo's deep linking!"
+      ### DISCUSS: move to deep_link_methods?
+      def respond_to_url_change
+        return if apotomo_root.find_by_id('deep_link')  # add only once.
+        apotomo_root << widget("apotomo/deep_link_widget", :setup, 'deep_link')
+      end
+      
       
       def self.included(base) #:nodoc:
         base.class_eval do
