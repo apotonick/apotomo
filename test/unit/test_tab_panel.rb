@@ -4,14 +4,14 @@ require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 class TabPanelTest < Test::Unit::TestCase
   include Apotomo::UnitTestCase
   
-  def test_recognizes_path?
-    w = tab_panel('mice')
+  def test_responds_to_url_change_for?
+    w = tab_panel('mice', :is_url_listener => true)
     w.current_child_id = 'jerry'
     
-    assert ! w.recognizes_path?("")
-    assert ! w.recognizes_path?("mice=jerry")
-    assert w.recognizes_path?("mice=")
-    assert w.recognizes_path?("mice=berry")
+    assert ! w.responds_to_url_change_for?("")
+    assert ! w.responds_to_url_change_for?("mice=jerry")
+    assert w.responds_to_url_change_for?("mice=")
+    assert w.responds_to_url_change_for?("mice=berry")
   end
   
   def test_local_fragment

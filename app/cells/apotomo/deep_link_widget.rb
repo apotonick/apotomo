@@ -15,7 +15,7 @@ class Apotomo::DeepLinkWidget < Apotomo::StatefulWidget
       # find the update root (### DISCUSS: this might be more than one root, as in A--B)
     path = param(:deep_link)  # path is #tab=users/icon=3
     
-    update_root = root.find {|w| w.adds_deep_link? and w.recognizes_path?(path)}  ### DISCUSS: we just look for one root here.
+    update_root = root.find {|w| w.responds_to_url_change_for?(path)}  ### DISCUSS: we just look for one root here.
     
     update_root.trigger(:urlChanged) if update_root
     

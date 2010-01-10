@@ -31,7 +31,7 @@ module Apotomo
     ### DISCUSS: use #find_param instead of #param to provide a cleaner parameter retrieval?
     def find_current_child
       if adds_deep_link?
-        child_id  = value_for_path(param(:deep_link))
+        child_id  = local_value_for_path(param(:deep_link))
       else
         child_id  = param(param_name)
       end
@@ -40,30 +40,20 @@ module Apotomo
     end
     
     def default_child;  children.first;   end
-    def param_name;     name;             end
     
     
     def find_child(id)
       children.find { |c| c.name.to_s == id }
     end
     
+    def param_name; local_fragment_key; end
     
-    def recognizes_path?(path)
-      value = value_for_path(path)
-      return unless value
-      
-      return value != @current_child_id
+    
+    def responds_to_local_fragment_value?(value)
+      value != @current_child_id
     end
     
-    # Tries to find a corresponding directory in the url fragment
-    # and returns the value.
-    def value_for_path(path)
-      return if path.blank?
-      
-      if path_portion = path.split("/").find {|i| i.include?(name)}
-        return path_portion.sub("#{param_name}=", "")
-      end
-    end
+  
     
     
     
@@ -76,13 +66,13 @@ module Apotomo
     end
     
     def local_fragment
-      "#{name}=#{current_child_id}"
+      "#{local_fragment_key}=#{current_child_id}"
     end
     
     
     # Used in view to create the tab link in deep-linking mode.
     def url_fragment_for_tab(tab)
-      url_fragment_with("#{param_name}=#{tab.name}")
+      url_fragment_with("#{local_fragment_key}=#{tab.name}")
     end
   end
 end

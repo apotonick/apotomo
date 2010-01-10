@@ -69,6 +69,27 @@ class AddressingTest < Test::Unit::TestCase
   end
   
   
+  def test_local_fragment_key
+    assert_equal "mouse", mouse_mock.local_fragment_key
+  end
+  
+  
+  def test_responds_to_url_change_for
+    m = mouse_mock do
+      def eating; render :nothing => :true; end
+    end
+    
+    m.send :add_deep_link
+    m.invoke
+    
+    assert ! m.responds_to_url_change_for?("")
+    assert ! m.responds_to_url_change_for?(nil)
+    assert ! m.responds_to_url_change_for?("/some/path")
+    
+    # mouse is in :eating state:
+    assert !  m.responds_to_url_change_for?("/mouse=eating")
+    assert    m.responds_to_url_change_for?("/mouse=feeding")
+  end
   
   
   def test_path
