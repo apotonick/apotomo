@@ -6,8 +6,16 @@ module Apotomo
     attr_accessor :current_child_id
     
     
+    # Called in StatefulWidget's constructor.
+    def initialize_deep_link_for(id, start_states, opts)
+      return unless opts[:is_url_listener]
+      
+      respond_to_event :urlChange, :from => self.name, :with => :switch
+    end
+    
+    
+    
     def display
-      respond_to_event :urlChanged, :from => self.name, :with => :switch
       respond_to_event(:switchChild, :with => :switch)
       
       
@@ -30,8 +38,8 @@ module Apotomo
     
     ### DISCUSS: use #find_param instead of #param to provide a cleaner parameter retrieval?
     def find_current_child
-      if adds_deep_link?
-        child_id  = local_value_for_path(param(:deep_link))
+      if responds_to_url_change?
+        child_id  = url_fragment[param_name]
       else
         child_id  = param(param_name)
       end
@@ -46,15 +54,26 @@ module Apotomo
       children.find { |c| c.name.to_s == id }
     end
     
-    def param_name; local_fragment_key; end
+    def param_name; name; end
     
     
-    def responds_to_local_fragment_value?(value)
-      value != @current_child_id
+    # Called by deep_link_widget#process to query if we're involved in an URL change.
+    def responds_to_url_change_for?(fragment)
+      # don't respond to an empty/invalid/ fragment as we don't get any information from it:
+      return if fragment[param_name].blank?
+      
+      fragment[param_name] != @current_child_id
     end
     
-  
+    def local_fragment
+      "#{param_name}=#{current_child_id}"
+    end
     
+    
+    # Used in view to create the tab link in deep-linking mode.
+    def url_fragment_for_tab(tab)
+      url_fragment_for("#{param_name}=#{tab.name}")
+    end
     
     
     def address(way={}, target=self, state=nil)
@@ -63,16 +82,6 @@ module Apotomo
       return way if isRoot?
 
       return parent.address(way, target)
-    end
-    
-    def local_fragment
-      "#{local_fragment_key}=#{current_child_id}"
-    end
-    
-    
-    # Used in view to create the tab link in deep-linking mode.
-    def url_fragment_for_tab(tab)
-      url_fragment_with("#{local_fragment_key}=#{tab.name}")
     end
   end
 end

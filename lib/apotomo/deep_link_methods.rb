@@ -1,90 +1,90 @@
 module Apotomo
   module DeepLinkMethods
-    
     def self.included(base)
-      base.extend(ClassMethods)
-      
       base.initialize_hooks << :initialize_deep_link_for
     end
     
-    module ClassMethods
-      def adds_deep_link(portion=true)  ### DISCUSS: pass block to customize portion?
-        @class_local_fragment = portion
-      end
-      
-      def class_local_fragment
-        @class_local_fragment
-      end
-    end
     
     # Called in StatefulWidget's constructor.
     def initialize_deep_link_for(id, start_states, opts)
-      add_deep_link if opts[:is_url_listener] ### DISCUSS: remove #add_de
+      #add_deep_link if opts[:is_url_listener] ### DISCUSS: remove #add_de
     end
     
-    def adds_deep_link?
-      @local_fragment || self.class.class_local_fragment
+    def responds_to_url_change?
+      evt_table.all_handlers_for(:urlChange, name).size > 0
     end
     
     
+    ### DISCUSS: private? rename to compute_url_fragment_for ?
     # Computes the fragment part of the widget's url by querying all widgets up to root.
     # Widgets managing a certain state will usually insert state recovery information
     # via local_fragment.
-    def url_fragment(portions=[], local_portion=nil)
-      local_portion = local_fragment if adds_deep_link? and local_portion.nil?
+    def url_fragment_for(local_portion=nil, portions=[])
+      local_portion = local_fragment if responds_to_url_change? and local_portion.nil?
       
       portions.unshift(local_portion) # prepend portions as we move up.
       
       return portions.compact.join("/") if isRoot?
       
-      parent.url_fragment(portions)
-    end
-    
-    def url_fragment_with(local_portion)
-      url_fragment([], local_portion)
+      parent.url_fragment_for(nil, portions)
     end
     
     
-    
+    # Called when widget :is_url_listener. Adds the local url fragment portion to the url.
     def local_fragment
-      "#{local_fragment_key}=#{state_name}"
+      #"#{local_fragment_key}=#{state_name}"
     end
     
     # Key found in the url fragment, pointing to the local fragment.
-    def local_fragment_key
-      name
+    #def local_fragment_key
+    #  name
+    #end
+    
+    
+    # Called by DeepLinkWidget#process to query if we're involved in an URL change.
+    # Do return false if you're not interested in the change.
+    #
+    # This especially means:
+    #  * the fragment doesn't include you or is empty
+    #   fragment[name].blank?
+    #  * your portion in the fragment didn't change
+    #   tab=first/content=html vs. tab=first/content=markdown
+    #   fragment[:tab] != @active_tab
+    def responds_to_url_change_for?(fragment)
     end
     
-    ### DISCUSS: this is "routing", somehow.
-    # Tries to find a corresponding directory in the url fragment
-    # and returns the value.
-    def local_value_for_path(path)
-      return if path.blank?
+    
+    
+    class UrlFragment
+      attr_reader :fragment
       
-      if path_portion = path.split("/").find {|i| i.include?(local_fragment_key)}
-        return path_portion.sub("#{local_fragment_key}=", "")
+      def initialize(fragment)
+        @fragment = fragment || ""
+      end
+      
+      def to_s
+        fragment.to_s
+      end
+      
+      def blank?
+        fragment.blank?
+      end
+      
+      ### TODO: make path separator configurable.
+      def [](key)
+        if path_portion = fragment.split("/").find {|i| i.include?(key.to_s)}
+          return path_portion.sub("#{key}=", "")
+        end
+        
+        nil
       end
     end
     
-    
-    def responds_to_url_change_for?(path)
-      return unless adds_deep_link?
-      return unless value = local_value_for_path(path)
-      
-      responds_to_local_fragment_value?(value)
+    # Query object for the url fragment. Use this to retrieve state information from the
+    # deep link.
+    def url_fragment
+      UrlFragment.new(param(:deep_link))
     end
     
-    # Decider to find out whether the local url fragment really asks
-    # for an update.
-    # Overwrite to change the local fragment.
-    def responds_to_local_fragment_value?(value)
-      value.to_s != last_state.to_s # respond if the current value differs from the last state.
-    end
-    
-    
-    private
-      def add_deep_link(portion=true)
-        @local_fragment = portion
-      end
   end
 end

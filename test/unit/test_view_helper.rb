@@ -140,6 +140,12 @@ class ViewHelperTest < ActionView::TestCase
       trigger_event(:alarm)
   end
   
+  ### DISCUSS: move to UrlListenerTest?
+  def test_update_url
+    assert_dom_equal 'SWFAddress.setValue("trap=open");', update_url("trap=open")
+  end
+  
+  
   def test_address_to_event
     @cell =  @a
         

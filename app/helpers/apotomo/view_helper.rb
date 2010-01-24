@@ -188,7 +188,7 @@ module Apotomo
     end
     
     
-    
+    ### TODO: remove?
     def link_to_app_state(title, widget_id=false, way={}, html_options={})
       target = target_widget_for(widget_id)
       
@@ -209,6 +209,10 @@ module Apotomo
       'apotomo_iframe'
     end
     
+    
+    def update_url(fragment)
+      'SWFAddress.setValue("' + fragment + '");'
+    end
     
     ### TODO: test me.
     ### DISCUSS: rename to rendered_children ?

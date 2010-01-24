@@ -15,7 +15,7 @@ In Apotomo, it is the opposite. Widgets are small, autonomous components that lo
 Let's use the famous and tiresome counter example.
 
  class CounterCell < Apotomo::StatefulWidget
-   transition :from => :setup, :to => :increment
+   transition :from => :display, :to => :increment
    
    def display
      respond_to_event :counterClick, :with => :increment

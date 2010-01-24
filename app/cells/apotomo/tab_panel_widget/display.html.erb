@@ -41,8 +41,8 @@
 	  tab_class = "active" if tab.name == @current_child_id
     %>
     <li class="<%= tab_class %>">
-      <%- if @cell.adds_deep_link? %>
-      	<%= link_to_function tab.title, 'SWFAddress.setValue("' + @cell.url_fragment_for_tab(tab) + '")' %>
+      <%- if @cell.responds_to_url_change? %>
+      	<%= link_to_function tab.title, update_url(@cell.url_fragment_for_tab(tab)) %>
       <%- else %>
 		<%= link_to_event tab.title, {:type => :switchChild, @cell.param_name => tab.name} %>
       <% end %>

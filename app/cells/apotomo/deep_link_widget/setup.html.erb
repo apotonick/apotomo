@@ -11,5 +11,10 @@
    	
    	
     	SWFAddress.onChange = function() {
-   		}  
+   		}
+   		
+   		SWFAddress.onInit = function() {
+   		#{remote_function :url => address_to_event(:type=>:internalChange),  :with => '\'deep_link=\'+SWFAddress.getPath()'}
+   			//alert('init');
+   		}
    		" %>
