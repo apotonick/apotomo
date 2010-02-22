@@ -10,5 +10,10 @@ module Apotomo
     def ==(other)
       self.to_s == other.to_s
     end
+    
+    def call(*args)
+      process_event(*args)
+    end
+    
   end
 end

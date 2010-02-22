@@ -1,4 +1,6 @@
 # (c) 2008-2009, Nick Sutterer <apotonick@gmail.com>
+require 'onfire'
+
 module Apotomo
   # The StatefulWidget is the core component in Apotomo. Any widget is derived from 
   # this class.
@@ -59,6 +61,9 @@ module Apotomo
     attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
     
     include TreeNode
+    
+    include Onfire
+    
     include EventMethods   ### TODO: set a "see also" link in the docs.
     include Transitions
     include Caching

@@ -42,4 +42,6 @@ class EventHandlerTest < Test::Unit::TestCase
     assert h1 != h3
   end
   
+  ### TODO: test #call
+  
 end

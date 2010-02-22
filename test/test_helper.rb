@@ -1,6 +1,30 @@
+require 'rubygems'
+require 'shoulda'
+
 require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
 
 Cell::Base.view_paths.unshift File.expand_path(File.dirname(__FILE__) + "/fixtures")
+
+# Load test support files.
+Dir[File.join(File.dirname(__FILE__), *%w[support ** *.rb]).to_s].each { |f| require f }
+
+
+Test::Unit::TestCase.class_eval do
+  include Apotomo::WidgetShortcuts
+  include Apotomo::TestCaseMethods
+  
+  def setup
+    @controller = UrlMockController.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    @controller.request   = @request
+    @controller.response  = @response
+    @controller.params    = {}
+    @controller.session   = @session = {}
+  end
+end
+
+
 
 class MouseCell < Apotomo::StatefulWidget
   def eating; render; end
@@ -45,12 +69,16 @@ class UrlMockController < ActionController::Base
   end
 end
 
+
+
+
+
 module Apotomo::UnitTestCase
   
   attr_accessor :controller, :session
   
   # allow people to set up trees within test methods, with shortcuts.
-  include Apotomo::WidgetShortcuts
+  #include Apotomo::WidgetShortcuts
   
   
   def setup
