@@ -112,7 +112,7 @@ module Apotomo
     end
     
     def unfreezeable_ivars
-      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block', '@ivars_before', '@rendered_children']
+      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block', '@ivars_before', '@rendered_children', '@page_updates']
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.

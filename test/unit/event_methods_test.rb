@@ -2,10 +2,10 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
  
 class EventMethodsTest < Test::Unit::TestCase
 
-  context "#respond_to_event and #trigger" do
+  context "#respond_to_event and #fire" do
     setup do
       @mum = mouse_mock('mum', [:answer_squeak, :escape, :alert])
-      @mum << @kid = mouse_mock('kid', :peek)
+        @mum << @kid = mouse_mock('kid', :peek)
       
       @mum.respond_to_event :squeak, :with => :answer_squeak
       @mum.respond_to_event :squeak, :from => 'kid', :with => :alert
@@ -19,7 +19,7 @@ class EventMethodsTest < Test::Unit::TestCase
         
         def answer_squeak;  self.list << 'answer squeak'; "" end
         def alert;          self.list << 'be alerted'; "" end
-        def escape;         self.list << 'escape'; "" end
+        def escape;         self.list << 'escape'; "escape" end
       end
       @kid.instance_eval do
         def peek;           root.list << 'peek'; "" end
@@ -55,6 +55,28 @@ class EventMethodsTest < Test::Unit::TestCase
       @mum.respond_to_event :peep, :with => :answer_squeak, :once => false
       @mum.fire :peep
       assert_equal ['answer squeak', 'answer squeak'], @mum.list
+    end
+    
+    
+    context "#trigger" do
+      should "be an alias for #fire" do
+        @kid.trigger :footsteps
+        assert_equal ['peek', 'escape'], @mum.list
+      end
+    end
+    
+    
+    context "page_updates" do
+      should "expose a simple Array for now" do
+        assert_kind_of Array, @mum.page_updates
+        assert_equal 0, @mum.page_updates.size
+      end
+      
+      should "be queued in root#page_updates after #fire" do
+        @mum.fire :footsteps
+        assert_equal([{'mum' => 'escape'}], @mum.page_updates)
+      end
+      
     end
     
   end 

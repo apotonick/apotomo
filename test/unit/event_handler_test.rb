@@ -1,8 +1,28 @@
-require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
+require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 
 
 class EventHandlerTest < Test::Unit::TestCase
-  include Apotomo::UnitTestCase
+  context "an abstract EventHandler" do
+    should "push {source_id => nil} pairs to root's ordered page_updates when #call'ed" do
+      @mum = mouse_mock('mum')
+        @mum << @kid = mouse_mock('kid')
+      
+      assert_equal 0, @mum.page_updates.size
+      
+      [@mum, @kid, @mum].each do |source|
+        Apotomo::EventHandler.new.call(Apotomo::Event.new(:squeak, source))
+      end
+      
+      # order matters:
+      assert_equal 3, @mum.page_updates.size
+      assert_equal 0, @kid.page_updates.size
+      assert_equal({'mum' => nil}, @mum.page_updates[0])
+      assert_equal({'kid' => nil}, @mum.page_updates[1])
+      assert_equal({'mum' => nil}, @mum.page_updates[2])
+    end
+  end
+  
+  
   
   def test_invoke_to_s
     h = Apotomo::InvokeEventHandler.new

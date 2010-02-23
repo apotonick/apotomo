@@ -288,12 +288,10 @@
     
     def process_event_request(action)
       source  = apotomo_root.find_by_id(params[:source])
-      evt     = Apotomo::Event.new(params[:type], source) # type is :invoke per default.
-      ### FIXME: let trigger handle event creation!!!
-      #tree.find_by_id(params[:source]).fire(evt)
       
-      processed_handlers = source.invoke_for_event(evt)
-      #tree.find_by_id(params[:source]).trigger(type.to_sym)
+      source.fire(params[:type] || :invoke)
+      
+      processed_handlers = source.root.page_updates ### DISCUSS: no EventProcessor any more but all content in root.page_updates. that's another dependency but less complex.
       
       
       freeze_apotomo_root!

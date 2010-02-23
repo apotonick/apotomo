@@ -11,8 +11,9 @@ module Apotomo
       self.to_s == other.to_s
     end
     
-    def call(*args)
-      process_event(*args)
+    # Invoked by Onfire.
+    def call(event)
+      event.source.root.page_updates << {event.source.name => process_event(event)}
     end
     
   end

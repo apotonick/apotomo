@@ -1,8 +1,11 @@
 module Apotomo
   # Introduces event-processing functions into the StatefulWidget.
   module EventMethods
-    attr_accessor :evt_processor
-    
+    attr_writer :page_updates
+    # Replacement for the EventProcessor singleton queue.
+    def page_updates
+      @page_updates ||= []
+    end
     
     # Instructs the widget to look out for <tt>event_type</tt> Events that are passing by while bubbling.
     # If an appropriate event is encountered the widget will send the targeted widget (or itself) to another
@@ -48,22 +51,6 @@ module Apotomo
     
     def trigger(*args)
       fire(*args)
-    end
-    
-    def process_handlers_with_event(handlers, event)
-      Apotomo::EventProcessor.instance.queue_handlers_with_event(handlers, event)
-    end
-    
-    
-    # Start the rendering/event cycle by fireing an <tt>event</tt>.
-    # Returns the filled, rendered EventHandler pipeline after all handlers have been
-    # executed.
-    def invoke_for_event(evt)
-      processor = Apotomo::EventProcessor.instance.init!
-      
-      fire(evt)
-      
-      return processor.process_queue
     end
     
     # Invokes <tt>state</tt> on the widget <em>and</end> updates itself on the page. This should
