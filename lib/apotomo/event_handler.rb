@@ -13,6 +13,7 @@ module Apotomo
     
     # Invoked by Onfire.
     def call(event)
+                                          ### FIXME: event.source is WRONG, should be self.widget_id
       event.source.root.page_updates << {event.source.name => process_event(event)}
     end
     

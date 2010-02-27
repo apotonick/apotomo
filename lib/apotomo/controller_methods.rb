@@ -286,10 +286,11 @@
     # incoming event processing -------------------------------------------------
     #--
     
-    def process_event_request(action)
-      source  = apotomo_root.find_by_id(params[:source])
+    def process_event_request(request_params)
+      action  = request_params[:action]
+      source  = apotomo_root.find_by_id(request_params[:source])
       
-      source.fire(params[:type] || :invoke)
+      source.fire(request_params[:type] || :invoke)
       
       processed_handlers = source.root.page_updates ### DISCUSS: no EventProcessor any more but all content in root.page_updates. that's another dependency but less complex.
       
@@ -313,7 +314,6 @@
     
     def render_page_update_for(processed_handlers)
       render :update do |page|
-        
         processed_handlers.each do |handler, content|
           next if content.blank?
           

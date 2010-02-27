@@ -4,26 +4,7 @@ class EventMethodsTest < Test::Unit::TestCase
 
   context "#respond_to_event and #fire" do
     setup do
-      @mum = mouse_mock('mum', [:answer_squeak, :escape, :alert])
-        @mum << @kid = mouse_mock('kid', :peek)
-      
-      @mum.respond_to_event :squeak, :with => :answer_squeak
-      @mum.respond_to_event :squeak, :from => 'kid', :with => :alert
-      @mum.respond_to_event :footsteps, :with => :escape
-      
-      @kid.respond_to_event :footsteps, :with => :peek
-      
-      @mum.instance_eval do
-        class << self;      attr_writer :list; end
-        def list;           @list ||= []; end
-        
-        def answer_squeak;  self.list << 'answer squeak'; "" end
-        def alert;          self.list << 'be alerted'; "" end
-        def escape;         self.list << 'escape'; "escape" end
-      end
-      @kid.instance_eval do
-        def peek;           root.list << 'peek'; "" end
-      end
+      mum_and_kid!
     end
     
     should "alert @mum first, then make her squeak when @kid squeaks" do
