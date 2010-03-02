@@ -55,7 +55,7 @@ class EventMethodsTest < Test::Unit::TestCase
       
       should "be queued in root#page_updates after #fire" do
         @mum.fire :footsteps
-        assert_equal([{'mum' => 'escape'}], @mum.page_updates)
+        assert_equal([PageUpdate.new(:replace => 'mum', :with => "escape")], @mum.page_updates)
       end
       
     end

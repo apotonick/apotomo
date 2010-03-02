@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 
 class EventHandlerTest < Test::Unit::TestCase
   context "an abstract EventHandler" do
-    should "push {source_id => nil} pairs to root's ordered page_updates when #call'ed" do
+    should "push nil to root's ordered page_updates when #call'ed" do
       @mum = mouse_mock('mum')
         @mum << @kid = mouse_mock('kid')
       
@@ -16,9 +16,9 @@ class EventHandlerTest < Test::Unit::TestCase
       # order matters:
       assert_equal 3, @mum.page_updates.size
       assert_equal 0, @kid.page_updates.size
-      assert_equal({'mum' => nil}, @mum.page_updates[0])
-      assert_equal({'kid' => nil}, @mum.page_updates[1])
-      assert_equal({'mum' => nil}, @mum.page_updates[2])
+      assert_equal(nil, @mum.page_updates[0])
+      assert_equal(nil, @mum.page_updates[1])
+      assert_equal(nil, @mum.page_updates[2])
     end
   end
   

@@ -1,5 +1,7 @@
 module Apotomo
   module TestCaseMethods
+    PageUpdate= Apotomo::PageUpdate
+    
     # Provides a ready-to-use mouse widget instance.
     def mouse_mock(id='mouse', start_state=:eating, opts={}, &block)
       mouse = mouse_class_mock.new(id, start_state, opts)
@@ -24,16 +26,18 @@ module Apotomo
       
       @kid.respond_to_event :footsteps, :with => :peek
       
+      
       @mum.instance_eval do
-        class << self;      attr_writer :list; end
-        def list;           @list ||= []; end
+        def list; @list ||= []; end
         
-        def answer_squeak;  self.list << 'answer squeak'; "" end
-        def alert;          self.list << 'be alerted'; "" end
-        def escape;         self.list << 'escape'; "escape" end
+        def answer_squeak;  self.list << 'answer squeak'; render :text => "" end
+        def alert;          self.list << 'be alerted';    render :text => "" end
+        def escape;         self.list << 'escape';        render :text => "escape" end
       end
+      @mum.list ### FIXME: if called in invoke context only, list gets wiped out by flush_brain.
+      
       @kid.instance_eval do
-        def peek;           root.list << 'peek'; "" end
+        def peek;           root.list << 'peek'; render :text => "" end
       end
     end
 

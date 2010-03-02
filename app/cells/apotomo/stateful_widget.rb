@@ -251,7 +251,8 @@ module Apotomo
       
       
       if content = opts[:text]
-        return content
+        #return content
+        return page_update_for( content, opts)
       end
       if opts[:nothing]
         return "" 
@@ -262,7 +263,7 @@ module Apotomo
       rendered_children = render_children_for(state, opts)
       
       
-      ### FIXME: we need to expose @controller here for several helper method. that sucks!
+      ### FIXME: we need to expose @controller here for helper methods. that sucks!
       @controller =root.controller
       
       html_options = opts[:html_options] || {} ### DISCUSS: move to #defaultize_render_options_for.
@@ -273,11 +274,15 @@ module Apotomo
       
       
       content = render_view_for(opts, state)
-      #content = render_view_for(content, state)  # defined in Cell::Base.
       
-      frame_content_for(content, html_options)
+      ### TODO: test :div => false
+      content = frame_content_for(content, html_options)
       
-      
+      page_update_for(content, opts)
+    end
+    
+    def page_update_for(content, options)
+      PageUpdate.new :replace => name, :with => content
     end
     
     def prepare_locals_for(locals, rendered_children)

@@ -8,7 +8,7 @@ task :default => :test
 desc 'Test the Apotomo plugin.'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
-  t.pattern = 'test/**/test_*.rb'
+  t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
 

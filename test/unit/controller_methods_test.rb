@@ -4,6 +4,8 @@ class ControllerMethodsTest < Test::Unit::TestCase
   context "#process_event_request" do
     setup do
       mum_and_kid!
+      
+      PageUpdate = Apotomo::PageUpdate
     end
     
     should "encounter 2 page-updates when @kid squeaks" do
@@ -26,8 +28,8 @@ class ControllerMethodsTest < Test::Unit::TestCase
       res = @controller.process_event_request({:type => :squeak, :source => 'kid', :action => :event})  ### FIXME: remove :action, find out differently.
       
       assert_equal 2, res.size
-      assert_equal({:mum => ""}, res.first)
-      assert_equal ({:mum => ""}, res.last)
+      assert_equal(PageUpdate.new(:replace => 'mum'), res.first)
+      assert_equal(PageUpdate.new(:replace => 'mum'), res.last)
     end
     
   end
