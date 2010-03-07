@@ -231,11 +231,6 @@
     def thaw_tree?; ! redraw_tree?; end
     
     
-    def widget_event?
-      params['apotomo_action']
-    end
-    
-    
     
     
     def freeze_apotomo_root!

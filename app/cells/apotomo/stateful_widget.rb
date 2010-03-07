@@ -79,17 +79,15 @@ module Apotomo
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.    
     def initialize(id, start_states=:widget_content, opts={})
-      @opts         = opts  # was: super(controller, opts)
+      @opts         = opts
       @name         = id
       @start_states = start_states.kind_of?(Array) ? start_states : [start_states]
 
       @child_params = {}
       @visible      = true
       @version      = 0
-      @ivars_before = nil
       @invoke_block = nil
       
-      @brain        = []        # ivars set during state execution(s).
       @cell         = self
       @state_name   = nil
       
@@ -118,13 +116,9 @@ module Apotomo
     # Defines the instance vars which should <em>not</em> be copied to the view.
     # Called in Cell::Base.
     def ivars_to_ignore
-      (instance_variables - ivars_to_expose)
+      []
     end
     
-    # Defines the ivars which should be copied to and accessable in the view.
-    def ivars_to_expose
-      @brain + ['@rendered_children']
-    end
 
     #--
     # don't thaw when
@@ -184,9 +178,6 @@ module Apotomo
       ### this is the next state we go to, all prior references to state where input.
       ### #render_state really means what it does: we processed the input symbol, checked the condition and now go to the new state (which produces output).
       
-      flush_brain if start_state?(state)
-      @ivars_before = instance_variables
-      
       render_state(state)
     end
     
@@ -233,11 +224,6 @@ module Apotomo
     #  <div id="mouse" class="highlighted"...>
     def render(opts={})
       state = @state_name
-      
-      logger.debug @brain.inspect
-      logger.debug "state ivars:"
-      @brain |= (instance_variables - @ivars_before)
-      logger.debug @brain.inspect
       
       
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.

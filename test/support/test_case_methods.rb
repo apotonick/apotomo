@@ -40,6 +40,20 @@ module Apotomo
         def peek;           root.list << 'peek'; render :text => "" end
       end
     end
-
+    
+    
+    ### TODO: clean up, test, ass!
+    def hibernate_widget(widget)
+      session = {}
+      session['apotomo_widget_content'] = {}
+      widget.freeze_instance_vars_to_storage(session['apotomo_widget_content'])
+      session['apotomo_root'] = widget
+      
+      widget = Marshal.load(Marshal.dump(session))['apotomo_root']
+      widget.thaw_instance_vars_from_storage(session['apotomo_widget_content'])
+      #widget.controller = @controller
+      widget
+    end
+  
   end
 end
