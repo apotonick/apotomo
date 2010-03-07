@@ -3,11 +3,12 @@ module Apotomo
     attr_reader :target, :content, :replace
     
     def initialize(options)
+      super(options[:with] || "")
+      
       @target   = options[:replace] || options[:replace_html]
       raise RuntimeError unless @target
       
       @replace  = options[:replace]
-      @content  = options[:with] || ""
     end
     
     def replace?
@@ -18,16 +19,8 @@ module Apotomo
       not replace?
     end
     
-    def to_s
-      @content
-    end
-    
-    def inspect
-      '"'+to_s+'"'
-    end
-    
     def ==(obj)
-      [@target, @content, @replace] == [obj.target, obj.content, obj.replace]
+      [@target, self.to_s, @replace] == [obj.target, obj.to_s, obj.replace]
     end
   end
 end

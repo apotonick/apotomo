@@ -13,6 +13,7 @@ module Apotomo
     
     # Invoked by Onfire.
     def call(event)
+      puts "EventHandler: calling"
       event.source.root.page_updates << process_event(event)
     end
     

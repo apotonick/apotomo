@@ -31,8 +31,7 @@
       
       
       def render_event_response
-        action = params['apotomo_action']   ### TODO: i don't like that. why?
-        process_event_request(action.to_sym)
+        process_event_request(params)
       end
       
       
@@ -179,33 +178,6 @@
           super(id_for_proc(proc))
         end
       end
-      
-    # outgoing rendering --------------------------------------------------------
-    
-    
-    # Renders the widget named <tt>widget_id</tt> from the ApplicationWidgetTree
-    # into the controller action. Additionally activates event processing for this
-    # widget and all its children.
-    #--
-    # NOTE: defaults to :layout => true
-    # DISCUSS: remove #act_as_widget in favour of less confusion?
-    #--
-    def act_as_widget(widget_id, options={})
-      # create tree (new/from store)...
-      
-      # and pass it to the dispatched actions:
-      
-      if action = widget_event?
-        process_event_request(action.to_sym)
-        return
-      end
-      
-      options_for_action = {:layout => true}  # same setting as when rendering an action
-      options_for_action[:layout] = options.delete(:layout) if options.key?(:layout)
-      options_for_action[:text]   = render_widget_for(widget_id, options)
-      
-      render options_for_action
-    end
     
     # :process is true by default.
     def render_widget(widget, options={}, &block)
@@ -234,8 +206,6 @@
       
       
       widget.opts = opts unless opts.empty?
-      
-      #yield target
       
       content = widget.render_content &block
       
@@ -287,10 +257,10 @@
     #--
     
     def process_event_request(request_params)
-      action  = request_params[:action]
+      action  = request_params[:apotomo_action]
       source  = apotomo_root.find_by_id(request_params[:source])
       
-      source.fire(request_params[:type] || :invoke)
+      source.fire(request_params[:type].to_sym)
       
       processed_handlers = source.root.page_updates ### DISCUSS: no EventProcessor any more but all content in root.page_updates. that's another dependency but less complex.
       
@@ -300,27 +270,29 @@
       
       
       # usually an event is reported via this controller action:
-      if action == :event
-        render_page_update_for(processed_handlers)      
-      elsif action == :iframe2event
+      
+      
+      if action == 'event'
+        render_page_updates(processed_handlers)      
+      elsif action == 'iframe2event'
         #Rails.logger.debug "IFRAME2EVENT happened!"
         render_iframe_update_for(processed_handlers)
-      elsif action == :data
+      elsif action == 'data'
         render_data_for(processed_handlers)
       end
       
     end
     
     
-    def render_page_update_for(processed_handlers)
+    def render_page_updates(page_updates)
       render :update do |page|
-        processed_handlers.each do |handler, content|
-          next if content.blank?
+        page_updates.each do |page_update|
+          next if page_update.blank?
           
-          if controller.executable_javascript?(content)
-            page << content
+          if controller.executable_javascript?(page_update)
+            page << page_update
           else
-            page.replace handler.widget_id, content
+            page.replace page_update.target, page_update
           end
         end
         

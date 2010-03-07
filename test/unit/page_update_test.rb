@@ -15,7 +15,7 @@ class PageUpdateTest < Test::Unit::TestCase
     
     should "be allowed to omit the :with" do
       mum = Apotomo::PageUpdate.new :replace => "mum"
-      assert_equal "", mum.to_s
+      assert_equal "", mum
     end
     
   end
@@ -28,12 +28,22 @@ class PageUpdateTest < Test::Unit::TestCase
     
     context "in string context" do
       should "simply expose its content" do
-        assert_equal "squeak!", @outer.to_s
-        assert_equal "squeak!", @inner.to_s  
+        assert_equal "squeak!", "#{@outer}"
+        assert_equal "squeak!", "#{@inner}"
       end
       
+      should "respond stringy to #to_s" do
+        assert_equal "squeak!", @outer.to_s
+        assert_equal "squeak!", @inner.to_s
+      end
+       
       should "respond stringy to #kind_of?" do
         assert_kind_of String, @outer
+      end
+      
+      should "respond stringy to #blank?" do
+        assert PageUpdate.new(:replace => 'mum').blank?
+        assert ! PageUpdate.new(:replace => 'mum', :with => "squeak!").blank?
       end
       
     end

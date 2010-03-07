@@ -14,7 +14,7 @@ class ControllerMethodsTest < Test::Unit::TestCase
         def freeze_apotomo_root!;end        ### FIXME: remove #freeze_apotomo_root! dependency from #process_event_request. what does it do there?
         include Apotomo::ControllerMethods  ### FIXME: remove before_filter dependency.
         
-        def render_page_update_for(page_updates)
+        def render_page_updates(page_updates) # mock is just a pass-through method.
           page_updates
         end
       end.new
@@ -25,12 +25,14 @@ class ControllerMethodsTest < Test::Unit::TestCase
       end
       
       
-      res = @controller.process_event_request({:type => :squeak, :source => 'kid', :action => :event})  ### FIXME: remove :action, find out differently.
+      res = @controller.process_event_request({:type => :squeak, :source => 'kid', :apotomo_action => 'event'})  ### FIXME: remove :action, find out differently.
       
       assert_equal 2, res.size
-      assert_equal(PageUpdate.new(:replace => 'mum'), res.first)
-      assert_equal(PageUpdate.new(:replace => 'mum'), res.last)
+      assert_equal(PageUpdate.new(:replace => 'mum', :with => 'alert!'), res[0])
+      assert_equal(PageUpdate.new(:replace => 'mum', :with => 'squeak'), res[1])
     end
+    
+    should ""
     
   end
 end

@@ -12,6 +12,7 @@ Dir[File.join(File.dirname(__FILE__), *%w[support ** *.rb]).to_s].each { |f| req
 Test::Unit::TestCase.class_eval do
   include Apotomo::WidgetShortcuts
   include Apotomo::TestCaseMethods
+  include Apotomo::AssertionsHelper
   
   def setup
     @controller = UrlMockController.new

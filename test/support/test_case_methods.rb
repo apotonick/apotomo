@@ -30,8 +30,8 @@ module Apotomo
       @mum.instance_eval do
         def list; @list ||= []; end
         
-        def answer_squeak;  self.list << 'answer squeak'; render :text => "" end
-        def alert;          self.list << 'be alerted';    render :text => "" end
+        def answer_squeak;  self.list << 'answer squeak'; render :text => "squeak" end
+        def alert;          self.list << 'be alerted';    render :text => "alert!" end
         def escape;         self.list << 'escape';        render :text => "escape" end
       end
       @mum.list ### FIXME: if called in invoke context only, list gets wiped out by flush_brain.
