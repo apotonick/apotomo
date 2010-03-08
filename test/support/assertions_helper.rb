@@ -5,5 +5,9 @@ module Apotomo
     def assert_selekt(content, *args)
       assert_select(HTML::Document.new(content).root, *args)
     end
+
+    def assert_not(assertion)
+      assert !assertion
+    end
   end
 end

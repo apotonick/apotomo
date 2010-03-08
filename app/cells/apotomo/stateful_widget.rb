@@ -64,7 +64,7 @@ module Apotomo
     include Onfire
     
     include EventMethods   ### TODO: set a "see also" link in the docs.
-    include Transitions
+    include Transition
     include Caching
     
     include DeepLinkMethods
@@ -130,7 +130,7 @@ module Apotomo
       
       ### TODO: remove the * propagation.
       if input.blank?
-        input = next_state(last_state) || @start_state
+        input = next_state_for(last_state) || @start_state
       end
       
       
