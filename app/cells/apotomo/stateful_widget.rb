@@ -1,4 +1,3 @@
-# (c) 2008-2009, Nick Sutterer <apotonick@gmail.com>
 require 'onfire'
 
 module Apotomo
@@ -74,14 +73,16 @@ module Apotomo
     
     
     attr_writer :controller
-    attr_reader :last_brain
+        
+        def start_states; [@start_state]; end ### FIXME: remove me when Transitions is refactored.
+        
         
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.    
-    def initialize(id, start_states=:widget_content, opts={})
+    def initialize(id, start_state, opts={})
       @opts         = opts
       @name         = id
-      @start_states = start_states.kind_of?(Array) ? start_states : [start_states]
+      @start_state  = start_state
 
       @child_params = {}
       @visible      = true
@@ -91,7 +92,7 @@ module Apotomo
       @cell         = self
       @state_name   = nil
       
-      process_initialize_hooks(id, start_states, opts)
+      process_initialize_hooks(id, start_state, opts)
     end
     
     def process_initialize_hooks(*args)
@@ -119,67 +120,27 @@ module Apotomo
       []
     end
     
-
-    #--
-    # don't thaw when
-    #   - parent explicitly invokes a start state
-    #   - in F5 context (*)
-    #   - in init context (*)
-    # the is_f5_fixme flag is needed for context propagation when children are rendered.
-    # this is a part i don't like.
-    #--
-    # Central entry point for starting the FSM and recursively executing the respective
-    # state method and rendering its view. The invoke'd widget will call #invoke
-    # for each visible child, per default.
-    # See #invoke_state.
     
+    # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
+    # This might lead us to some other state since the state method could call #jump_to_state.
     ### DISCUSS: state is input in FSM speech, or event.
     def invoke(input=nil, &block)
       @invoke_block = block ### DISCUSS: store block so we don't have to pass it 10 times?
       logger.debug "\ninvoke on #{name} with #{input.inspect}"
       
       ### TODO: remove the * propagation.
-      if input.to_s == "*"
-        @is_f5_fixme = true
-        input= start_state_for_state(last_state)
-        logger.debug "F5, going back to #{input}"
+      if input.blank?
+        input = next_state(last_state) || @start_state
       end
       
-      process_input(input)
+      
+      
+      logger.debug "#{name}: transition: #{last_state} to #{input}"
+      logger.debug "                                    ...#{input}"
+      
+      render_state(input)
     end
     
-    # Initiates the rendering cycle of the widget:
-    # - if <tt>state</tt> isn't a start state, the environment of the widget is restored
-    #   using #thaw.
-    # - find the next valid state (usually this should be the passed <tt>state</tt>).
-    # - executes the respective state method for <tt>state</tt> 
-    #   (per default also named <tt>state</tt>)
-    # - invoke the children
-    # - render the view for the state (per default named after the state method)
-    def process_input(input)
-      state = input
-      unless start_state?(input)
-        state = find_next_state_for(last_state, input)
-      end 
-      
-
-      
-      invoke_state(state)
-    end
-    
-    # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
-    # This might lead us to some other state since the state method could call #jump_to_state.
-    ### DISCUSS: should be public.
-    def invoke_state(state)
-      logger.debug "#{name}: transition: #{last_state} to #{state}"
-      logger.debug "                                    ...#{state}"
-      
-      ### DISCUSS: at this point, we finally know the concrete next state.
-      ### this is the next state we go to, all prior references to state where input.
-      ### #render_state really means what it does: we processed the input symbol, checked the condition and now go to the new state (which produces output).
-      
-      render_state(state)
-    end
     
     
     # called in Cell::Base#render_state
@@ -317,16 +278,7 @@ module Apotomo
 
     def decide_child_state_for(child, invoke_opts)
       invoke_opts ||= {}
-      next_state    = nil
-      next_state    = "*" if @is_f5_fixme
-      
-      invoke_opts.stringify_keys[child.name.to_s] || next_state
-    end
-    
-    
-    # is only called when the whole page is reloaded (F5).
-    def render_content &block
-      invoke("*", &block)
+      invoke_opts.stringify_keys[child.name.to_s]
     end
     
     
@@ -436,13 +388,6 @@ module Apotomo
     children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }
   end
   
-  
-  def flush_brain
-    @brain.each do |var|
-      remove_instance_variable(var)
-    end
-    @brain.clear
-  end
 
   def _dump(depth)
       strRep = String.new
@@ -466,7 +411,7 @@ module Apotomo
           ###@ name, klass, parent, content_str = line.split(@@fieldSep)
           name, klass, parent = line.split(@@fieldSep)
           #logger.debug "thawing #{name}->#{parent}"
-          currentNode = klass.constantize.new(name)
+          currentNode = klass.constantize.new(name, nil)
           
           ###@ Marshal.load(content_str).each do |k,v|
           ###@   ###@ logger.debug "setting "+k.inspect

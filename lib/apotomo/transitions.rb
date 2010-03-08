@@ -54,6 +54,14 @@ module Apotomo::Transitions
   def start_states; @start_states;    end
   
   
+  def has_transition?(state)
+    transitions[state].present?
+  end
+  
+  def next_state(state)
+    transitions.fetch(state, []).first
+  end
+  
   def start_state?(state)
     start_states.include?(state)
   end

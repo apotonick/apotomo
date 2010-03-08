@@ -207,7 +207,7 @@
       
       widget.opts = opts unless opts.empty?
       
-      content = widget.render_content &block
+      content = widget.invoke(&block)
       
       ### DISCUSS: this happens multiple times when calling #render_widget more than once!
       freeze_apotomo_root!

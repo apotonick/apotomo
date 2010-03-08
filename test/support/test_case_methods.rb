@@ -17,7 +17,7 @@ module Apotomo
     end
     
     def mum_and_kid!
-      @mum = mouse_mock('mum', [:answer_squeak, :escape, :alert])
+      @mum = mouse_mock('mum', :answer_squeak)
         @mum << @kid = mouse_mock('kid', :peek)
       
       @mum.respond_to_event :squeak, :with => :answer_squeak
@@ -34,7 +34,6 @@ module Apotomo
         def alert;          self.list << 'be alerted';    render :text => "alert!" end
         def escape;         self.list << 'escape';        render :text => "escape" end
       end
-      @mum.list ### FIXME: if called in invoke context only, list gets wiped out by flush_brain.
       
       @kid.instance_eval do
         def peek;           root.list << 'peek'; render :text => "" end
