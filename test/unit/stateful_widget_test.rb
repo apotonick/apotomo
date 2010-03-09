@@ -13,5 +13,15 @@ class StatefulWidgetTest < Test::Unit::TestCase
     should "accept a start state as second option" do
       assert_equal :squeak, @mum.instance_variable_get('@start_state')
     end
+    
+    should "respond to #version" do
+      assert_equal 0, mouse_mock.version
+    end
+    
+    should "have a version setter" do
+      @mum = mouse_mock
+      @mum.version = 1
+      assert_equal 1, @mum.version
+    end
   end
 end

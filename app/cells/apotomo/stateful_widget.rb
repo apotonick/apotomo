@@ -72,10 +72,9 @@ module Apotomo
     helper Apotomo::ViewHelper
     
     
-    attr_writer :controller
-        
-        def start_states; [@start_state]; end ### FIXME: remove me when Transitions is refactored.
-        
+    attr_writer   :controller
+    attr_accessor :version
+    
         
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.    
@@ -84,10 +83,8 @@ module Apotomo
       @name         = id
       @start_state  = start_state
 
-      @child_params = {}
       @visible      = true
       @version      = 0
-      @invoke_block = nil
       
       @cell         = self
       @state_name   = nil
@@ -128,7 +125,6 @@ module Apotomo
       @invoke_block = block ### DISCUSS: store block so we don't have to pass it 10 times?
       logger.debug "\ninvoke on #{name} with #{input.inspect}"
       
-      ### TODO: remove the * propagation.
       if input.blank?
         input = next_state_for(last_state) || @start_state
       end
@@ -282,31 +278,10 @@ module Apotomo
     end
     
     
-    ### TODO: discuss the need for recursive params?
-    def set_local_param(param, value)
-      @child_params[param] = value  ### needed for #param.
-    end
-    
-    # Retrieve the param value for child. This parameter has to be explicitly set 
-    # with #set_child_param prior to this call.
-    def local_param(param)
-      @child_params[param]
-    end
-    
-    
     ### DISCUSS: use #param only for accessing request data.
     def param(name)
       params[name]
     end
-    
-    ### DISCUSS: use #find_param to retrieve objects from ascendents.
-    def find_param(name)
-      local_param(name) || parent.find_param(name)
-    end
-
-    #--
-    ### addressing/utilities ------------------------------------------------------
-    #--
     
     # This is called when a bookmarkable link is calculated. Every widget on the path
     # from the targeted to root can insert state recovery information in the address
