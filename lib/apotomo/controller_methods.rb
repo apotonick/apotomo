@@ -237,13 +237,13 @@
       session['apotomo_root']           = apotomo_root
       session['apotomo_widget_content'] = {}  ### DISCUSS: always reset the hash here?
       
-      apotomo_root.freeze_instance_vars_to_storage(session['apotomo_widget_content'])
+      apotomo_root.freeze_data_to(session['apotomo_widget_content'])
     end
     
     
     def thaw_apotomo_root
       root = session['apotomo_root']
-      root.thaw_instance_vars_from_storage(session['apotomo_widget_content'])
+      root.thaw_data_from(session['apotomo_widget_content'])
       root
     end
     

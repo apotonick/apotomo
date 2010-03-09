@@ -31,5 +31,15 @@ module Apotomo
     end
     
     def tree_flushed?;  @tree_flushed; end
+    
+    ### TODO: move controller dependency to rails/merb/sinatra layer only!
+    def process_event_request_for(request_params, controller)
+      self.root.controller = controller
+      
+      source = self.root.find_by_id(request_params[:source])
+      
+      source.fire(request_params[:type].to_sym)
+      source.root.page_updates ### DISCUSS: that's another dependency.
+    end
   end
 end

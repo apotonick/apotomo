@@ -104,11 +104,11 @@ module Apotomo
     # Defines the instance vars that should <em>not</em> survive between requests, 
     # which means they're not frozen in Apotomo::StatefulWidget#freeze.
     def ivars_to_forget
-      unfreezeable_ivars
+      unfreezable_ivars
     end
     
-    def unfreezeable_ivars
-      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block', '@ivars_before', '@rendered_children', '@page_updates']
+    def unfreezable_ivars
+      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block', '@ivars_before', '@rendered_children', '@page_updates', '@opts']
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.
@@ -340,29 +340,30 @@ module Apotomo
       strRep << @@recordSep
     end
   
-  #--
-  ### DISCUSS: taking the path as key slightly blows up the session.
-  #--
-  def freeze_instance_vars_to_storage(storage)
-    #logger.debug "freezing in #{path}"
-    storage[path] = {}  ### DISCUSS: check if we overwrite stuff?
-    (self.instance_variables - ivars_to_forget).each do |var|
-      storage[path][var] = instance_variable_get(var)
-      #logger.debug "  #{var}: #{storage[path][var]}"
-    end
-    
-    children.each { |ch| ch.freeze_instance_vars_to_storage(storage) }
-  end
-  def thaw_instance_vars_from_storage(storage)
-    #logger.debug "thawing in #{path}"
-    storage[path].each do |k, v|
-      instance_variable_set(k, v)
-      #logger.debug "  set #{k}: #{v}"
-    end
-    
-    children.each { |ch| ch.thaw_instance_vars_from_storage(storage) }
-  end
   
+    def freeze_ivars_to(storage)
+      frozen = {}
+      (self.instance_variables - unfreezable_ivars).each do |ivar|
+        frozen[ivar] = instance_variable_get(ivar)
+      end
+      storage[path] = frozen
+    end
+    
+    def freeze_data_to(storage)
+      freeze_ivars_to(storage)
+      children.each { |child| child.freeze_data_to(storage) }
+    end
+    
+    def thaw_ivars_from(storage)
+      storage.fetch(path, {}).each do |k, v|
+        instance_variable_set(k, v)
+      end
+    end
+    
+    def thaw_data_from(storage)
+      thaw_ivars_from(storage)
+      children.each { |child| child.thaw_data_from(storage) }
+    end
 
   def _dump(depth)
       strRep = String.new

@@ -61,4 +61,21 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
     end
   end
+  
+  context "#process_event_request_for" do
+    setup do
+      ### FIXME: what about that automatic @controller everywhere?
+      mum_and_kid!
+      @mum.controller = nil # check if controller gets connected.
+      @processor = Apotomo::RequestProcessor.new({'apotomo_root' => @mum})
+    end
+    
+    should "return 2 page_updates when @kid squeaks" do
+      res = @processor.process_event_request_for({:type => :squeak, :source => 'kid'}, @controller)
+      
+      assert_equal 2, res.size
+      assert_equal(PageUpdate.new(:replace => 'mum', :with => 'alert!'), res[0])
+      assert_equal(PageUpdate.new(:replace => 'mum', :with => 'squeak'), res[1])
+    end
+  end
 end
