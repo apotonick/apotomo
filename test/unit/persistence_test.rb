@@ -95,4 +95,11 @@ class PersistenceTest < Test::Unit::TestCase
       assert_equal :bark,           mum.children.first.children.first.instance_variable_get(:@start_state)
     end
   end
+  
+  context "#frozen_widget?" do
+    should "return true if a valid widget is passed" do
+      assert_not Apotomo::StatefulWidget.frozen_widget_in?({})
+      assert Apotomo::StatefulWidget.frozen_widget_in?({:apotomo_root => mouse_mock})
+    end
+  end
 end

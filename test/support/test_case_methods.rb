@@ -38,6 +38,8 @@ module Apotomo
       @kid.instance_eval do
         def peek;           root.list << 'peek'; render :text => "" end
       end
+      
+      @mum
     end
     
     

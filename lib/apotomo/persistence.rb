@@ -37,8 +37,12 @@ module Apotomo
     module ClassMethods
       def thaw_from(storage)
         root = storage[:apotomo_root]
-        root.thaw_data_from(storage[:apotomo_widget_ivars])
+        root.thaw_data_from(storage.fetch(:apotomo_widget_ivars, {}))
         root
+      end
+      
+      def frozen_widget_in?(storage)
+        storage[:apotomo_root].kind_of? Apotomo::StatefulWidget
       end
     end
   end
