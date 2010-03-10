@@ -41,17 +41,13 @@ module Apotomo
     end
     
     
-    ### TODO: clean up, test, ass!
     def hibernate_widget(widget)
       session = {}
-      session['apotomo_widget_content'] = {}
-      widget.freeze_data_to(session['apotomo_widget_content'])
-      session['apotomo_root'] = widget
+      widget.freeze_to(session)
       
-      widget = Marshal.load(Marshal.dump(session))['apotomo_root']
-      widget.thaw_data_from(session['apotomo_widget_content'])
-      #widget.controller = @controller
-      widget
+      session = Marshal.load(Marshal.dump(session))
+      
+      Apotomo::StatefulWidget.thaw_from(session)
     end
   
   end

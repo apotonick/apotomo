@@ -60,6 +60,7 @@ module Apotomo
     attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
     
     include TreeNode
+    include Persistence
     
     include Onfire
     
@@ -341,29 +342,7 @@ module Apotomo
     end
   
   
-    def freeze_ivars_to(storage)
-      frozen = {}
-      (self.instance_variables - unfreezable_ivars).each do |ivar|
-        frozen[ivar] = instance_variable_get(ivar)
-      end
-      storage[path] = frozen
-    end
     
-    def freeze_data_to(storage)
-      freeze_ivars_to(storage)
-      children.each { |child| child.freeze_data_to(storage) }
-    end
-    
-    def thaw_ivars_from(storage)
-      storage.fetch(path, {}).each do |k, v|
-        instance_variable_set(k, v)
-      end
-    end
-    
-    def thaw_data_from(storage)
-      thaw_ivars_from(storage)
-      children.each { |child| child.thaw_data_from(storage) }
-    end
 
   def _dump(depth)
       strRep = String.new
