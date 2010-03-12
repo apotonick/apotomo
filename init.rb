@@ -24,3 +24,4 @@
 module Apotomo
 end
 
+::Apotomo::ControllerMethods = ::Apotomo::Rails::ControllerMethods
