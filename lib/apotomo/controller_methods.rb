@@ -2,6 +2,58 @@
     module ControllerMethods
       include WidgetShortcuts
       
+      def bound_use_widgets_blocks
+        session[:bound_use_widgets_blocks] ||= ProcHash.new
+      end
+      
+      def flush_bound_use_widgets_blocks
+        session[:bound_use_widgets_blocks] = nil
+      end
+      
+      def apotomo_request_processor
+        return @apotomo_request_processor if @apotomo_request_processor # happens once per request.
+        
+        options = {}  ### TODO: process rails options (flush_tree, version)
+        
+        @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options)
+        
+        flush_bound_use_widgets_blocks if @apotomo_request_processor.tree_flushed?
+        
+        @apotomo_request_processor
+      end
+      
+      def apotomo_root
+        apotomo_request_processor.root
+      end
+      
+      # Yields the root widget for manipulating the widget tree in a controller action.
+      # Note that the passed block is executed once per session and not in every request.
+      #
+      # Example:
+      #   def login
+      #     use_widgets do |root|
+      #       root << cell(:login, :form, 'login_box')
+      #     end
+      #
+      #     @box = render_widget 'login_box'
+      #   end
+      def use_widgets(&block)
+        return if bound_use_widgets_blocks.include?(block)
+        
+        yield apotomo_root
+        
+        bound_use_widgets_blocks << block  # remember the proc.
+      end
+      
+      
+      def render_widget(widget, options={}, &block)
+        apotomo_request_processor.render_widget_for(widget, options, self, &block)
+      end
+      
+      def apotomo_freeze
+        apotomo_request_processor.freeze!
+      end
+    
       
       attr_writer :apotomo_default_url_options
       
@@ -9,25 +61,6 @@
         @apotomo_default_url_options ||= {}
       end
       
-    
-      def apotomo_root
-        return @apotomo_root if @apotomo_root # should be default, after first call.
-        
-        # this is executed once per request:
-        if session['apotomo_root']
-          Rails.logger.debug "restoring *dynamic*  widget_tree from session."
-          @apotomo_root = thaw_apotomo_root
-        else
-          @apotomo_root = widget('apotomo/stateful_widget', :widget_content, '__root__')
-        end
-        
-        add_unbound_procs_to(@apotomo_root) # add #has_widgets blocks.
-        
-        ### DISCUSS: passing controller in #invoke sucks. passing in widget constructor sucks. but setting it here sucks as well. i hate controllers.
-        @apotomo_root.controller = self
-        
-        return @apotomo_root
-      end
       
       
       def render_event_response
@@ -42,32 +75,7 @@
       
       protected
       
-      # Makes the passed +widget+ instance a persistant (stateful!) widget by
-      # adding it to +root+.
-      def use_widget(widget)
-        return if apotomo_root.find do |w| w.name == widget.name end
-        
-        apotomo_root << widget
-      end
       
-      # Yields the root widget for manipulating the widget tree in a controller action.
-      # Note that this method is executed once per session and not in every request.
-      #
-      # Example:
-      #   def login
-      #     use_widgets do |root|
-      #       root << cell(:login, :form, 'login_box')
-      #     end
-      #
-      #     @box = render_widget 'login_box'
-      #   end
-      def use_widgets(&block)
-        return if bound_procs.include?(block)
-        
-        
-        yield apotomo_root    # yield, and..
-        bound_procs << block  # remember the proc.
-      end
       
       
       def respond_to_event(type, options)
@@ -80,28 +88,6 @@
       end
       
       
-      def add_unbound_procs_to(root)
-        collect_unbound_has_widgets_blocks.each do |proc|
-          proc.call(root)       # yield, and..
-          bound_procs << (proc) # remember the proc.
-        end
-      end
-      
-      def collect_unbound_has_widgets_blocks
-        ### TODO: implement has_widgets_blocks - bound_procs.
-        self.class.has_widgets_blocks.reject do |proc|
-          bound_procs.include?(proc)
-        end || Array.new
-      end
-      
-      
-      def bound_procs
-        session[:apotomo_bound_procs] ||= ProcHash.new  ### DISCUSS: the session dependency sucks.
-      end
-      
-      def reset_bound_procs
-        session[:apotomo_bound_procs] = nil
-      end
       
       ### DISCUSS: rename? should say "this controller action wants apotomo's deep linking!"
       ### DISCUSS: move to deep_link_methods?
@@ -113,55 +99,13 @@
       
       def self.included(base) #:nodoc:
         base.class_eval do
-          extend ClassMethods
           extend WidgetShortcuts
           
-          class_inheritable_array :has_widgets_blocks
-          base.has_widgets_blocks = []
+          helper ::Apotomo::ViewMethods
           
-          before_filter :apotomo_handle_flushing
+          #before_filter :apotomo_handle_flushing
         end
         
-      end
-      
-    private
-      def apotomo_handle_flushing
-        ### TODO: check if flushing is allowed at all.
-        flush_widget_tree unless thaw_tree?
-      end
-      
-      def flush_widget_tree
-        reset_bound_procs   # make has_widgets blocks work again.
-        session['apotomo_widget_content'] = {}  ### TODO: implement #reset_widget_store
-        session['apotomo_root']           = nil ### TODO: implement #reset_widget_tree
-      end
-    
-      
-    public  ### FIXME: provide proper access levels for ALL methods.
-      
-      module ClassMethods
-        # Same as #use_widgets but to be used in controller class context.
-        # As soon as the class is compiled, the widget tree manipulation will take effects.
-        # Also note that this method is executed only once per session.
-        # Example:
-        #
-        #   class HunterController < ApplicationController::Base
-        #     include Apotomo::ControllerMethods
-        #     
-        #     has_widgets do |root|
-        #       root << cell(:bear_trap, :charged, 'nasty_trap')
-        #     end
-        #     
-        #     def trap_bears
-        #       @box = render_widget 'nasty_trap'
-        #     end
-        def has_widgets(&block)
-          has_widgets_blocks << block
-        end
-        
-        ### DISCUSS: do we need that?
-        def responds_to_event(type, options)
-        end
       end
       
       
@@ -180,72 +124,9 @@
       end
     
     # :process is true by default.
-    def render_widget(widget, options={}, &block)
-      process_events = options.key?(:process_events) ? options.delete(:process_events) : true
-      
-      if process_events
-        apotomo_default_url_options[:action] = :render_event_response
-      end
-      
-      
-      render_widget_for(widget, options, &block)
-    end
-    
-    ### TODO: put it in WidgetTree or somewhere else, as it's not a controller 
-    ###   helper.
-    # Finds the widget named <tt>widget_id</tt> and renders it.
-    def render_widget_for(widget_id, opts={}, &block)      
-      ### DISCUSS: let user pass widget OR/and widget_id ?
-      if widget_id.kind_of? Apotomo::StatefulWidget
-        widget = widget_id
-      else
-        widget = apotomo_root.find_by_id(widget_id)
-        raise "Couldn't render non-existent widget `#{widget_id}`" unless widget
-      end
-      
-      
-      
-      widget.opts = opts unless opts.empty?
-      
-      content = widget.invoke(&block)
-      
-      ### DISCUSS: this happens multiple times when calling #render_widget more than once!
-      freeze_apotomo_root!
-      
-      return content
-    end
     
     
-    
-    
-    
-    
-    # If true, the widget tree is reloaded during runtime, even if it was already frozen
-    # before. Reloading creates and runs ApplicationWidgetTree#draw.
-    # This is used in development mode when you changed the tree while the server is
-    # running. Default is to <em>not</em> reload the tree.
-    def redraw_tree?
-      ### DISCUSS: how to set this flag from outside?
-      params[:reload_tree] || false
-    end
-    def thaw_tree?; ! redraw_tree?; end
-    
-    
-    
-    
-    def freeze_apotomo_root!
-      session['apotomo_root']           = apotomo_root
-      session['apotomo_widget_content'] = {}  ### DISCUSS: always reset the hash here?
-      
-      apotomo_root.freeze_data_to(session['apotomo_widget_content'])
-    end
-    
-    
-    def thaw_apotomo_root
-      root = session['apotomo_root']
-      root.thaw_data_from(session['apotomo_widget_content'])
-      root
-    end
+ 
     
     #--
     # incoming event processing -------------------------------------------------

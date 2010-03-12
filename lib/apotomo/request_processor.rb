@@ -63,7 +63,7 @@ module Apotomo
       widget.opts = opts unless opts.empty?
       
       ### TODO: move controller dependency to rails/merb/sinatra layer only!
-      widget.controller = controller
+      widget.root.controller = controller
       
       widget.invoke(&block)
     end
