@@ -196,7 +196,7 @@ module Apotomo
       
       if content = opts[:text]
         #return content
-        return page_update_for( content, opts)
+        return page_update_for(content, opts)
       end
       if opts[:nothing]
         return "" 
@@ -226,7 +226,8 @@ module Apotomo
     end
     
     def page_update_for(content, options)
-      PageUpdate.new :replace => name, :with => content
+      replace = options[:replace_html] ? :replace_html : :replace
+      PageUpdate.new replace => name, :with => content
     end
     
     def prepare_locals_for(locals, rendered_children)

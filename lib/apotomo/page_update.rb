@@ -1,6 +1,6 @@
 module Apotomo
   class PageUpdate < String
-    attr_reader :target, :content, :replace
+    attr_reader :target, :replace
     
     def initialize(options)
       super(options[:with] || "")

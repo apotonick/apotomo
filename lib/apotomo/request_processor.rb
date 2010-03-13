@@ -33,6 +33,7 @@ module Apotomo
     def tree_flushed?;  @tree_flushed; end
     
     ### TODO: move controller dependency to rails/merb/sinatra layer only!
+    ### TODO: rename to #process_for
     def process_event_request_for(request_params, controller)
       self.root.controller = controller
       

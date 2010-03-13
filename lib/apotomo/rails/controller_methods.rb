@@ -3,6 +3,16 @@
       module ControllerMethods
         include WidgetShortcuts
         
+        def self.included(base) #:nodoc:
+          base.class_eval do
+            extend WidgetShortcuts
+            
+            helper ::Apotomo::Rails::ViewMethods
+            
+            after_filter :apotomo_freeze
+          end
+        end
+        
         def bound_use_widgets_blocks
           session[:bound_use_widgets_blocks] ||= ProcHash.new
         end
@@ -12,8 +22,9 @@
         end
         
         def apotomo_request_processor
-          return @apotomo_request_processor if @apotomo_request_processor # happens once per request.
+          return @apotomo_request_processor if @apotomo_request_processor
           
+          # happens once per request:
           options = {}  ### TODO: process rails options (flush_tree, version)
           
           @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options)
@@ -55,7 +66,14 @@
           apotomo_request_processor.freeze!
         end
       
-        
+        def render_event_response
+          page_updates = apotomo_request_processor.process_event_request_for({:type => params[:type], :source => params[:source]}, self)
+          
+          render_page_updates(page_updates)
+        end
+      
+      
+      
         attr_writer :apotomo_default_url_options
         
         def apotomo_default_url_options
@@ -63,19 +81,24 @@
         end
         
         
-        
-        def render_event_response
-          process_event_request(params)
-        end
-        
-        
-        def executable_javascript?(content)
-          content.kind_of? ActiveSupport::JSON::Variable
-        end
-        
-        
         protected
         
+        def render_page_updates(page_updates)
+          render :update do |page|
+            page_updates.each do |page_update|
+              next if page_update.blank?
+              
+              ### DISCUSS: provide proper PageUpdate API.
+              if page_update.kind_of? ActiveSupport::JSON::Variable
+                page << "#{page_update}"
+              elsif page_update.replace?
+                page.replace page_update.target, "#{page_update}"
+              elsif page_update.replace_html?
+                page.replace_html page_update.target, "#{page_update}"
+              end
+            end
+          end 
+        end
         
         
         
@@ -98,83 +121,16 @@
         end
         
         
-        def self.included(base) #:nodoc:
-          base.class_eval do
-            extend WidgetShortcuts
-            
-            helper ::Apotomo::Rails::ViewMethods
-            
-            #before_filter :apotomo_handle_flushing
-          end
-          
-        end
         
         
-        class ProcHash < Array
-          def id_for_proc(proc)
-            proc.to_s.split('@').last
-          end
         
-          def <<(proc)
-            super(id_for_proc(proc))
-          end
-          
-          def include?(proc)
-            super(id_for_proc(proc))
-          end
-        end
-      
-      # :process is true by default.
+        
+        
       
       
-  
-      
-      #--
-      # incoming event processing -------------------------------------------------
-      #--
-      
-      def process_event_request(request_params)
-        action  = request_params[:apotomo_action]
-        source  = apotomo_root.find_by_id(request_params[:source])
-        
-        source.fire(request_params[:type].to_sym)
-        
-        processed_handlers = source.root.page_updates ### DISCUSS: no EventProcessor any more but all content in root.page_updates. that's another dependency but less complex.
-        
-        
-        freeze_apotomo_root!
-        
-        
-        
-        # usually an event is reported via this controller action:
-        
-        
-        if action == 'event'
-          render_page_updates(processed_handlers)      
-        elsif action == 'iframe2event'
-          #Rails.logger.debug "IFRAME2EVENT happened!"
-          render_iframe_update_for(processed_handlers)
-        elsif action == 'data'
-          render_data_for(processed_handlers)
-        end
-        
-      end
       
       
-      def render_page_updates(page_updates)
-        render :update do |page|
-          page_updates.each do |page_update|
-            next if page_update.blank?
-            
-            if controller.executable_javascript?(page_update)
-              page << page_update
-            else
-              page.replace page_update.target, page_update
-            end
-          end
-          
-        end 
-      end
+      
       
       
       def render_data_for(processed_handlers)
@@ -208,6 +164,20 @@
             var loc = document.location;
             with(window.parent) { setTimeout(function() { window.eval('#{script}'); loc.replace('about:blank'); }, 1) } 
           </script></body></html>"
+      end
+      
+      class ProcHash < Array
+        def id_for_proc(proc)
+          proc.to_s.split('@').last
+        end
+      
+        def <<(proc)
+          super(id_for_proc(proc))
+        end
+        
+        def include?(proc)
+          super(id_for_proc(proc))
+        end
       end
     end
   end

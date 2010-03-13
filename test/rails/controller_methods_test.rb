@@ -93,6 +93,55 @@ class ControllerMethodsTest < Test::Unit::TestCase
     end
   end
   
+  context "responding to an event request and" do
+    setup do
+      @controller.instance_variable_set :@page, mock()
+      @controller.instance_eval do
+        def render(*args)
+          @page.expects(:replace).with('mum', '<div id="mum">burp!</div>')
+          @page.expects(:replace_html).with('kid', 'squeak!')
+          @page.expects(:<<).with('squeak();')
+          
+          yield @page
+        end
+      end
+    end
+    
+    context "invoking #render_page_updates" do
+      should "render one replace, one replace_html and one JS injection" do
+        @controller.send :render_page_updates, [
+          Apotomo::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
+          Apotomo::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
+          ActiveSupport::JSON::Variable.new('squeak();')
+        ]
+      end
+    end
+    
+    context "processing the request in #render_event_response" do
+      setup do
+        @mum = mouse_mock('mum', :eating)
+        @mum << @kid = mouse_mock('kid', :squeak)
+        
+        @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
+        @kid.respond_to_event :doorSlam, :with => :squeak
+        @mum.respond_to_event :doorSlam, :with => :squeak
+        
+        @mum.instance_eval do
+          def squeak; render :js => 'squeak();'; end
+        end
+        @kid.instance_eval do
+          def squeak; render :text => 'squeak!', :replace_html => :true; end
+        end
+      end
+      
+      should "render one replace, one replace_html and one JS injection" do
+        @controller.params = {:source => :kid, :type => :doorSlam}
+        @controller.apotomo_root << @mum
+        @controller.render_event_response
+      end
+    end
+  end
+  
   context "The ProcHash" do
     setup do
       @procs = Apotomo::ControllerMethods::ProcHash.new
