@@ -71,13 +71,11 @@
           
           render_page_updates(page_updates)
         end
-      
-      
-      
-        attr_writer :apotomo_default_url_options
         
-        def apotomo_default_url_options
-          @apotomo_default_url_options ||= {}
+        # Computes the url hash to the event processing action. May be passed to url_for. 
+        def apotomo_address_for(widget, options)
+          options[:action] ||= :render_event_response ### TODO: provide configuration directive.
+          widget.address_for_event(options)
         end
         
         

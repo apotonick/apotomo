@@ -23,5 +23,25 @@ class StatefulWidgetTest < Test::Unit::TestCase
       @mum.version = 1
       assert_equal 1, @mum.version
     end
+    
+    context "responding to #address_for_event" do
+      should "accept an event :type" do
+        assert_equal({:type => :squeak, :source => 'mum'}, @mum.address_for_event(:type => :squeak))
+      end
+      
+      should "accept a :source" do
+        assert_equal({:type => :squeak, :source => 'kid'}, @mum.address_for_event(:type => :squeak, :source => 'kid'))
+      end
+      
+      should "accept arbitrary options" do
+        assert_equal({:type => :squeak, :volume => 'loud', :source => 'mum'}, @mum.address_for_event(:type => :squeak, :volume => 'loud'))
+      end
+      
+      should "complain if no type given" do
+        assert_raises RuntimeError do
+          @mum.address_for_event(:source => 'mum')
+        end
+      end
+    end
   end
 end

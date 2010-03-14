@@ -285,6 +285,30 @@ module Apotomo
       params[name]
     end
     
+    
+    # Returns the address hash to the event controller and the targeted widget.
+    #
+    # Reserved options for <tt>way</tt>:
+    #   :source   explicitly specifies an event source.
+    #             The default is to take the current widget as source.
+    #   :type     specifies the event type.
+    #
+    # Any other option will be directly passed into the address hash and is 
+    # available via StatefulWidget#param in the widget.
+    #
+    # Can be passed to #url_for.
+    # 
+    # Example:
+    #   address_for_event :type => :squeak, :volume => 9
+    # will result in an address that triggers a <tt>:click</tt> event from the current
+    # widget and also provides the parameter <tt>:item_id</tt>.
+    def address_for_event(options)
+      raise "please specify the event :type" unless options[:type]
+      
+      options[:source] ||= self.name
+      options
+    end
+    
     # This is called when a bookmarkable link is calculated. Every widget on the path
     # from the targeted to root can insert state recovery information in the address
     # by overriding #local_address.
