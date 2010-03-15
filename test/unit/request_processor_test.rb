@@ -71,11 +71,11 @@ class RequestProcessorTest < Test::Unit::TestCase
     end
     
     should "return 2 page_updates when @kid squeaks" do
-      res = @processor.process_event_request_for({:type => :squeak, :source => 'kid'}, @controller)
+      res = @processor.process_for({:type => :squeak, :source => 'kid'}, @controller)
       
       assert_equal 2, res.size
-      assert_equal(PageUpdate.new(:replace => 'mum', :with => 'alert!'), res[0])
-      assert_equal(PageUpdate.new(:replace => 'mum', :with => 'squeak'), res[1])
+      assert_equal(Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => 'alert!'), res[0])
+      assert_equal(Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => 'squeak'), res[1])
     end
   end
   

@@ -36,4 +36,16 @@ class RenderTest < Test::Unit::TestCase
     end
   end
   
+  context "sending data with #render :raw" do
+    setup do
+      @mum = mouse_mock do
+        def squeak; render :raw => "squeak\n"; end
+      end
+    end
+    
+    should "return a Content::Raw instance" do
+      assert_kind_of Apotomo::Content::Raw, @mum.invoke(:squeak)
+      assert_equal String.new("squeak\n"), @mum.invoke(:squeak)
+    end
+  end
 end

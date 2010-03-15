@@ -8,8 +8,8 @@ module Apotomo
       @session      = session
       @tree_flushed = false
       
-      if options[:flush_tree].blank? and StatefulWidget.frozen_widget_in?(session)
-        @root = StatefulWidget.thaw_from(session)
+      if options[:flush_tree].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)
+        @root = ::Apotomo::StatefulWidget.thaw_from(session)
       else
         @root = flushed_root 
       end
@@ -32,9 +32,9 @@ module Apotomo
     
     def tree_flushed?;  @tree_flushed; end
     
-    ### TODO: move controller dependency to rails/merb/sinatra layer only!
-    ### TODO: rename to #process_for
-    def process_event_request_for(request_params, controller)
+    # Fires the request event in the widget tree and collects the rendered page updates.
+    def process_for(request_params, controller)
+      ### TODO: move controller dependency to rails/merb/sinatra layer only!
       self.root.controller = controller
       
       source = self.root.find_by_id(request_params[:source])
@@ -52,7 +52,7 @@ module Apotomo
     # Renders the widget named <tt>widget_id</tt>, passing optional <tt>opts</tt> and a block to it.
     # Use this in your #render_widget wrapper.
     def render_widget_for(widget_id, opts, controller, &block)
-      if widget_id.kind_of?(StatefulWidget)
+      if widget_id.kind_of?(::Apotomo::StatefulWidget)
         widget = widget_id
       else
         widget = root.find_by_id(widget_id)

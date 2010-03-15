@@ -135,10 +135,12 @@ module Apotomo
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
       ### DISCUSS: move to Cell::Base?
       if content = opts[:js]
-        return ActiveSupport::JSON::Variable.new(content)
+        return ::Apotomo::Content::Javascript.new(content)
       end
       
-      
+      if content = opts[:raw]
+        return ::Apotomo::Content::Raw.new(content)
+      end
       
       
       
@@ -175,7 +177,7 @@ module Apotomo
     
     def page_update_for(content, options)
       replace = options[:replace_html] ? :replace_html : :replace ### TODO: test me/document me.
-      PageUpdate.new replace => name, :with => content
+      ::Apotomo::Content::PageUpdate.new replace => name, :with => content
     end
     
     def prepare_locals_for(locals, rendered_children)

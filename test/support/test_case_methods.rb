@@ -1,7 +1,5 @@
 module Apotomo
   module TestCaseMethods
-    PageUpdate= Apotomo::PageUpdate
-    
     # Provides a ready-to-use mouse widget instance.
     def mouse_mock(id='mouse', start_state=:eating, opts={}, &block)
       mouse = mouse_class_mock.new(id, start_state, opts)

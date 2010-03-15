@@ -93,62 +93,94 @@ class ControllerMethodsTest < Test::Unit::TestCase
     end
   end
   
-  context "responding to an event request and" do
-    setup do
-      @controller.instance_variable_set :@page, mock()
-      @controller.instance_eval do
-        def render(*args)
-          @page.expects(:replace).with('mum', '<div id="mum">burp!</div>')
-          @page.expects(:replace_html).with('kid', 'squeak!')
-          @page.expects(:<<).with('squeak();')
+  context "responding to an event request" do
+    context "for a page updates event and" do
+      setup do
+        @controller.instance_variable_set :@page, mock()
+        @controller.instance_eval do
+          def render(*args)
+            @page.expects(:replace).with('mum', '<div id="mum">burp!</div>')
+            @page.expects(:replace_html).with('kid', 'squeak!')
+            @page.expects(:<<).with('squeak();')
+            
+            yield @page
+          end
+        end
+      end
+      
+      context "invoking #render_page_updates" do
+        should "render one replace, one replace_html and one JS injection" do
+          @controller.send :render_page_updates, [
+            Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
+            Apotomo::Content::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
+            Apotomo::Content::Javascript.new('squeak();')
+          ]
+        end
+      end
+      
+      context "processing the request in #render_event_response" do
+        setup do
+          @mum = mouse_mock('mum', :eating)
+          @mum << @kid = mouse_mock('kid', :squeak)
           
-          yield @page
+          @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
+          @kid.respond_to_event :doorSlam, :with => :squeak
+          @mum.respond_to_event :doorSlam, :with => :squeak
+          
+          @mum.instance_eval do
+            def squeak; render :js => 'squeak();'; end
+          end
+          @kid.instance_eval do
+            def squeak; render :text => 'squeak!', :replace_html => :true; end
+          end
+        end
+        
+        should "render one replace, one replace_html and one JS injection" do
+          @controller.params = {:source => :kid, :type => :doorSlam}
+          @controller.apotomo_root << @mum
+          @controller.render_event_response
         end
       end
     end
     
-    context "invoking #render_page_updates" do
-      should "render one replace, one replace_html and one JS injection" do
-        @controller.send :render_page_updates, [
-          Apotomo::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
-          Apotomo::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
-          ActiveSupport::JSON::Variable.new('squeak();')
-        ]
-      end
-    end
-    
-    context "processing the request in #render_event_response" do
+    context "for a data push event and" do
       setup do
-        @mum = mouse_mock('mum', :eating)
-        @mum << @kid = mouse_mock('kid', :squeak)
-        
-        @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
-        @kid.respond_to_event :doorSlam, :with => :squeak
-        @mum.respond_to_event :doorSlam, :with => :squeak
-        
-        @mum.instance_eval do
-          def squeak; render :js => 'squeak();'; end
-        end
-        @kid.instance_eval do
-          def squeak; render :text => 'squeak!', :replace_html => :true; end
+        @controller.instance_eval do
+          def render(options); options; end
         end
       end
       
-      should "render one replace, one replace_html and one JS injection" do
-        @controller.params = {:source => :kid, :type => :doorSlam}
-        @controller.apotomo_root << @mum
-        @controller.render_event_response
-      end
-    end
-    
-    context "responding to #apotomo_address_for" do
-      setup do
-        @mum = mouse_mock
+      context "invoking render_raw" do
+        should "pass-through the content to render :text" do
+          assert_equal({:text => "squeak\n"}, @controller.send(:render_raw, [Apotomo::Content::Raw.new("squeak\n")]))
+        end
       end
       
-      should "per default add the :render_event_response action to the url" do
-        assert_equal({:action => :render_event_response, :type => :squeak, :source => 'mouse'}, @controller.apotomo_address_for(@mum, :type => :squeak))
+      context "processing it in #render_event_response" do
+        setup do
+          @mum = mouse_mock('mum') do
+            def squeak; render :raw => "squeak\n"; end
+          end
+          
+          @mum.respond_to_event :dataLoad, :with => :squeak
+        end
+        
+        should "render :text" do
+          @controller.params = {:source => :mum, :type => :dataLoad}
+          @controller.apotomo_root << @mum
+          assert_equal({:text => "squeak\n"}, @controller.render_event_response)
+        end
       end
+    end
+  end
+  
+  context "responding to #apotomo_address_for" do
+    setup do
+      @mum = mouse_mock
+    end
+    
+    should "per default add the :render_event_response action to the url" do
+      assert_equal({:action => :render_event_response, :type => :squeak, :source => 'mouse'}, @controller.apotomo_address_for(@mum, :type => :squeak))
     end
   end
   

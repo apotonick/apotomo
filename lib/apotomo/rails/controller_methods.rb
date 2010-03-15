@@ -67,7 +67,10 @@
         end
       
         def render_event_response
-          page_updates = apotomo_request_processor.process_event_request_for({:type => params[:type], :source => params[:source]}, self)
+          page_updates = apotomo_request_processor.process_for({:type => params[:type], :source => params[:source]}, self)
+          
+          ### DISCUSS: how to properly handle multiple/mixed contents (raw data, page updates)? 
+          return render_raw(page_updates) if page_updates.first.kind_of? Apotomo::Content::Raw
           
           render_page_updates(page_updates)
         end
@@ -87,7 +90,7 @@
               next if page_update.blank?
               
               ### DISCUSS: provide proper PageUpdate API.
-              if page_update.kind_of? ActiveSupport::JSON::Variable
+              if page_update.kind_of? ::Apotomo::Content::Javascript
                 page << "#{page_update}"
               elsif page_update.replace?
                 page.replace page_update.target, "#{page_update}"
@@ -98,6 +101,12 @@
           end 
         end
         
+        # Returns the raw content to the browser. This is needed when a widget send data to its
+        # JavaScript model in the browser, eg when paging a grid.
+        def render_raw(data)
+          render :text => data.first
+        end
+      
         
         
         def respond_to_event(type, options)
@@ -118,28 +127,6 @@
           apotomo_root << widget("apotomo/deep_link_widget", :setup, 'deep_link')
         end
         
-        
-        
-        
-        
-        
-        
-      
-      
-      
-      
-      
-      
-      
-      def render_data_for(processed_handlers)
-        ### TODO: what if more events have been attached, smart boy?
-        Rails.logger.debug "  +++++++++ page updates:"
-        Rails.logger.debug processed_handlers.inspect
-        (handler, content) = processed_handlers.find {|i| i.last.size > 0}  ### FIXME: how do we know which handler to return? better check for kind_of? Data
-        
-        render :text => content
-      end
-      
       
       def render_iframe_update_for(processed_handlers)
         script = ""
