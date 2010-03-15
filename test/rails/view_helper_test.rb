@@ -16,21 +16,21 @@ class ViewHelperTest < ActionView::TestCase
     
     should "respond to #link_to_event" do
       assert_dom_equal "<a href=\"#\" onclick=\"new Ajax.Request('/barn/render_event_response?source=mum&amp;type=footsteps', {asynchronous:true, evalScripts:true}); return false;\">Walk!</a>",
-      link_to_event("Walk!", :type => :footsteps)
+      link_to_event("Walk!", :footsteps)
     end
     
     should "respond to #form_to_event" do
       assert_dom_equal "<form onsubmit=\"new Ajax.Request('/barn/render_event_response?source=mum&amp;type=footsteps', {asynchronous:true, evalScripts:true, parameters:Form.serialize(this)}); return false;\" method=\"post\" action=\"/barn/render_event_response?source=mum&amp;type=footsteps\">",
-      form_to_event(:type => :footsteps)
+      form_to_event(:footsteps)
     end
     
     should "respond to #trigger_event" do
       assert_dom_equal "new Ajax.Request('/barn/render_event_response?source=mum&type=footsteps', {asynchronous:true, evalScripts:true})",
-      trigger_event(:type => :footsteps)
+      trigger_event(:footsteps)
     end
     
     should "respond to #url_for_event" do
-      assert_equal({:type=>:footsteps, :source=>"mum", :action=>:render_event_response}, url_for_event(:type => :footsteps))
+      assert_equal({:type=>:footsteps, :source=>"mum", :action=>:render_event_response}, url_for_event(:footsteps))
     end
   end
 end

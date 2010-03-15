@@ -76,7 +76,8 @@
         end
         
         # Computes the url hash to the event processing action. May be passed to url_for. 
-        def apotomo_address_for(widget, options)
+        def compute_event_address_for(widget, event_type, options={})
+          options[:type]     = event_type
           options[:action] ||= :render_event_response ### TODO: provide configuration directive.
           widget.address_for_event(options)
         end

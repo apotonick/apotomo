@@ -7,7 +7,7 @@ module Apotomo
       @page_updates ||= []
     end
     
-    # Instructs the widget to look out for <tt>event_type</tt> Events that are passing by while bubbling.
+    # Instructs the widget to look out for <tt>type</tt> Events that are passing by while bubbling.
     # If an appropriate event is encountered the widget will send the targeted widget (or itself) to another
     # state, which implies an update of the invoked widget.
     #
@@ -35,7 +35,7 @@ module Apotomo
     # It is important to understand the <tt>:from</tt> parameter as it filters the event source - it wouldn't make
     # sense to refill the mouse trap if the bear trap snapped, would it?
     
-    def respond_to_event(event_type, options)
+    def respond_to_event(type, options)
       options[:once] = true if options[:once].nil?
       
       handler_opts              = {}
@@ -44,9 +44,9 @@ module Apotomo
       
       handler = InvokeEventHandler.new(handler_opts)
       
-      return if options[:once] and event_table.all_handlers_for(event_type, options[:from]).include?(handler)
+      return if options[:once] and event_table.all_handlers_for(type, options[:from]).include?(handler)
       
-      on(event_type, :do => handler, :from => options[:from])
+      on(type, :do => handler, :from => options[:from])
     end
     
     def trigger(*args)
