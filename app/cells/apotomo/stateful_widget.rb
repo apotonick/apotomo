@@ -1,57 +1,6 @@
 require 'onfire'
 
 module Apotomo
-  # The StatefulWidget is the core component in Apotomo. Any widget is derived from 
-  # this class.
-  #
-  # === Widgets are mini-controllers
-  # Widgets are derived cells[http://cells.rubyforge.org/rdoc], meaning they basically
-  # look and behave like super-fast mini-controllers known from Rails. State actions in 
-  # a widget are like controller actions - they implement the business logic in a method
-  # and can render a corresponding view.
-  # Instance variables from the widget are passed to the state view, which is
-  # automatically found by convention: view filename and state method usually have the
-  # same name. Use <tt>render :view => my_view</tt> to rendero alternative views.
-  # 
-  # You can plug multiple of these "mini-controllers" into a page, and you can even make
-  # one widget contain others. The modeling currently happens in the WidgetTree.
-  #
-  # === Widgets are state machines
-  # States can be connected to model a workflow. For example, a form widget could have
-  # one state for diplaying an empty form, one state showing the filled-out form 
-  # with messages at invalid fields, and one state showing a success message after the
-  # form had valid input.
-  # 
-  # To send a widget - from outside - into a certain state, you usually #invoke a
-  # state. Initial start states are defined in #new. Valid transitions are defined in
-  # #transition_map and you can jump to an arbitrary state by calling #jump_to_state
-  # inside a state method.
-  #
-  # When a widget changes its state, it automatically updates the respective part in the
-  # page.
-  # 
-  # === Widgets are stateful
-  # After a state transition a widget restores the last environment it was in. So you
-  # have all the instance variables back that have been there when the state method
-  # finished. You no longer are aware of requests, rather think in a persistent
-  # environment.
-  # 
-  # === Widgets are event-driven
-  # Unlike in traditional rails, widgets are not updated by requests 
-  # directly, but by events. Events usually get triggered by form submits using 
-  # ViewHelper#form_to_event, by clicking links or by real GUI events (as a 
-  # <tt>onChange</tt> event in Javascript which you map to an Apotomo event with 
-  # ViewHelper#address_to_event).
-  # 
-  # Widgets can also fire events internally using EventAware#trigger.
-  # Listeners that handle an event are attached with EventAware#watch.
-  
-  # The brain
-  # collects ivars set during state execution(s), even in successive state jumps.
-  # brain content is exposed to view and unset when hitting a start state.
-  # If you want to set an everlasting ivar which survives a start state, set it before
-  # #render_content_for_state, best place is the constructor.
-  
   class StatefulWidget < Cell::Base
     
     class_inheritable_array :initialize_hooks, :instance_writer => false
@@ -64,13 +13,13 @@ module Apotomo
     
     include Onfire
     
-    include EventMethods   ### TODO: set a "see also" link in the docs.
+    include EventMethods
     include Transition
     include Caching
     
     include DeepLinkMethods
     
-    helper Apotomo::ViewHelper
+    helper Apotomo::Rails::ViewHelper
     
     
     attr_writer   :controller
@@ -121,21 +70,20 @@ module Apotomo
     
     # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
     # This might lead us to some other state since the state method could call #jump_to_state.
-    ### DISCUSS: state is input in FSM speech, or event.
-    def invoke(input=nil, &block)
+    def invoke(state=nil, &block)
       @invoke_block = block ### DISCUSS: store block so we don't have to pass it 10 times?
-      logger.debug "\ninvoke on #{name} with #{input.inspect}"
+      logger.debug "\ninvoke on #{name} with #{state.inspect}"
       
-      if input.blank?
-        input = next_state_for(last_state) || @start_state
+      if state.blank?
+        state = next_state_for(last_state) || @start_state
       end
       
       
       
-      logger.debug "#{name}: transition: #{last_state} to #{input}"
-      logger.debug "                                    ...#{input}"
+      logger.debug "#{name}: transition: #{last_state} to #{state}"
+      logger.debug "                                    ...#{state}"
       
-      render_state(input)
+      render_state(state)
     end
     
     
@@ -226,7 +174,7 @@ module Apotomo
     end
     
     def page_update_for(content, options)
-      replace = options[:replace_html] ? :replace_html : :replace
+      replace = options[:replace_html] ? :replace_html : :replace ### TODO: test me/document me.
       PageUpdate.new replace => name, :with => content
     end
     
@@ -245,7 +193,6 @@ module Apotomo
     # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 
     # transition or not.
     ### TODO: document the need for return.
-    ### TODO: document that there is no state check or brain erase.
     def jump_to_state(state)
       logger.debug "STATE JUMP! to #{state}"
       

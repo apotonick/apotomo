@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 
 class ViewHelperTest < ActionView::TestCase
-  tests Apotomo::ViewHelper
+  tests Apotomo::Rails::ViewHelper
   
   context "A widget state view" do
     setup do
@@ -27,6 +27,10 @@ class ViewHelperTest < ActionView::TestCase
     should "respond to #trigger_event" do
       assert_dom_equal "new Ajax.Request('/barn/render_event_response?source=mum&type=footsteps', {asynchronous:true, evalScripts:true})",
       trigger_event(:type => :footsteps)
+    end
+    
+    should "respond to #url_for_event" do
+      assert_equal({:type=>:footsteps, :source=>"mum", :action=>:render_event_response}, url_for_event(:type => :footsteps))
     end
   end
 end

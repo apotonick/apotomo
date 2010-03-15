@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 class ViewMethodsTest < ActionController::TestCase
   context "A Rails controller view invoking #render_widget" do
     setup do
-      @controller = UrlMockController.new
+      @controller = ApotomoController.new
       @controller.extend Apotomo::ControllerMethods
       @controller.session = {}
       
