@@ -128,61 +128,56 @@ module Apotomo
     #  render :html_options => {:class => :highlighted}
     # will result in
     #  <div id="mouse" class="highlighted"...>
-    def render(opts={})
+    #
+    # :rendered_children
+    # :replace_html/:replace
+    def render(options={})
+      options.reverse_merge!  :render_children  => true, 
+                              :html_options     => {},
+                              :locals           => {}
+      
       state = @state_name
       
       
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
-      ### DISCUSS: move to Cell::Base?
-      if content = opts[:js]
+      if content = options[:js]
         return ::Apotomo::Content::Javascript.new(content)
       end
       
-      if content = opts[:raw]
+      if content = options[:raw]
         return ::Apotomo::Content::Raw.new(content)
       end
       
-      
-      
-      if content = opts[:text]
-        #return content
-        return page_update_for(content, opts)
+      if content = options[:text]
+        return page_update_for(content, options)
       end
-      if opts[:nothing]
+      
+      if options[:nothing]
         return "" 
       end
       
       
-      ### TODO: test :render_children => false
-      rendered_children = render_children_for(state, opts)
+      rendered_children = render_children_for(state, options)
       
       
       ### FIXME: we need to expose @controller here for helper methods. that sucks!
       @controller =root.controller
       
-      html_options = opts[:html_options] || {} ### DISCUSS: move to #defaultize_render_options_for.
-      html_options[:id] ||= name
+      options[:html_options].reverse_merge!(:id => name)
+      options[:locals].reverse_merge!(:rendered_children => rendered_children)
       
       
-      opts[:locals] = prepare_locals_for(opts[:locals], rendered_children)
-      
-      
-      content = render_view_for(opts, state)
+      content = render_view_for(options, state)
       
       ### TODO: test :div => false
-      content = frame_content_for(content, html_options)
+      content = frame_content_for(content, options[:html_options])
       
-      page_update_for(content, opts)
+      page_update_for(content, options)
     end
     
     def page_update_for(content, options)
       replace = options[:replace_html] ? :replace_html : :replace ### TODO: test me/document me.
       ::Apotomo::Content::PageUpdate.new replace => name, :with => content
-    end
-    
-    def prepare_locals_for(locals, rendered_children)
-      locals ||= {}
-      locals = {:rendered_children => rendered_children}.merge(locals)
     end
 
     # Wrap the widget's current state content into a div frame.
@@ -206,11 +201,11 @@ module Apotomo
       children.find_all { |w| w.visible? }
     end
 
-    def render_children_for(state, opts)
-      rendered_children  = ActiveSupport::OrderedHash.new
+    def render_children_for(state, options)
+      rendered_children = ActiveSupport::OrderedHash.new
       
-      children_to_render.each do |cell|
-        child_state = decide_child_state_for(cell, opts[:invoke])
+      options[:render_children] and children_to_render.each do |cell|
+        child_state = decide_child_state_for(cell, options[:invoke])
         logger.debug "    #{cell.name} -> #{child_state}"
         
         rendered_children[cell.name] = render_child(cell, child_state)
