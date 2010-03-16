@@ -6,7 +6,8 @@ module Apotomo
     class_inheritable_array :initialize_hooks, :instance_writer => false
     self.initialize_hooks = []
     
-    attr_accessor :opts ### DISCUSS: don't allow this, rather introduce #visible?.
+    attr_accessor :opts
+    attr_writer   :visible
     
     include TreeNode
     include Persistence
@@ -49,7 +50,10 @@ module Apotomo
     def last_state
       @state_name
     end
-
+    
+    def visible?
+      @visible
+    end
 
     # Defines the instance vars that should <em>not</em> survive between requests, 
     # which means they're not frozen in Apotomo::StatefulWidget#freeze.
@@ -102,7 +106,14 @@ module Apotomo
     # * <tt>:layout</tt> - If set to a valid filename inside your cell's view_paths, the current state view will be rendered inside the layout (as known from controller actions). Layouts should reside in <tt>app/cells/layouts</tt>.
     # * <tt>:html_options</tt> - Pass a hash to add html attributes like +class+ or +style+ to the widgets' surrounding div.
     # * <tt>:js</tt> - Executes the string as JavaScript on the page. If set, no view will be rendered.
+    # * <tt>:raw</tt> - Will send the string directly to the browser, no view will be rendered.
+    # * <tt>:replace_html</tt> - If true, the new content will replace the innerHtml of the widget's div. Defaults to false, which replaces the complete div.
+    # * <tt>:render_children</tt> - If false, automatic rendering of child widgets is turned off. Defaults to true.
+    # * <tt>:frame</tt> - If false, automatic framing of the widget is turned off. Pass some valid tag name if you prefer some other container tag in place of the div.
     # * <tt>:invoke</tt> - Explicitly define the state to be invoked on a child when rendering.
+    # * see Cell::Base#render for additional options
+    #
+    # Note that <tt>:text => ...</tt> and <tt>:replace_html => true</tt> will turn off <tt>:frame</tt>.
     #
     # Example:
     #  class MouseCell < Apotomo::StatefulWidget
@@ -129,14 +140,28 @@ module Apotomo
     # will result in
     #  <div id="mouse" class="highlighted"...>
     #
-    # :rendered_children
-    # :replace_html/:replace
+    #  render :frame => :p
+    # will result in
+    #  <p id="mouse">...</p>
     def render(options={})
-      options.reverse_merge!  :render_children  => true, 
-                              :html_options     => {},
-                              :locals           => {}
+      if options[:text] or options[:replace_html] # per default, disable framing for :text/:replace_html
+        options.reverse_merge!(:frame => false)
+      end
       
-      state = @state_name
+      options.reverse_merge!  :render_children  => true,
+                              :frame            => :div,
+                              :html_options     => {},
+                              :locals           => {},
+                              :replace_html     => false,
+                              :invoke           => {}
+                              
+      
+      rendered_children = render_children_for(options)
+      
+      options[:html_options].reverse_merge!(:id => name)
+      options[:locals].reverse_merge!(:rendered_children => rendered_children)
+      
+      @controller = controller # that dependency SUCKS.
       
       
       ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
@@ -148,42 +173,28 @@ module Apotomo
         return ::Apotomo::Content::Raw.new(content)
       end
       
-      if content = options[:text]
-        return page_update_for(content, options)
-      end
-      
       if options[:nothing]
         return "" 
       end
       
       
-      rendered_children = render_children_for(state, options)
+      content = render_view_for(options, @state_name) # defined in Cell::Base.
+      content = frame_content_for(content, options)
       
-      
-      ### FIXME: we need to expose @controller here for helper methods. that sucks!
-      @controller =root.controller
-      
-      options[:html_options].reverse_merge!(:id => name)
-      options[:locals].reverse_merge!(:rendered_children => rendered_children)
-      
-      
-      content = render_view_for(options, state)
-      
-      ### TODO: test :div => false
-      content = frame_content_for(content, options[:html_options])
-      
-      page_update_for(content, options)
+      page_update_for(content, options[:replace_html])
     end
     
-    def page_update_for(content, options)
-      replace = options[:replace_html] ? :replace_html : :replace ### TODO: test me/document me.
-      ::Apotomo::Content::PageUpdate.new replace => name, :with => content
+    def page_update_for(content, replace_html)
+      mode = replace_html ? :replace_html : :replace
+      ::Apotomo::Content::PageUpdate.new(mode => name, :with => content)
     end
 
-    # Wrap the widget's current state content into a div frame.
-    def frame_content_for(content, html_options)
+    # Wrap the content into a div frame.
+    def frame_content_for(content, options)
+      return content unless options[:frame]
+      
       ### TODO: i'd love to see a real API for helpers in rails.
-      Object.new.extend(ActionView::Helpers::TagHelper).content_tag(:div, content, html_options)
+      Object.new.extend(ActionView::Helpers::TagHelper).content_tag(options[:frame], content, options[:html_options])
     end
     
 
@@ -197,30 +208,33 @@ module Apotomo
     end
     
     
-    def children_to_render
-      children.find_all { |w| w.visible? }
+    def visible_children
+      children.find_all { |kid| kid.visible? }
     end
 
-    def render_children_for(state, options)
-      rendered_children = ActiveSupport::OrderedHash.new
+    def render_children_for(options)
+      return {} unless options[:render_children]
       
-      options[:render_children] and children_to_render.each do |cell|
-        child_state = decide_child_state_for(cell, options[:invoke])
-        logger.debug "    #{cell.name} -> #{child_state}"
-        
-        rendered_children[cell.name] = render_child(cell, child_state)
+      render_children(options[:invoke])
+    end
+    
+    def render_children(invoke_options={})
+      returning rendered_children = ActiveSupport::OrderedHash.new do
+        visible_children.each do |kid|
+          child_state = decide_state_for(kid, invoke_options)
+          logger.debug "    #{kid.name} -> #{child_state}"
+          
+          rendered_children[kid.name] = render_child(kid, child_state)
+        end
       end
-      
-      return rendered_children
     end
 
     def render_child(cell, state)
      cell.invoke(state)
     end
 
-    def decide_child_state_for(child, invoke_opts)
-      invoke_opts ||= {}
-      invoke_opts.stringify_keys[child.name.to_s]
+    def decide_state_for(child, invoke_options)
+      invoke_options.stringify_keys[child.name.to_s]
     end
     
     
@@ -292,14 +306,7 @@ module Apotomo
       root.controller
     end
     
-    # Sets the widget to invisible, which will usually suppress executing the 
-    # state method and rendering. Apparently the same applies to all children 
-    # of this widget.
-    def invisible!; @visible = false; end
-    # Sets the widget to visible (default).
-    def visible!;   @visible = true; end
-    # Returns if visible.
-    def visible?;   @visible; end
+    
     
     
     def createDumpRep

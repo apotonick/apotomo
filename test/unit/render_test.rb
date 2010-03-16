@@ -10,6 +10,16 @@ class RenderTest < ActionView::TestCase
       assert_equal '<div id="mouse">burp!</div>', @mum.invoke(:eating)
     end
     
+    should "omit the framing div if :frame is false" do
+      @mum.instance_eval { def eating; render :frame => false; end }
+      assert_equal 'burp!', @mum.invoke(:eating)
+    end
+    
+    should "frame the content in a <p> if :frame is :p" do
+      @mum.instance_eval { def eating; render :frame => :p; end }
+      assert_equal '<p id="mouse">burp!</p>', @mum.invoke(:eating)
+    end
+    
     context "and accepting additional :html_options" do
       should "should add the options to the div and override even the id" do
         @mum.instance_eval do
@@ -23,6 +33,36 @@ class RenderTest < ActionView::TestCase
           def eating; render :html_options => {:class => 'smack'}; end
         end
         assert_dom_equal '<div id="mouse" class="smack">burp!</div>', @mum.invoke
+      end
+    end
+    
+    context "with :text" do
+      setup do
+        @mum.instance_eval { def eating; render :text => "burp!!!"; end }
+      end
+      
+      should "per default omit the frame" do
+        assert_equal "burp!!!", @mum.invoke
+      end
+      
+      should "add a frame if it is explicitely set" do
+        @mum.instance_eval { def eating; render :text => "burp!!!", :frame => :div; end }
+        assert_equal '<div id="mouse">burp!!!</div>', @mum.invoke
+      end
+    end
+    
+    context "with :replace_html" do
+      setup do
+        @mum.instance_eval { def eating; render :replace_html => true; end }
+      end
+      
+      should "per default omit the frame as it is replacing the inner html" do
+        assert_equal "burp!", @mum.invoke
+      end
+      
+      should "add a frame if it is explicitely set" do
+        @mum.instance_eval { def eating; render :replace_html => true, :frame => :div; end }
+        assert_equal '<div id="mouse">burp!</div>', @mum.invoke
       end
     end
     
@@ -44,7 +84,7 @@ class RenderTest < ActionView::TestCase
         def snuggle; render; end
       end
       
-      @mum << mouse_mock('kid')
+      @mum << @kid = mouse_mock('kid')
     end
     
     should "per default render kid's content inside mums div with rendered_children" do
@@ -59,7 +99,14 @@ class RenderTest < ActionView::TestCase
       assert_equal '<div id="mum"><snuggle></snuggle></div>', @mum.invoke(:snuggle)
     end
     
-    should_eventually "provide an ordered hash rendered_children"
+    should "invoke kid even if :text is passed" do
+      @mum.instance_eval { def snuggle; render :text => "snuggle!"; end }
+      assert_not @kid.last_state
+      assert_equal 'snuggle!', @mum.invoke
+      assert_equal :eating, @kid.last_state
+    end
+    
+    should_eventually "provide an ordered rendered_children hash"
   end
   
   context "sending data with #render :raw" do
@@ -72,6 +119,31 @@ class RenderTest < ActionView::TestCase
     should "return a Content::Raw instance" do
       assert_kind_of Apotomo::Content::Raw, @mum.invoke(:squeak)
       assert_equal String.new("squeak\n"), @mum.invoke(:squeak)
+    end
+  end
+  
+  context "In default rendering context" do
+    setup do
+      @mum = mouse_mock do
+        def eating; render; end
+      end
+    end
+    
+    context "the returned content" do
+      should "be wrapped in a PageUpdate object" do
+        assert_kind_of Apotomo::Content::PageUpdate, @mum.invoke
+      end
+      
+      should "respond to #replace?" do
+        assert @mum.invoke.replace?
+        assert_not @mum.invoke.replace_html?
+      end
+      
+      should "respond to #replace_html when setting :replace_html" do
+        @mum.instance_eval { def eating; render :replace_html => true; end }
+        assert_not @mum.invoke.replace?
+        assert @mum.invoke.replace_html?
+      end
     end
   end
 end

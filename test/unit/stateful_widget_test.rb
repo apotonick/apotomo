@@ -43,5 +43,62 @@ class StatefulWidgetTest < Test::Unit::TestCase
         end
       end
     end
+    
+    context "implementing visibility" do
+      should "per default respond to #visible?" do
+        assert @mum.visible?
+      end
+      
+      should "expose a setter therefore" do
+        @mum.visible = false
+        assert_not @mum.visible?
+      end
+      
+      context "in a widget family" do
+        setup do
+          @mum << @jerry = mouse_mock('jerry')
+          @mum << @berry = mouse_mock('berry')
+        end
+        
+        should "per default return all #visible_children" do
+          assert_equal [@jerry, @berry], @mum.visible_children
+          assert_equal [], @jerry.visible_children
+        end
+        
+        should "hide berry in #visible_children if he's invisible" do
+          @berry.visible = false
+          assert_equal [@jerry], @mum.visible_children
+        end
+      end
+    end
+  end
+  
+  context "mum having a family" do
+    setup do
+      mum_and_kid!
+      @mum << @berry = mouse_mock('berry')
+        @berry << @pet = mouse_mock('pet')
+    end
+    
+    context "responding to #render_children" do
+      should "return an OrderedHash for the rendered kids" do
+        kids = @mum.render_children
+        assert_kind_of ::ActiveSupport::OrderedHash, kids
+        assert_equal 2, kids.size
+      end
+      
+      should "return an OrderedHash even if there are no kids" do
+        kids = @kid.render_children
+        assert_kind_of ::ActiveSupport::OrderedHash, kids
+        assert_equal 0, kids.size
+      end
+      
+      should "return an empty OrderedHash when all kids are invisible" do
+        @pet.visible = false
+        kids = @berry.render_children
+        assert_kind_of ::ActiveSupport::OrderedHash, kids
+        assert_equal 0, kids.size
+      end
+    end
   end
 end

@@ -28,9 +28,9 @@ module Apotomo
       @mum.instance_eval do
         def list; @list ||= []; end
         
-        def answer_squeak;  self.list << 'answer squeak'; render :text => "squeak" end
-        def alert;          self.list << 'be alerted';    render :text => "alert!" end
-        def escape;         self.list << 'escape';        render :text => "escape" end
+        def answer_squeak;  self.list << 'answer squeak'; render :text => "squeak", :render_children => false; end
+        def alert;          self.list << 'be alerted';    render :text => "alert!", :render_children => false; end
+        def escape;         self.list << 'escape';        render :text => "escape", :render_children => false; end
       end
       
       @kid.instance_eval do
