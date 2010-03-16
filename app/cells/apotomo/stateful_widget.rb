@@ -82,8 +82,6 @@ module Apotomo
         state = next_state_for(last_state) || @start_state
       end
       
-      
-      
       logger.debug "#{name}: transition: #{last_state} to #{state}"
       logger.debug "                                    ...#{state}"
       
@@ -267,39 +265,10 @@ module Apotomo
       options
     end
     
-    # This is called when a bookmarkable link is calculated. Every widget on the path
-    # from the targeted to root can insert state recovery information in the address
-    # by overriding #local_address.
-    def address(way={}, target=self, state=nil)
-    #def address(way=HashWithIndifferentAccess.new, target=self, state=nil)
-      way.merge!( local_address(target, way, state) )
-      
-      #logger.debug "address: #{name}"
-      #logger.debug way.inspect
-
-      return way if isRoot?
-
-      return parent.address(way, target)
-    end
-    
-      
-    # Override this if the widget needs to set state recovery information for a 
-    # bookmarkable link.
-    # Must return a Hash with the local state recovery information.
-    def local_address(target, way, state)
-      {}
-    end
-
-    def find_by_id(widget_id)
-      return find {|node| node.name.to_s == widget_id.to_s}
-    end
-    
+    # Returns the widget named <tt>widget_id</tt> as long as it is below self or self itself.
     def find_widget(widget_id)
-      root.find_by_id(widget_id)
+      find {|node| node.name.to_s == widget_id.to_s}
     end
-    
-    
-    
     
     def controller
       return @controller if isRoot?

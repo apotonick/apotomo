@@ -71,6 +71,33 @@ class StatefulWidgetTest < Test::Unit::TestCase
         end
       end
     end
+    
+    should "respond to #find_widget" do
+      mum_and_kid!
+      assert_not @mum.find_widget('pet')
+      assert @kid, @mum.find_widget('kid')
+    end
+    
+    context "with initialize_hooks" do
+      should "expose its class_inheritable_array with #initialize_hooks" do
+        @mum = mouse_mock
+        @mum.class.instance_eval { self.initialize_hooks << :initialize_mouse }
+        assert ::Apotomo::StatefulWidget.initialize_hooks.size + 1 == @mum.class.initialize_hooks.size
+      end
+      
+      should "execute the initialize_hooks in the correct order in #process_initialize_hooks" do
+        @mum = mouse_mock
+        @mum.class.instance_eval do
+          define_method(:executed) { @executed ||= [] }
+          define_method(:setup) { executed << :setup }
+          define_method(:configure) { executed << :configure }
+          initialize_hooks << :setup
+          initialize_hooks << :configure
+        end
+        
+        assert_equal [:setup, :configure], @mum.class.new('zombie', nil).executed
+      end
+    end
   end
   
   context "mum having a family" do

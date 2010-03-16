@@ -37,7 +37,7 @@ module Apotomo
       ### TODO: move controller dependency to rails/merb/sinatra layer only!
       self.root.controller = controller
       
-      source = self.root.find_by_id(request_params[:source])
+      source = self.root.find_widget(request_params[:source])
       
       source.fire(request_params[:type].to_sym)
       source.root.page_updates ### DISCUSS: that's another dependency.
@@ -55,7 +55,7 @@ module Apotomo
       if widget_id.kind_of?(::Apotomo::StatefulWidget)
         widget = widget_id
       else
-        widget = root.find_by_id(widget_id)
+        widget = root.find_widget(widget_id)
         raise "Couldn't render non-existent widget `#{widget_id}`" unless widget
       end
       
