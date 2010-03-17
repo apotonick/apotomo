@@ -5,10 +5,10 @@ module Apotomo
     attr_reader :session, :root
     
     def initialize(session, options={})
-      @session      = session
-      @tree_flushed = false
+      @session          = session
+      @widgets_flushed  = false
       
-      if options[:flush_tree].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)
+      if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)
         @root = ::Apotomo::StatefulWidget.thaw_from(session)
       else
         @root = flushed_root 
@@ -18,7 +18,7 @@ module Apotomo
     end
     
     def flushed_root
-      @tree_flushed = true
+      @widgets_flushed = true
       widget('apotomo/stateful_widget', :content, 'root')
     end
     
@@ -30,7 +30,7 @@ module Apotomo
       @root.version = version
     end
     
-    def tree_flushed?;  @tree_flushed; end
+    def widgets_flushed?;  @widgets_flushed; end
     
     # Fires the request event in the widget tree and collects the rendered page updates.
     def process_for(request_params, controller)

@@ -17,7 +17,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
       
       should "mark the tree as flushed" do
-        assert @processor.tree_flushed?
+        assert @processor.widgets_flushed?
       end
       
       should "provide a single root-node for #root" do
@@ -39,25 +39,25 @@ class RequestProcessorTest < Test::Unit::TestCase
       should "provide a widget family for #root" do
         assert_equal 2, @processor.root.size
         assert_equal 1, @processor.root.version
-        assert_not @processor.tree_flushed?
+        assert_not @processor.widgets_flushed?
       end
       
       should "provide a single root for #root when :flush_tree is set" do
-        @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :flush_tree => true)
+        @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :flush_widgets => true)
         assert_equal 1, @processor.root.size
-        assert @processor.tree_flushed?
+        assert @processor.widgets_flushed?
       end
       
       should "provide a single root for #root when :version differs" do
         @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :version => 0)
         assert_equal 1, @processor.root.size
-        assert @processor.tree_flushed?
+        assert @processor.widgets_flushed?
       end
       
       should "provide a widget family for #root when :version is correct" do
         @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :version => 1)
         assert_equal 2, @processor.root.size
-        assert_not @processor.tree_flushed?
+        assert_not @processor.widgets_flushed?
       end
     end
   end

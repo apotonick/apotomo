@@ -25,11 +25,12 @@
           return @apotomo_request_processor if @apotomo_request_processor
           
           # happens once per request:
-          options = {}  ### TODO: process rails options (flush_tree, version)
+          ### DISCUSS: policy in production?
+          options = {:flush_widgets => params[:flush_widgets]}  ### TODO: process rails options (flush_tree, version)
           
           @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options)
           
-          flush_bound_use_widgets_blocks if @apotomo_request_processor.tree_flushed?
+          flush_bound_use_widgets_blocks if @apotomo_request_processor.widgets_flushed?
           
           @apotomo_request_processor
         end
@@ -50,9 +51,11 @@
         #     @box = render_widget 'login_box'
         #   end
         def use_widgets(&block)
+          root = apotomo_root ### DISCUSS: let RequestProcessor initialize so we get flushed, eventually. maybe add a :before filter for that? or move #use_widgets to RequestProcessor?
+          
           return if bound_use_widgets_blocks.include?(block)
           
-          yield apotomo_root
+          yield root
           
           bound_use_widgets_blocks << block  # remember the proc.
         end

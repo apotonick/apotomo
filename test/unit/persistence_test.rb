@@ -46,7 +46,7 @@ class PersistenceTest < Test::Unit::TestCase
       @mum.freeze_ivars_to(@storage)
       
       assert_equal 1, @storage.size
-      assert_equal 6, @storage['mum'].size
+      assert_equal 5, @storage['mum'].size
     end
     
     should "push family's freezable ivars to the storage when calling #freeze_data_to" do
@@ -54,9 +54,9 @@ class PersistenceTest < Test::Unit::TestCase
       @mum.freeze_data_to(@storage)
       
       assert_equal 3, @storage.size
-      assert_equal 6, @storage['mum'].size
-      assert_equal 6, @storage['mum/kid'].size
-      assert_equal 5, @storage['mum/kid/pet'].size
+      assert_equal 5, @storage['mum'].size
+      assert_equal 5, @storage['mum/kid'].size
+      assert_equal 4, @storage['mum/kid/pet'].size
     end
     
     should "push ivars and structure to the storage when calling #freeze_to" do

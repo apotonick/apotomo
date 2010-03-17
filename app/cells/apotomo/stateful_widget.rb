@@ -38,7 +38,6 @@ module Apotomo
       @version      = 0
       
       @cell         = self
-      @state_name   = nil
       
       process_initialize_hooks(id, start_state, opts)
     end

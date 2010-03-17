@@ -6,6 +6,7 @@ class ControllerMethodsTest < Test::Unit::TestCase
       @controller = Class.new(ActionController::Base).new
       @controller.extend Apotomo::ControllerMethods
       @controller.session = {}
+      @controller.params  = {}
     end
     
     context "responding to #apotomo_root" do
