@@ -271,62 +271,7 @@ module Apotomo
     end
     
     def controller
-      return @controller if isRoot?
-      root.controller
+      isRoot? ? @controller : root.controller
     end
-    
-    
-    
-    
-    def createDumpRep
-      strRep = String.new
-      strRep << @name.to_s << @@fieldSep << self.class.to_s << @@fieldSep << (isRoot? ? @name.to_s : @parent.name.to_s)
-      
-      ###@ strRep << @@fieldSep << dump_instance_variables << @@recordSep
-      strRep << @@recordSep
-    end
-  
-  
-    
-
-  def _dump(depth)
-      strRep = String.new
-      each {|node| strRep << node.createDumpRep}
-      strRep
   end
-  
-    def self._load(str)
-      ### TODO: fix multiple loading issue.
-      #@@load_count ||= 0
-      #@@load_count+=1
-      #raise "too much loading" if @@load_count > 1
-      
-      loadDumpRep(str)
-    end
-    def self.loadDumpRep(str)
-      nodeHash = Hash.new
-      rootNode = nil
-      str.split(@@recordSep).each do |line|
-        
-          ###@ name, klass, parent, content_str = line.split(@@fieldSep)
-          name, klass, parent = line.split(@@fieldSep)
-          #logger.debug "thawing #{name}->#{parent}"
-          currentNode = klass.constantize.new(name, nil)
-          
-          ###@ Marshal.load(content_str).each do |k,v|
-          ###@   ###@ logger.debug "setting "+k.inspect
-          ###@   currentNode.instance_variable_set(k, v)
-          ###@ end
-          
-          nodeHash[name] = currentNode
-          if name != parent  # Do for a child node
-              nodeHash[parent].add(currentNode)
-          else
-              rootNode = currentNode
-          end
-      end
-      rootNode
-  end
-  end
-
 end

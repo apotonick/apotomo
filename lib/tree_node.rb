@@ -6,9 +6,6 @@ module TreeNode
 
   attr_reader :content, :name, :parent
   attr_writer :content
-
-  @@fieldSep = '|'
-  @@recordSep = "\n.\n"
   
   def self.included(base)
     base.initialize_hooks << :initialize_tree_node_for

@@ -2,19 +2,20 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 
 class PersistenceTest < Test::Unit::TestCase
   
+  class PersistentMouse < Apotomo::StatefulWidget # we need a named class for marshalling.
+    attr_reader :who, :what
+      
+    def educate
+      @who  = "the cat"
+      @what = "run away"
+      render :nothing => true
+    end
+      
+    def recap;  render :nothing => true; end
+  end
+  
   context "After #hibernate_widget (request) the widget" do
     should "still have the same ivars" do
-      class PersistentMouse < Apotomo::StatefulWidget # we need a named class for marshalling.
-        attr_reader :who, :what
-          
-        def educate
-          @who  = "the cat"
-          @what = "run away"
-          render :nothing => true
-        end
-          
-        def recap;  render :nothing => true; end
-      end
       @mum = PersistentMouse.new('mum', :educate)
       @mum.controller = @controller ### FIXME: remove that dependency
       
@@ -96,7 +97,41 @@ class PersistenceTest < Test::Unit::TestCase
     end
   end
   
-  context "#frozen_widget?" do
+  context "dumping and loading" do
+    setup do
+      @mum = PersistentMouse.new('mum', :eating)
+      @mum << @kid = PersistentMouse.new('kid', :eating)
+    end
+    
+    context "a single widget" do
+      should "provide a serialized widget on #node_dump" do
+        assert_equal "mum|PersistenceTest::PersistentMouse|mum", @mum.dump_node
+        assert_equal "kid|PersistenceTest::PersistentMouse|mum", @kid.dump_node
+      end
+      
+      should "recover the widget skeleton when invoking self.node_load" do
+        @mum, parent = ::Apotomo::StatefulWidget.load_node(@mum.dump_node)
+        assert_kind_of PersistentMouse, @mum
+        assert_equal 'mum', @mum.name
+        assert_equal 1,     @mum.size
+        assert_equal 'mum', parent
+      end
+    end
+    
+    context "a widget family" do
+      should "provide the serialized tree on _dump" do
+        assert_equal "mum|PersistenceTest::PersistentMouse|mum\nkid|PersistenceTest::PersistentMouse|mum\n", @mum._dump(10)
+      end
+      
+      should "recover the widget tree on _load" do
+        @mum = ::Apotomo::StatefulWidget._load(@mum._dump(10))
+        assert_equal 2, @mum.size
+        assert_equal @mum, @mum['kid'].parent
+      end
+    end
+  end
+  
+  context "#frozen_widget_in?" do
     should "return true if a valid widget is passed" do
       assert_not Apotomo::StatefulWidget.frozen_widget_in?({})
       assert Apotomo::StatefulWidget.frozen_widget_in?({:apotomo_root => mouse_mock})
