@@ -13,8 +13,8 @@ module Apotomo
     include Persistence
     
     include Onfire
-    
     include EventMethods
+    
     include Transition
     include Caching
     

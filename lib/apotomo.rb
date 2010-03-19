@@ -21,6 +21,12 @@
 #  THE SOFTWARE.
 #  
 
+begin
+  require 'onfire'
+rescue
+  gem 'onfire'
+  require 'onfire'
+end
 
 module Apotomo
 end

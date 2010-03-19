@@ -69,6 +69,12 @@ module Apotomo
       Apotomo::EventProcessor.instance.processed_handlers << [name, invoke(:state)]
     end
     
+    
+    
+    protected
+    # Get all handlers from self for the passed event (overriding Onfire#local_event_handlers).
+    def local_event_handlers(event)
+      event_table.all_handlers_for(event.type, event.source.name) # we key with widget_id.
+    end
   end
-
 end

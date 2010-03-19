@@ -170,23 +170,6 @@ module TreeNode
       root
   end
 
-  # Returns an array of siblings for this node.
-  # If a block is provided, yeilds each of the sibling
-  # nodes to the block.
-  def siblings
-      if block_given?
-          return nil if isRoot?
-          for sibling in parent.children
-  yield sibling if sibling != self
-          end
-      else
-        return [self] if isRoot?
-          siblings = []
-          parent.children {|sibling| siblings << sibling if sibling != self}
-          siblings
-      end
-  end
-
   # Provides a comparision operation for the nodes. Comparision
   # is based on the natural character-set ordering for the
   # node names.
@@ -194,63 +177,8 @@ module TreeNode
       return +1 if other == nil
       self.name <=> other.name
   end
-
-  # Freezes all nodes in the tree
-  def freezeTree!
-      each {|node| node.freeze}
-  end
-
-  # Creates a dump representation
-  def createDumpRep
-      strRep = String.new
-      #strRep << @name << @@fieldSep << (isRoot? ? @name : @parent.name)
-      strRep << @name.to_s << @@fieldSep << (isRoot? ? @name.to_s : @parent.name.to_s)
-      #strRep << @@fieldSep << Marshal.dump(@content) << @@recordSep
-      
-      instance_content = String.new
-      
-      (self.instance_variables - ivars_to_forget).each do |var|
-        #Rails.logger.debug var
-        #Rails.logger.debug instance_variable_get(var).inspect
-        instance_content << var << ":" << Marshal.dump(instance_variable_get(var)) << "^"
-      end
-      #strRep << @@fieldSep << Marshal.dump(@content) << @@recordSep
-      
-      strRep << @@fieldSep << instance_content << @@recordSep
-  end
-
-  def _dump(depth)
-      strRep = String.new
-      each {|node| strRep << node.createDumpRep}
-      strRep
-  end
-  
-  
-  def self.loadDumpRep(str)
-      nodeHash = Hash.new
-      rootNode = nil
-      str.split(@@recordSep).each do |line|
-          name, parent, contentStr = line.split(@@fieldSep)
-          content = Marshal.load(contentStr)
-          currentNode = Tree::TreeNode.new(name, content)
-          nodeHash[name] = currentNode
-          if name != parent  # Do for a child node
-              nodeHash[parent].add(currentNode)
-          else
-              rootNode = currentNode
-          end
-      end
-      rootNode
-  end
-
-  #def TreeNode._load(str)
-  def self._load(str)
-      loadDumpRep(str)
-  end
   
   protected :parent=, :setAsRoot!
-  private_class_method :loadDumpRep
-  
   
   def find_by_path(selector)
     next_node = self

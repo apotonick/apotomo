@@ -34,6 +34,16 @@ class PersistenceTest < Test::Unit::TestCase
       assert_equal @mum.who,  "the cat"
       assert_equal @mum.what, "run away"
     end
+    
+    should "still have its event_table" do
+      @mum    = PersistentMouse.new('mum', :educate)
+      @event  = Apotomo::Event.new(:squeak, @mum)
+      @mum.respond_to_event :squeak, :with => :educate
+      
+      assert_equal 1, @mum.send(:local_event_handlers, @event).size
+      @mum = hibernate_widget(@mum)
+      assert_equal 1, @mum.send(:local_event_handlers, @event).size
+    end
   end
   
   context "freezing and thawing a widget family" do
