@@ -37,7 +37,7 @@ module Apotomo
       ### TODO: move controller dependency to rails/merb/sinatra layer only!
       self.root.controller = controller
       
-      source = self.root.find_widget(request_params[:source])
+      source = self.root.find_widget(request_params[:source]) or raise "Source #{request_params[:source].inspect} non-existent."
       
       source.fire(request_params[:type].to_sym)
       source.root.page_updates ### DISCUSS: that's another dependency.

@@ -62,7 +62,7 @@ class RequestProcessorTest < Test::Unit::TestCase
     end
   end
   
-  context "#process_event_request_for" do
+  context "#process_for" do
     setup do
       ### FIXME: what about that automatic @controller everywhere?
       mum_and_kid!
@@ -76,6 +76,12 @@ class RequestProcessorTest < Test::Unit::TestCase
       assert_equal 2, res.size
       assert_equal(Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => 'alert!'), res[0])
       assert_equal(Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => 'squeak'), res[1])
+    end
+    
+    should "raise an exception when :source is unknown" do
+      assert_raises RuntimeError do
+        @processor.process_for({:type => :squeak, :source => 'tom'}, @controller)
+      end
     end
   end
   
