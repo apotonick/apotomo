@@ -25,12 +25,12 @@ class ViewHelperTest < ActionView::TestCase
     end
     
     should "respond to #multipart_form_to_event" do
-      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\"></iframe><form method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
+      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\" style=\"display: none;\"></iframe><form enctype=\"multipart/form-data\" method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
       multipart_form_to_event(:footsteps)
     end
     
     should "render multipart form if :multipart => true" do
-      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\"></iframe><form method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
+      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\" style=\"display: none;\"></iframe><form enctype=\"multipart/form-data\" method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
       form_to_event(:footsteps, :multipart => true)
     end
     

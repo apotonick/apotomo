@@ -38,10 +38,10 @@ module Apotomo
       # Better call <tt>#form_to_event :multipart => true</tt> and stay forward-compatible.
       def multipart_form_to_event(type, options={}, html_options={}, &block)
         options.reverse_merge!      :apotomo_iframe => true
-        html_options.reverse_merge! :target         => :apotomo_iframe
+        html_options.reverse_merge! :target         => :apotomo_iframe, :multipart => true
         
-        '<iframe id="apotomo_iframe" name="apotomo_iframe"></iframe>' <<     
-        form_tag(@controller.compute_event_address_for(@cell, type, options), html_options, &block)
+        # i hate rails:
+        concat('<iframe id="apotomo_iframe" name="apotomo_iframe" style="display: none;"></iframe>') << form_tag(@controller.compute_event_address_for(@cell, type, options), html_options, &block)
       end
       
       def url_for_event(type, options={})
