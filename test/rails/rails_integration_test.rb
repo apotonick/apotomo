@@ -2,6 +2,9 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
  
 #class RailsIntegrationTest < ActionController::IntegrationTest
 class RailsIntegrationTest < ActionController::TestCase
+  require 'responds_to_parent'
+  include RespondsToParent::SelectorAssertion
+  
   def simulate_request!
     @controller.instance_eval { @apotomo_request_processor = nil }
   end
@@ -13,7 +16,9 @@ class RailsIntegrationTest < ActionController::TestCase
       @controller.session = {}
       @controller.params  = {}
       
-      @mum = mouse_mock('mum', 'snuggle') { def snuggle; render; end }
+      #@mum = mouse_mock('mum', 'snuggle') { def snuggle; render; end }
+      @mum = MouseCell.new('mum', :snuggle)
+      @mum.instance_eval{ def snuggle; render; end }
       
       @controller.instance_variable_set(:@mum, @mum)
       @controller.instance_eval do
@@ -65,6 +70,18 @@ class RailsIntegrationTest < ActionController::TestCase
       get 'widget', :flush_widgets => 1
       assert_response :success  # will fail if no #use_widgets block invoked
       assert @controller.apotomo_request_processor.widgets_flushed?
+    end
+    
+    should "render updates to the parent window for an iframe request" do
+      get 'widget'
+      assert_response :success
+      @controller.apotomo_root['mum'].respond_to_event :squeak, :with => :snuggle
+      
+      get 'render_event_response', :source => 'mum', :type => :squeak, :apotomo_iframe => true
+      assert_response :success
+      assert_select_parent do |script|
+        assert_select_rjs :replace, 'mum'
+      end
     end
   end
 end

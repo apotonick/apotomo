@@ -27,7 +27,21 @@ module Apotomo
       #
       # The values of form elements are available via StatefulWidget#param.
       def form_to_event(type, options={}, html_options={}, &block)
+        return multipart_form_to_event(type, options, html_options, &block) if options.delete(:multipart)
+        
         form_remote_tag({:url => @controller.compute_event_address_for(@cell, type, options), :html => html_options}, &block)
+      end
+      
+      # Creates a form that submits itself via an iFrame and executes the response
+      # in the parent window. This is needed to upload files via AJAX.
+      #
+      # Better call <tt>#form_to_event :multipart => true</tt> and stay forward-compatible.
+      def multipart_form_to_event(type, options={}, html_options={}, &block)
+        options.reverse_merge!      :apotomo_iframe => true
+        html_options.reverse_merge! :target         => :apotomo_iframe
+        
+        '<iframe id="apotomo_iframe" name="apotomo_iframe"></iframe>' <<     
+        form_tag(@controller.compute_event_address_for(@cell, type, options), html_options, &block)
       end
       
       def url_for_event(type, options={})

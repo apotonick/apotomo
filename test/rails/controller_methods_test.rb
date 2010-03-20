@@ -119,6 +119,16 @@ class ControllerMethodsTest < Test::Unit::TestCase
         end
       end
       
+      context "invoking #render_iframe_updates" do
+        should "render one replace, one replace_html and one JS injection" do
+          @controller.send :render_iframe_updates, [
+            Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
+            Apotomo::Content::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
+            Apotomo::Content::Javascript.new('squeak();')
+          ]
+        end
+      end
+      
       context "processing the request in #render_event_response" do
         setup do
           @mum = mouse_mock('mum', :eating)
@@ -138,6 +148,12 @@ class ControllerMethodsTest < Test::Unit::TestCase
         
         should "render one replace, one replace_html and one JS injection" do
           @controller.params = {:source => :kid, :type => :doorSlam}
+          @controller.apotomo_root << @mum
+          @controller.render_event_response
+        end
+        
+        should "render one replace, one replace_html and one JS injection to the parent window" do
+          @controller.params = {:source => :kid, :type => :doorSlam, :apotomo_iframe => true}
           @controller.apotomo_root << @mum
           @controller.render_event_response
         end

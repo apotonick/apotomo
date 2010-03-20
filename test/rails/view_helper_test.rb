@@ -24,6 +24,16 @@ class ViewHelperTest < ActionView::TestCase
       form_to_event(:footsteps)
     end
     
+    should "respond to #multipart_form_to_event" do
+      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\"></iframe><form method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
+      multipart_form_to_event(:footsteps)
+    end
+    
+    should "render multipart form if :multipart => true" do
+      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\"></iframe><form method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
+      form_to_event(:footsteps, :multipart => true)
+    end
+    
     should "respond to #trigger_event" do
       assert_dom_equal "new Ajax.Request('/barn/render_event_response?source=mum&type=footsteps', {asynchronous:true, evalScripts:true})",
       trigger_event(:footsteps)

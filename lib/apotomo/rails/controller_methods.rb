@@ -75,6 +75,8 @@
           ### DISCUSS: how to properly handle multiple/mixed contents (raw data, page updates)? 
           return render_raw(page_updates) if page_updates.first.kind_of? Apotomo::Content::Raw
           
+          return render_iframe_updates(page_updates) if params[:apotomo_iframe]
+          
           render_page_updates(page_updates)
         end
         
@@ -110,8 +112,15 @@
         def render_raw(data)
           render :text => data.first
         end
-      
         
+        # Renders the page updates through an iframe. Requires the responds_to_parent Rails plugin,
+        # see http://github.com/markcatley/responds_to_parent .
+        def render_iframe_updates(page_updates)
+          require 'responds_to_parent'
+          responds_to_parent do
+            render_page_updates(page_updates)
+          end
+        end
         
         def respond_to_event(type, options)
           handler = ProcEventHandler.new
