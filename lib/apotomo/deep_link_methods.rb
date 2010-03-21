@@ -24,7 +24,7 @@ module Apotomo
       
       portions.unshift(local_portion) # prepend portions as we move up.
       
-      return portions.compact.join("/") if isRoot?
+      return portions.compact.join("/") if root?
       
       parent.url_fragment_for(nil, portions)
     end

@@ -147,4 +147,12 @@ class PersistenceTest < Test::Unit::TestCase
       assert Apotomo::StatefulWidget.frozen_widget_in?({:apotomo_root => mouse_mock})
     end
   end
+  
+  context "#symbolized_instance_variables?" do
+    should "return instance_variables as symbols" do
+      @mum = mouse_mock
+      assert_equal @mum.instance_variables.size, @mum.symbolized_instance_variables.size
+      assert_not @mum.symbolized_instance_variables.find { |ivar| ivar.kind_of? String }
+    end
+  end
 end

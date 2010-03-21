@@ -19,6 +19,7 @@ module Apotomo
     include Caching
     
     include DeepLinkMethods
+    include WidgetShortcuts
     
     helper Apotomo::Rails::ViewHelper
     
@@ -43,7 +44,7 @@ module Apotomo
     end
     
     def process_initialize_hooks(*args)
-      self.class.initialize_hooks.each { |h| send(h, *args) }
+      self.class.initialize_hooks.each { |method| send(method, *args) }
     end
     
     def last_state
@@ -61,7 +62,7 @@ module Apotomo
     end
     
     def unfreezable_ivars
-      ['@childrenHash', '@children', '@parent', '@controller', '@cell', '@invoke_block', '@ivars_before', '@rendered_children', '@page_updates', '@opts']
+      [:@childrenHash, :@children, :@parent, :@controller, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts]
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.
@@ -140,7 +141,7 @@ module Apotomo
     #  render :frame => :p
     # will result in
     #  <p id="mouse">...</p>
-    def render(options={})
+    def render(options={})     
       if options[:text] or options[:replace_html] # per default, disable framing for :text/:replace_html
         options.reverse_merge!(:frame => false)
       end
@@ -270,7 +271,7 @@ module Apotomo
     end
     
     def controller
-      isRoot? ? @controller : root.controller
+      root? ? @controller : root.controller
     end
   end
 end

@@ -5,7 +5,7 @@ module TreeNode
   include Enumerable
 
   attr_reader :content, :name, :parent
-  attr_writer :content
+  attr_writer :content, :parent
   
   def self.included(base)
     base.initialize_hooks << :initialize_tree_node_for
@@ -16,7 +16,6 @@ module TreeNode
   # name of the node is expected to be unique across the
   # tree.
   def initialize_tree_node_for(name, *args)
-    @name = name
     self.setAsRoot!
 
     @childrenHash = Hash.new
@@ -27,15 +26,9 @@ module TreeNode
   def to_s
           s = size()
           "Node ID: #{@name} Content: #{@content} Parent: " +
-                  (isRoot?()  ? "ROOT" : "#{@parent.name}") +
+                  (root?()  ? "ROOT" : "#{@parent.name}") +
                   " Children: #{@children.length}" +
                   " Total Nodes: #{s}"
-  end
-
-  # Protected method to set the parent node.
-  # This method should NOT be invoked by client code.
-  def parent=(parent)
-      @parent = parent
   end
 
   # Convenience synonym for Tree#add method. 
@@ -57,7 +50,6 @@ module TreeNode
       @children << child
       child.parent = self
       return child
-
   end
 
   # Removes the specified child node from the receiver node.
@@ -74,25 +66,17 @@ module TreeNode
   # Removes this node from its parent. If this is the root node,
   # then does nothing.
   def removeFromParent!
-      @parent.remove!(self) unless isRoot?
+      @parent.remove!(self) unless root?
   end
 
   # Removes all children from the receiver node.
-  def removeAll!
+  def remove_all!
       for child in @children
           child.setAsRoot!
       end
       @childrenHash.clear
       @children.clear
       self
-  end
-  
-  def move_children_to(target)
-    children.clone.each {|c|# Rails.logger.debug "adding child #{c}";
-      @childrenHash.delete(c.name)
-      @children.delete(c)
-      target << c
-    }
   end
   
   
@@ -103,15 +87,10 @@ module TreeNode
 
   # Indicates whether this node is a root node. Note that
   # orphaned children will also be reported as root nodes.
-  def isRoot?
+  def root?
       @parent == nil
   end
-
-  # Indicates whether this node has any immediate child nodes.
-  def hasChildren?
-      @children.length != 0
-  end
-
+  
   # Returns an array of all the immediate children.
   # If a block is given, yields each child node to the block.
   def children
@@ -152,11 +131,6 @@ module TreeNode
       @children.inject(1) {|sum, node| sum + node.size}
   end
 
-  # Convenience synonym for Tree#size
-  def length
-      size()
-  end
-
   # Pretty prints the tree starting with the receiver node.
   def printTree(tab = 0)
       puts((' ' * tab) + self.to_s)
@@ -166,7 +140,7 @@ module TreeNode
   # Returns the root for this node.
   def root
       root = self
-      root = root.parent while !root.isRoot?
+      root = root.parent while !root.root?
       root
   end
 
@@ -193,15 +167,6 @@ module TreeNode
   end
   
   
-  def find  ### DISCUSS: do we need that? isn't this implemented in Enumerable?
-    self.each do |node|
-      return node if yield node
-    end
-    
-    return nil  ### DISCUSS: what about some exception if we can't find the node?
-  end
-  
-  
   # Returns the path from the widget to root, encoded as 
   # a string of slash-seperated names. 
   def path
@@ -214,5 +179,4 @@ module TreeNode
     
     path.reverse.join("/")
   end
-  
 end

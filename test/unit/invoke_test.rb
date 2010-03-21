@@ -58,7 +58,9 @@ class InvokeTest < Test::Unit::TestCase
         def educate; render :view => :snuggle; end
       end
       
-      @mum << @kid = mouse_mock('kid', :snooze) do
+      # create an anonym class for @kid so we don't pollute with #transition's.
+      @mum << @kid = mouse_class_mock.new('kid', :snooze)
+      @kid.instance_eval do
         def snooze; render :nothing => true; end
         def listen; render :nothing => true; end
       end

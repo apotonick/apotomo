@@ -5,9 +5,14 @@ module Apotomo
       base.extend(ClassMethods)
     end
     
+    # For Ruby 1.8/1.9 compatibility.
+    def symbolized_instance_variables
+      instance_variables.map { |ivar| ivar.to_sym }
+    end
+    
     def freeze_ivars_to(storage)
       frozen = {}
-      (self.instance_variables - unfreezable_ivars).each do |ivar|
+      (symbolized_instance_variables - unfreezable_ivars).each do |ivar|
         frozen[ivar] = instance_variable_get(ivar)
       end
       storage[path] = frozen
