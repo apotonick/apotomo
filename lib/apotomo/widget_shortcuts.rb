@@ -1,12 +1,24 @@
 module Apotomo
-  # Provides shortcut methods for creating the widget tree.
+  # Shortcut methods for creating widget trees.
   module WidgetShortcuts
-    def widget(class_name, states, id, *args)
-      class_name.to_s.classify.constantize.new(id, states, *args)
+    # Creates an instance of <tt>class_name</tt> with the id <tt>id</tt> and start state <tt>state</tt>.
+    # Default start state is <tt>:display</tt>.
+    # Yields self if a block is passed.
+    # Example:
+    #   widget(:form, 'uploads', :build_form) do |form|
+    #     form << widget(:upload_field)
+    def widget(class_name, id, state=:display, *args)
+      object = class_name.to_s.classify.constantize.new(id, state, *args)
+      yield object if block_given?
+      object
     end
     
-    def section(id, *args)
-      widget('apotomo/section_widget', :widget_content, id, *args)
+    def container(id, *args, &block)
+      widget('apotomo/container_widget', id, *args, &block)
+    end
+    
+    def section(*args)
+      container(*args)
     end
     
     def cell(base_name, states, id, *args)

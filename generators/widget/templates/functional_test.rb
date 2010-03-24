@@ -1,14 +1,8 @@
-require File.expand_path(File.dirname(__FILE__) + "/../../vendor/plugins/apotomo/test/test_helper")
+require "test_helper"
 
-class <%= class_name %>CellTest < Test::Unit::TestCase
-  include Apotomo::UnitTestCase
-
-  # Repeat: "I love tests."
-  def test_widget
-    t = ApplicationWidgetTree.new(controller).draw_tree
-    
-    # simulate a request:
-    t = hibernate_tree(t)
-    
+class <%= class_name %>Test < Test::Unit::TestCase
+  test "a first test" do
+    html = widget(:<%= file_name %>, :<%= states.first %>, 'my_<%= file_name %>').invoke
+    assert_selekt html, "p"
   end
 end
