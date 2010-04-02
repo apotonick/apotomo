@@ -44,8 +44,16 @@ module Apotomo
         concat('<iframe id="apotomo_iframe" name="apotomo_iframe" style="display: none;"></iframe>') << form_tag(@controller.compute_event_address_for(@cell, type, options), html_options, &block)
       end
       
+      # Returns the url to trigger a +type+ event from the currently rendered widget.
+      # The source can be changed with +:source+. Additional +options+ will be appended to the query string.
+      #
+      # Note that this method will use the framework's internal routing if available (e.g. #url_for in Rails).
+      #
+      # Example:
+      #   url_for_event(:paginate, :page => 2)
+      #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
       def url_for_event(type, options={})
-        @controller.compute_event_address_for(@cell, type, options)
+        url_for @controller.compute_event_address_for(@cell, type, options)
       end
       
       ### TODO: test me.

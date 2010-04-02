@@ -40,7 +40,7 @@ class ViewHelperTest < ActionView::TestCase
     end
     
     should "respond to #url_for_event" do
-      assert_equal({:type=>:footsteps, :source=>"mum", :action=>:render_event_response}, url_for_event(:footsteps))
+      assert_equal("/barn/render_event_response?source=mum&amp;type=footsteps", url_for_event(:footsteps))
     end
   end
 end

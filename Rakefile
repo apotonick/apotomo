@@ -12,16 +12,23 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = true
 end
 
-desc 'Generate documentation for Apotomo.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Apotomo API'
-  rdoc.options << '--line-numbers' << '--inline-source' << '-m README'
-  
-  rdoc.rdoc_files.include('lib/**/*.rb')
-  rdoc.rdoc_files.include('app/**/*.rb')
-  rdoc.rdoc_files.include('test/*.rb')
-  rdoc.rdoc_files.include('README')
+namespace 'rdoc' do
+	desc 'Generate documentation for Apotomo.'
+	Rake::RDocTask.new(:build) do |rdoc|
+		rdoc.rdoc_dir = 'rdoc'
+		rdoc.title    = 'Apotomo API'
+		rdoc.options << '--line-numbers' << '--inline-source' << '-m README'
+		
+		rdoc.rdoc_files.include('lib/**/*.rb')
+		rdoc.rdoc_files.include('app/**/*.rb')
+		rdoc.rdoc_files.include('test/*.rb')
+		rdoc.rdoc_files.include('README')
+	end
+	
+	desc 'Upload the rdocs to apotomo.rubyforge.org.'
+	task :upload do
+		sh %{ scp -r rdoc nix@rubyforge.org:/var/www/gforge-projects/apotomo/ }
+	end
 end
 
 # Gem managment tasks.
