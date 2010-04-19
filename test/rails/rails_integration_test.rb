@@ -78,10 +78,10 @@ class RailsIntegrationTest < ActionController::TestCase
       @controller.apotomo_root['mum'].respond_to_event :squeak, :with => :snuggle
       
       get 'render_event_response', :source => 'mum', :type => :squeak, :apotomo_iframe => true
+      
       assert_response :success
-      assert_select_parent do |script|
-        assert_select_rjs :replace, 'mum'
-      end
+      assert_equal 'text/html', @response.content_type
+      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('$(\\\"mum\\\").replace(\\\"<div id=\\\\\\\"mum\\\\\\\"><snuggle><\\\\/snuggle><\\\\/div>\\\")'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
     end
   end
 end

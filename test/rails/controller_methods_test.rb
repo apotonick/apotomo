@@ -93,54 +93,35 @@ class ControllerMethodsTest < ActionController::TestCase
       assert @controller.session[:apotomo_widget_ivars]
     end
   end
-  
-  context "responding to an event request" do
-    context "for a page updates event and" do
+    
+  context "processing an event request" do
+    setup do
+      @mum = mouse_mock('mum', :eating)
+      @mum << @kid = mouse_mock('kid', :squeak)
       
-      context "invoking #render_iframe_updates" do
-        should "render one replace, one update and one JS injection" do
-          @controller.send :render_iframe_updates, [
-            Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
-            Apotomo::Content::PageUpdate.new(:update => 'kid', :with => 'squeak!'),
-            Apotomo::Content::Javascript.new('squeak();')
-          ]
-        end
+      @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
+      @kid.respond_to_event :doorSlam, :with => :squeak
+      @mum.respond_to_event :doorSlam, :with => :squeak
+      
+      @mum.instance_eval do
+        def squeak; render :js => 'squeak();'; end
       end
-      
-      context "processing the request in #render_event_response" do
-        setup do
-          @mum = mouse_mock('mum', :eating)
-          @mum << @kid = mouse_mock('kid', :squeak)
-          
-          @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
-          @kid.respond_to_event :doorSlam, :with => :squeak
-          @mum.respond_to_event :doorSlam, :with => :squeak
-          
-          @mum.instance_eval do
-            def squeak; render :js => 'squeak();'; end
-          end
-          @kid.instance_eval do
-            def squeak; render :text => 'squeak!', :update => :true; end
-          end
-        end
-        
-        should "set the MIME type to text/javascript" do
-          @controller.params = {:source => :kid, :type => :doorSlam}
-          @controller.apotomo_root << @mum
-          
-          get :render_event_response, :source => :kid, :type => :doorSlam
-          
-          assert_equal Mime::JS, @response.content_type
-          assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
-        end
-        
-        should "render one replace, one update and one JS injection to the parent window" do
-          @controller.params = {:source => :kid, :type => :doorSlam, :apotomo_iframe => true}
-          @controller.apotomo_root << @mum
-          @controller.render_event_response
-        end
+      @kid.instance_eval do
+        def squeak; render :text => 'squeak!', :update => :true; end
       end
     end
+    
+    context "in event mode" do
+      should "set the MIME type to text/javascript" do
+        @controller.apotomo_root << @mum
+        
+        get :render_event_response, :source => :kid, :type => :doorSlam
+        
+        assert_equal Mime::JS, @response.content_type
+        assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
+      end
+    end
+    
     
     context "for a data push event and" do
       setup do

@@ -96,13 +96,16 @@
           render :text => data.first
         end
         
-        # Renders the page updates through an iframe. Requires the responds_to_parent Rails plugin,
+        # Renders the page updates through an iframe. Copied from responds_to_parent,
         # see http://github.com/markcatley/responds_to_parent .
         def render_iframe_updates(page_updates)
-          require 'responds_to_parent'
-          responds_to_parent do
-            apotomo_request_processor.render_page_updates(page_updates)
-          end
+          script = apotomo_request_processor.render_page_updates(page_updates)
+          escaped_script = self.class.helpers.escape_javascript(script) ### TODO: use RequestProcessor.generator
+          
+          render :text => "<html><body><script type='text/javascript' charset='utf-8'>
+var loc = document.location;
+with(window.parent) { setTimeout(function() { window.eval('#{escaped_script}'); window.loc && loc.replace('about:blank'); }, 1) }
+</script></body></html>", :content_type => 'text/html'
         end
         
         def respond_to_event(type, options)
@@ -122,30 +125,7 @@
           return if apotomo_root.find_widget('deep_link')  # add only once.
           apotomo_root << widget("apotomo/deep_link_widget", :setup, 'deep_link')
         end
-        
       
-      def render_iframe_update_for(processed_handlers)
-        script = ""
-      
-        processed_handlers.each do |handler, content|
-            #content = handler.content
-            next unless content
-  
-            if content.class == String
-              script += 'Element.replace("'+handler.widget_id+'", "'+content.gsub('"', '\\\\\"').gsub("\n", "").gsub("'", "\\\\'")+'");'
-              #page.replace handler.widget_id, content
-            else
-              script += content.gsub("\n", "").gsub("'", "\\\\'")
-            end
-          end
-        logger.info script
-      
-        # stolen from responds_to_parent, thanks sean tradeway and you other guys!
-        render :text => "<html><body><script type='text/javascript' charset='utf-8'>
-            var loc = document.location;
-            with(window.parent) { setTimeout(function() { window.eval('#{script}'); loc.replace('about:blank'); }, 1) } 
-          </script></body></html>"
-      end
       
       class ProcHash < Array
         def id_for_proc(proc)
