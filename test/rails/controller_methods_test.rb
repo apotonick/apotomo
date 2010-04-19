@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), *%w[.. test_helper])
  
-class ControllerMethodsTest < Test::Unit::TestCase
+class ControllerMethodsTest < ActionController::TestCase
   context "A Rails controller" do
     setup do
       @controller = Class.new(ActionController::Base).new
@@ -97,25 +97,15 @@ class ControllerMethodsTest < Test::Unit::TestCase
   context "responding to an event request" do
     context "for a page updates event and" do
       setup do
-        @controller.instance_variable_set :@page, mock()
+        #@controller.instance_variable_set :@page, mock()
         @controller.instance_eval do
-          def render(*args)
+          def ___render(*args)
             @page.expects(:replace).with('mum', '<div id="mum">burp!</div>')
             @page.expects(:replace_html).with('kid', 'squeak!')
             @page.expects(:<<).with('squeak();')
             
             yield @page
           end
-        end
-      end
-      
-      context "invoking #render_page_updates" do
-        should "render one replace, one replace_html and one JS injection" do
-          @controller.send :render_page_updates, [
-            Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
-            Apotomo::Content::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
-            Apotomo::Content::Javascript.new('squeak();')
-          ]
         end
       end
       
@@ -146,10 +136,14 @@ class ControllerMethodsTest < Test::Unit::TestCase
           end
         end
         
-        should "render one replace, one replace_html and one JS injection" do
+        should "set the MIME type to text/javascript" do
           @controller.params = {:source => :kid, :type => :doorSlam}
           @controller.apotomo_root << @mum
-          @controller.render_event_response
+          
+          get :render_event_response, :source => :kid, :type => :doorSlam
+          
+          assert_equal Mime::JS, @response.content_type
+          assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
         end
         
         should "render one replace, one replace_html and one JS injection to the parent window" do

@@ -77,7 +77,7 @@
           
           return render_iframe_updates(page_updates) if params[:apotomo_iframe]
           
-          render_page_updates(page_updates)
+          render :text => apotomo_request_processor.render_page_updates(page_updates), :content_type => Mime::JS
         end
         
         # Computes the url hash to the event processing action. May be passed to url_for. 
@@ -90,23 +90,6 @@
         
         protected
         
-        def render_page_updates(page_updates)
-          render :update do |page|
-            page_updates.each do |page_update|
-              next if page_update.blank?
-              
-              ### DISCUSS: provide proper PageUpdate API.
-              if page_update.kind_of? ::Apotomo::Content::Javascript
-                page << "#{page_update}"
-              elsif page_update.replace?
-                page.replace page_update.target, "#{page_update}"
-              elsif page_update.replace_html?
-                page.replace_html page_update.target, "#{page_update}"
-              end
-            end
-          end 
-        end
-        
         # Returns the raw content to the browser. This is needed when a widget send data to its
         # JavaScript model in the browser, eg when paging a grid.
         def render_raw(data)
@@ -118,7 +101,7 @@
         def render_iframe_updates(page_updates)
           require 'responds_to_parent'
           responds_to_parent do
-            render_page_updates(page_updates)
+            apotomo_request_processor.render_page_updates(page_updates)
           end
         end
         
