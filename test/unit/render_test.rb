@@ -66,6 +66,27 @@ class RenderTest < ActionView::TestCase
       end
     end
     
+    context "with :js" do
+      should "return a Javascript object per default" do
+        @mum.instance_eval do
+          def squeak; render :js => 'squeak();'; end
+        end
+        assert_kind_of ::Apotomo::Content::Javascript, @mum.invoke(:squeak)
+      end
+      
+      should_eventually "generate javascript when called with a block" do
+      ### DISCUSS: eventually provide a generator object (for rightjs)?
+        @mum.instance_eval do
+          def squeak
+            render :js do |page|
+              page[:mum].insert_html(:below, "<p>squeak</p>")
+            end
+          end
+        end
+        assert_equal 'Element.insert("mum", { below: "<p>squeak</p>" });', @mum.invoke(:squeak)
+      end
+    end
+    
     should "expose its instance variables in the rendered view" do
       @mum = mouse_mock('mum', :educate) do
         def educate

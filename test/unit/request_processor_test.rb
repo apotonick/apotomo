@@ -68,8 +68,34 @@ class RequestProcessorTest < Test::Unit::TestCase
       mum_and_kid!
       @mum.controller = nil # check if controller gets connected.
       @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum})
+      
+      
+      
+      
+      
+      @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
+          @kid.respond_to_event :doorSlam, :with => :squeak
+          @mum.respond_to_event :doorSlam, :with => :squeak
+          
+          @mum.instance_eval do
+            def squeak; render :js => 'squeak();'; end
+          end
+          @kid.instance_eval do
+            def squeak; render :text => 'squeak!', :replace_html => :true; end
+          end
     end
     
+    context "calling #render_page_updates" do
+      should "return escaped JavaScript" do
+        assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();",
+        @processor.render_page_updates([
+          Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
+          Apotomo::Content::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
+          Apotomo::Content::Javascript.new('squeak();')
+        ])
+      end
+    end
+  
     should "return 2 page_updates when @kid squeaks" do
       res = @processor.process_for({:type => :squeak, :source => 'kid'}, @controller)
       
@@ -84,6 +110,8 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
     end
   end
+  
+  
   
   context "#freeze!" do
     should "serialize the widget family to @session" do
