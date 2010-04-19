@@ -51,17 +51,17 @@ class RenderTest < ActionView::TestCase
       end
     end
     
-    context "with :replace_html" do
+    context "with :update" do
       setup do
-        @mum.instance_eval { def eating; render :replace_html => true; end }
+        @mum.instance_eval { def eating; render :update => true; end }
       end
       
-      should "per default omit the frame as it is replacing the inner html" do
+      should "per default omit the frame as it is updating the inner html" do
         assert_equal "burp!", @mum.invoke
       end
       
       should "add a frame if it is explicitely set" do
-        @mum.instance_eval { def eating; render :replace_html => true, :frame => :div; end }
+        @mum.instance_eval { def eating; render :update => true, :frame => :div; end }
         assert_equal '<div id="mouse">burp!</div>', @mum.invoke
       end
     end
@@ -157,13 +157,13 @@ class RenderTest < ActionView::TestCase
       
       should "respond to #replace?" do
         assert @mum.invoke.replace?
-        assert_not @mum.invoke.replace_html?
+        assert_not @mum.invoke.update?
       end
       
-      should "respond to #replace_html when setting :replace_html" do
-        @mum.instance_eval { def eating; render :replace_html => true; end }
+      should "respond to #update? when setting :update" do
+        @mum.instance_eval { def eating; render :update => true; end }
         assert_not @mum.invoke.replace?
-        assert @mum.invoke.replace_html?
+        assert @mum.invoke.update?
       end
     end
   end

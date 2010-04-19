@@ -96,24 +96,12 @@ class ControllerMethodsTest < ActionController::TestCase
   
   context "responding to an event request" do
     context "for a page updates event and" do
-      setup do
-        #@controller.instance_variable_set :@page, mock()
-        @controller.instance_eval do
-          def ___render(*args)
-            @page.expects(:replace).with('mum', '<div id="mum">burp!</div>')
-            @page.expects(:replace_html).with('kid', 'squeak!')
-            @page.expects(:<<).with('squeak();')
-            
-            yield @page
-          end
-        end
-      end
       
       context "invoking #render_iframe_updates" do
-        should "render one replace, one replace_html and one JS injection" do
+        should "render one replace, one update and one JS injection" do
           @controller.send :render_iframe_updates, [
             Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
-            Apotomo::Content::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
+            Apotomo::Content::PageUpdate.new(:update => 'kid', :with => 'squeak!'),
             Apotomo::Content::Javascript.new('squeak();')
           ]
         end
@@ -132,7 +120,7 @@ class ControllerMethodsTest < ActionController::TestCase
             def squeak; render :js => 'squeak();'; end
           end
           @kid.instance_eval do
-            def squeak; render :text => 'squeak!', :replace_html => :true; end
+            def squeak; render :text => 'squeak!', :update => :true; end
           end
         end
         
@@ -146,7 +134,7 @@ class ControllerMethodsTest < ActionController::TestCase
           assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
         end
         
-        should "render one replace, one replace_html and one JS injection to the parent window" do
+        should "render one replace, one update and one JS injection to the parent window" do
           @controller.params = {:source => :kid, :type => :doorSlam, :apotomo_iframe => true}
           @controller.apotomo_root << @mum
           @controller.render_event_response

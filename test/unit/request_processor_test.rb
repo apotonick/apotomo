@@ -81,7 +81,7 @@ class RequestProcessorTest < Test::Unit::TestCase
             def squeak; render :js => 'squeak();'; end
           end
           @kid.instance_eval do
-            def squeak; render :text => 'squeak!', :replace_html => :true; end
+            def squeak; render :text => 'squeak!', :update => :true; end
           end
     end
     
@@ -90,7 +90,7 @@ class RequestProcessorTest < Test::Unit::TestCase
         assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();",
         @processor.render_page_updates([
           Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
-          Apotomo::Content::PageUpdate.new(:replace_html => 'kid', :with => 'squeak!'),
+          Apotomo::Content::PageUpdate.new(:update => 'kid', :with => 'squeak!'),
           Apotomo::Content::Javascript.new('squeak();')
         ])
       end

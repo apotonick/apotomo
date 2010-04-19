@@ -102,16 +102,16 @@ module Apotomo
     # * <tt>:view</tt> - Specifies the name of the view file to render. Defaults to the current state name.
     # * <tt>:template_format</tt> - Allows using a format different to <tt>:html</tt>.
     # * <tt>:layout</tt> - If set to a valid filename inside your cell's view_paths, the current state view will be rendered inside the layout (as known from controller actions). Layouts should reside in <tt>app/cells/layouts</tt>.
-    # * <tt>:html_options</tt> - Pass a hash to add html attributes like +class+ or +style+ to the widgets' surrounding div.
+    # * <tt>:html_options</tt> - Pass a hash to add html attributes to the widgets container tag.
     # * <tt>:js</tt> - Executes the string as JavaScript on the page. If set, no view will be rendered.
     # * <tt>:raw</tt> - Will send the string directly to the browser, no view will be rendered.
-    # * <tt>:replace_html</tt> - If true, the new content will replace the innerHtml of the widget's div. Defaults to false, which replaces the complete div.
+    # * <tt>:update</tt> - If true, the new content updates the innerHtml of the widget's div. Defaults to false, which replaces the complete div.
     # * <tt>:render_children</tt> - If false, automatic rendering of child widgets is turned off. Defaults to true.
     # * <tt>:frame</tt> - If false, automatic framing of the widget is turned off. Pass some valid tag name if you prefer some other container tag in place of the div.
     # * <tt>:invoke</tt> - Explicitly define the state to be invoked on a child when rendering.
     # * see Cell::Base#render for additional options
     #
-    # Note that <tt>:text => ...</tt> and <tt>:replace_html => true</tt> will turn off <tt>:frame</tt>.
+    # Note that <tt>:text => ...</tt> and <tt>:update => true</tt> will turn off <tt>:frame</tt>.
     #
     # Example:
     #  class MouseCell < Apotomo::StatefulWidget
@@ -141,8 +141,15 @@ module Apotomo
     #  render :frame => :p
     # will result in
     #  <p id="mouse">...</p>
-    def render(options={})     
-      if options[:text] or options[:replace_html] # per default, disable framing for :text/:replace_html
+    def render(*args, &block)
+      options = args.extract_options!
+      
+      if args.first == :js
+        options.reverse_merge!(:render_children => false)
+        options[:js] = true
+      end
+      
+      if options[:text] or options[:update] # per default, disable framing for :text/:update
         options.reverse_merge!(:frame => false)
       end
       
@@ -150,7 +157,7 @@ module Apotomo
                               :frame            => :div,
                               :html_options     => {},
                               :locals           => {},
-                              :replace_html     => false,
+                              :update           => false,
                               :invoke           => {}
                               
       
@@ -162,7 +169,6 @@ module Apotomo
       @controller = controller # that dependency SUCKS.
       
       
-      ### DISCUSS: provide a better JS abstraction API and de-coupled helpers like #visual_effect.
       if content = options[:js]
         return ::Apotomo::Content::Javascript.new(content)
       end
@@ -179,11 +185,11 @@ module Apotomo
       content = render_view_for(options, @state_name) # defined in Cell::Base.
       content = frame_content_for(content, options)
       
-      page_update_for(content, options[:replace_html])
+      page_update_for(content, options[:update])
     end
     
-    def page_update_for(content, replace_html)
-      mode = replace_html ? :replace_html : :replace
+    def page_update_for(content, update)
+      mode = update ? :update : :replace
       ::Apotomo::Content::PageUpdate.new(mode => name, :with => content)
     end
 

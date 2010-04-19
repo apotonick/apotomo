@@ -23,8 +23,8 @@ class ContentTest < Test::Unit::TestCase
     
     context "a PageUpdate instance" do
       setup do
-        @outer  = Apotomo::Content::PageUpdate.new :replace      => 'mum', :with =>"squeak!"
-        @inner  = Apotomo::Content::PageUpdate.new :replace_html => 'kid', :with =>"squeak!"
+        @outer  = Apotomo::Content::PageUpdate.new :replace => 'mum', :with =>"squeak!"
+        @inner  = Apotomo::Content::PageUpdate.new :update  => 'kid', :with =>"squeak!"
       end
       
       context "in string context" do
@@ -51,9 +51,9 @@ class ContentTest < Test::Unit::TestCase
       
       context "in comparison with another instance" do
         should "return true only if all options are equal" do
-          assert @outer == Apotomo::Content::PageUpdate.new(:replace => 'mum', :with =>"squeak!")
-          assert @outer != Apotomo::Content::PageUpdate.new(:replace => 'mum', :with =>"miau!")
-          assert @outer != Apotomo::Content::PageUpdate.new(:replace_html => 'mum', :with =>"squeak!")
+          assert @outer == Apotomo::Content::PageUpdate.new(:replace  => 'mum', :with =>"squeak!")
+          assert @outer != Apotomo::Content::PageUpdate.new(:replace  => 'mum', :with =>"miau!")
+          assert @outer != Apotomo::Content::PageUpdate.new(:update   => 'mum', :with =>"squeak!")
         end
       end
       
@@ -62,9 +62,9 @@ class ContentTest < Test::Unit::TestCase
         assert ! @inner.replace?
       end
       
-      should "respond to #replace_html?" do
-        assert ! @outer.replace_html?
-        assert @inner.replace_html?
+      should "respond to #update?" do
+        assert ! @outer.update?
+        assert @inner.update?
       end
       
       should "respond to #target" do

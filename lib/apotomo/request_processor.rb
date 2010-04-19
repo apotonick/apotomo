@@ -55,7 +55,7 @@ module Apotomo
           generator << "#{page_update}"
         elsif page_update.replace?
           generator.replace page_update.target, "#{page_update}"
-        elsif page_update.replace_html?
+        elsif page_update.update?
           generator.update page_update.target, "#{page_update}"
         end
       end.join("\n")

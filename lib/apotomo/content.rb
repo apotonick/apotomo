@@ -7,7 +7,7 @@ module Apotomo
       def initialize(options)
         super(options[:with] || "")
         
-        @target   = options[:replace] || options[:replace_html]
+        @target   = options[:replace] || options[:update]
         raise "Please specify a target widget id" unless @target
         
         @replace  = options[:replace]
@@ -17,7 +17,7 @@ module Apotomo
         @replace
       end
       
-      def replace_html?
+      def update?
         not replace?
       end
       
