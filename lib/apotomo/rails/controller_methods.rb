@@ -26,7 +26,9 @@
           
           # happens once per request:
           ### DISCUSS: policy in production?
-          options = {:flush_widgets => params[:flush_widgets]}  ### TODO: process rails options (flush_tree, version)
+          options = { :flush_widgets  => params[:flush_widgets],
+                      :js_framework   => Apotomo.js_framework || :prototype,
+          }  ### TODO: process rails options (flush_tree, version)
           
           @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options)
           
@@ -81,7 +83,7 @@
         end
         
         # Computes the url hash to the event processing action. May be passed to url_for. 
-        def compute_event_address_for(widget, event_type, options={})
+        def event_address_for(widget, event_type, options={})
           options[:type]     = event_type
           options[:action] ||= :render_event_response ### TODO: provide configuration directive.
           widget.address_for_event(options)
@@ -100,7 +102,7 @@
         # see http://github.com/markcatley/responds_to_parent .
         def render_iframe_updates(page_updates)
           script = apotomo_request_processor.render_page_updates(page_updates)
-          escaped_script = self.class.helpers.escape_javascript(script) ### TODO: use RequestProcessor.generator
+          escaped_script = apotomo_request_processor.js_generator.escape(script)
           
           render :text => "<html><body><script type='text/javascript' charset='utf-8'>
 var loc = document.location;

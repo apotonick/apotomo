@@ -5,8 +5,9 @@ module Apotomo
     attr_reader :session, :root
     
     def initialize(session, options={})
-      @session          = session
-      @widgets_flushed  = false
+      @session              = session
+      @widgets_flushed      = false
+      @js_framework         = options[:js_framework]
       
       if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)
         @root = ::Apotomo::StatefulWidget.thaw_from(session)
@@ -15,6 +16,10 @@ module Apotomo
       end
       
       handle_version!(options[:version])
+    end
+    
+    def js_generator
+      @js_generator ||= ::Apotomo::JavascriptGenerator.new(@js_framework)
     end
     
     def flushed_root
@@ -45,18 +50,16 @@ module Apotomo
     
     # Compiles the PageUpdates to JavaScript by utilizing JavascriptGenerator.
     def render_page_updates(page_updates)
-      generator = Apotomo::JavascriptGenerator.new(:prototype)
-      
       page_updates.collect do |page_update|
         next if page_update.blank?
         
         ### DISCUSS: provide proper PageUpdate API.
         if page_update.kind_of? ::Apotomo::Content::Javascript
-          generator << "#{page_update}"
+          js_generator << "#{page_update}"
         elsif page_update.replace?
-          generator.replace page_update.target, "#{page_update}"
+          js_generator.replace page_update.target, "#{page_update}"
         elsif page_update.update?
-          generator.update page_update.target, "#{page_update}"
+          js_generator.update page_update.target, "#{page_update}"
         end
       end.join("\n")
     end

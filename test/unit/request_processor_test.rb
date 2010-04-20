@@ -60,6 +60,18 @@ class RequestProcessorTest < Test::Unit::TestCase
         assert_not @processor.widgets_flushed?
       end
     end
+    
+    context "js_generator" do
+      #should "set a default javascript framework" do
+      #  @processor = Apotomo::RequestProcessor.new({})
+      #  assert_respond_to @processor.javascript_generator, :prototype
+      #end
+      
+      should "return the passed framework" do
+        @processor = Apotomo::RequestProcessor.new({}, :js_framework => :right)
+        assert_respond_to @processor.js_generator, :right
+      end
+    end
   end
   
   context "#process_for" do
@@ -67,7 +79,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       ### FIXME: what about that automatic @controller everywhere?
       mum_and_kid!
       @mum.controller = nil # check if controller gets connected.
-      @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum})
+      @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :js_framework => :prototype)
       
       
       

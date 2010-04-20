@@ -70,7 +70,6 @@ begin
 
     spec.add_dependency 'activesupport', 	'>= 2.3.0'
     spec.add_dependency 'onfire', 			'>= 0.1.0'
-    spec.add_dependency 'responds_to_parent', '>= 1.0.20091013'	# for iframe uploads.
   end
 
   Jeweler::GemcutterTasks.new

@@ -154,13 +154,13 @@ class ControllerMethodsTest < ActionController::TestCase
     end
   end
   
-  context "responding to #compute_event_address_for" do
+  context "responding to #event_address_for" do
     setup do
       @mum = mouse_mock
     end
     
     should "per default add the :render_event_response action to the url" do
-      assert_equal({:action => :render_event_response, :type => :squeak, :source => 'mouse'}, @controller.compute_event_address_for(@mum, :squeak))
+      assert_equal({:action => :render_event_response, :type => :squeak, :source => 'mouse'}, @controller.event_address_for(@mum, :squeak))
     end
   end
   

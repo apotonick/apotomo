@@ -1,6 +1,7 @@
 module Apotomo
   class JavascriptGenerator
     def initialize(framework)
+      raise "No JS framework specified" if framework.blank?
       extend "apotomo/javascript_generator/#{framework}".camelize.constantize
     end
     
@@ -28,8 +29,17 @@ module Apotomo
     end
     
     module Prototype
+      def prototype;            end
       def element(id);          "$(\"#{id}\")"; end
       def xhr(url);             "new Ajax.Request(\"#{url}\")"; end
+      def update(id, markup);   element(id) + '.update("'+escape(markup)+'")'; end
+      def replace(id, markup);  element(id) + '.replace("'+escape(markup)+'")'; end
+    end
+    
+    module Right
+      def right;                end
+      def element(id);          "$(\"#{id}\")"; end
+      def xhr(url);             "new Xhr(\"#{url}\", {evalScripts:true}).send()"; end
       def update(id, markup);   element(id) + '.update("'+escape(markup)+'")'; end
       def replace(id, markup);  element(id) + '.replace("'+escape(markup)+'")'; end
     end

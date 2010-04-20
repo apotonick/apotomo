@@ -29,4 +29,24 @@ rescue
 end
 
 module Apotomo
+  class << self
+    def js_framework=(js_framework)
+      @js_framework = js_framework
+    end
+    
+    def js_framework
+      @js_framework
+    end
+    
+    # Apotomo setup/configuration helper for initializer.
+    #
+    # == Usage/Exmaples:
+    #
+    #   Apotomo.setup do |config|
+    #     config.js_framework = :jquery
+    #   end
+    def setup
+      yield self
+    end
+  end
 end
