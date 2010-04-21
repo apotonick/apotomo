@@ -54,5 +54,24 @@ class ViewHelperTest < ActionView::TestCase
     should "respond to #url_for_event" do
       assert_equal("/barn/render_event_response?source=mum&amp;type=footsteps", url_for_event(:footsteps))
     end
+    
+    context "#widget_javascript" do
+      
+      should "usually render a javascript block" do
+        assert_equal "<script type=\"text/javascript\">\n//<![CDATA[\nalert(\"Beer!\")\n//]]>\n</script>", widget_javascript { 'alert("Beer!")' }
+      end
+      
+      should "be quiet if suppress_javascript is set" do
+        suppress_javascript = true
+        assert_equal "", widget_javascript { 'alert("Beer!")' }
+      end
+      
+      should_eventually "capture" do
+      puts "capturing"
+        v = ActionView::Base.new
+        c = v.capture do "capture me!" end
+        puts c.inspect
+      end
+    end
   end
 end

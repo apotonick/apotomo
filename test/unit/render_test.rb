@@ -87,6 +87,28 @@ class RenderTest < ActionView::TestCase
       end
     end
     
+    context "with :suppress_js" do
+      setup do
+        @mum.instance_eval do
+          def snuggle; render; end
+          self.class.send :attr_reader, :suppress_js
+        end
+      end
+      
+      should "per default be false" do
+        @mum.invoke :snuggle
+        assert !@mum.suppress_js
+      end
+      
+      should "be true when set" do
+        @mum.instance_eval do
+          def snuggle; render :suppress_js => true; end
+        end
+        @mum.invoke :snuggle
+        assert @mum.suppress_js
+      end
+    end
+    
     should "expose its instance variables in the rendered view" do
       @mum = mouse_mock('mum', :educate) do
         def educate
@@ -142,6 +164,7 @@ class RenderTest < ActionView::TestCase
       assert_equal String.new("squeak\n"), @mum.invoke(:squeak)
     end
   end
+  
   
   context "In default rendering context" do
     setup do

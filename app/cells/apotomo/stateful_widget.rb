@@ -62,7 +62,10 @@ module Apotomo
     end
     
     def unfreezable_ivars
-      [:@childrenHash, :@children, :@parent, :@controller, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts]
+      [:@childrenHash, :@children, :@parent, :@controller, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts,
+      :@suppress_javascript ### FIXME: implement with ActiveHelper and :locals.
+      
+      ]
     end
 
     # Defines the instance vars which should <em>not</em> be copied to the view.
@@ -158,7 +161,8 @@ module Apotomo
                               :html_options     => {},
                               :locals           => {},
                               :update           => false,
-                              :invoke           => {}
+                              :invoke           => {},
+                              :suppress_js      => false
                               
       
       rendered_children = render_children_for(options)
@@ -167,7 +171,7 @@ module Apotomo
       options[:locals].reverse_merge!(:rendered_children => rendered_children)
       
       @controller = controller # that dependency SUCKS.
-      
+      @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
       
       if content = options[:js]
         return ::Apotomo::Content::Javascript.new(content)

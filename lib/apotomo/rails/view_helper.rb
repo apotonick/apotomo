@@ -1,7 +1,8 @@
 module Apotomo
   module Rails
     module ViewHelper
-      # needs url_for, event_address_for
+      # needs :url_for, :event_address_for
+      
       # Returns the app JavaScript generator.
       def js_generator
         @controller.apotomo_request_processor.js_generator  ### DISCUSS: move to controller.
@@ -36,6 +37,10 @@ module Apotomo
         return multipart_form_to_event(type, options, html_options, &block) if options.delete(:multipart)
         
         form_remote_tag({:url => @controller.event_address_for(@cell, type, options), :html => html_options}, &block)
+        ### FIXME: couldn't get obstrusive js working, i don't understand rails helpers.
+        #html_options[:onSubmit] = js_generator.escape(js_generator.xhr(url_for_event(type, options)))
+        #puts html_options.inspect
+        #form_tag(url_for_event(type, options), html_options, &block)
       end
       
       # Creates a form that submits itself via an iFrame and executes the response
@@ -71,6 +76,13 @@ module Apotomo
       ### DISCUSS: rename to rendered_children ?
       def content
         @rendered_children.collect{|e| e.last}.join("\n")
+      end
+      
+      # needs: suppress_javascript
+      def widget_javascript(*args, &block)
+        return if @suppress_js ### FIXME: implement with ActiveHelper and :locals.
+        
+        javascript_tag(*args, &block)
       end
     end  
   end
