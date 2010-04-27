@@ -82,13 +82,20 @@
           render :text => apotomo_request_processor.render_page_updates(page_updates), :content_type => Mime::JS
         end
         
-        # Computes the url hash to the event processing action. May be passed to url_for. 
-        def event_address_for(widget, event_type, options={})
-          options[:type]     = event_type
-          options[:action] ||= :render_event_response ### TODO: provide configuration directive.
-          widget.address_for_event(options)
+        # Returns the url to trigger a +type+ event from +:source+, which is a non-optional parameter.
+        # Additional +options+ will be appended to the query string.
+        #
+        # Note that this method will use the framework's internal routing if available (e.g. #url_for in Rails).
+        #
+        # Example:
+        #   url_for_event(:paginate, :source => 'mouse', :page => 2)
+        #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
+        def url_for_event(type, options)
+          options.reverse_merge!  :action     => :render_event_response,
+                                  :type       => type,
+                                  :only_path  => true
+          url_for apotomo_request_processor.address_for(options)
         end
-        
         
         protected
         

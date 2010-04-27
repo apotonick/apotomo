@@ -1,12 +1,13 @@
 module Apotomo
   module Rails
     module ViewHelper
-      # needs :url_for, :event_address_for
+      # needs :@controller
       
       # Returns the app JavaScript generator.
       def js_generator
         @controller.apotomo_request_processor.js_generator  ### DISCUSS: move to controller.
       end
+      
       
       # Generates the JavaScript code to report an event of <tt>type</tt> to Apotomo with AJAX.
       # As always per default the event source is the currently rendered widget.
@@ -26,7 +27,7 @@ module Apotomo
       #
       # Note that the link is created using #link_to_remote.
       def link_to_event(title, type, options={}, html_options={})
-        link_to_remote(title, {:url => @controller.event_address_for(@cell, type, options)}, html_options)
+        link_to_remote(title, {:url => url_for_event(type, options)}, html_options)
       end
       
       # Creates a form tag that triggers an event via AJAX when submitted.
@@ -36,7 +37,7 @@ module Apotomo
       def form_to_event(type, options={}, html_options={}, &block)
         return multipart_form_to_event(type, options, html_options, &block) if options.delete(:multipart)
         
-        form_remote_tag({:url => @controller.event_address_for(@cell, type, options), :html => html_options}, &block)
+        form_remote_tag({:url => url_for_event(type, options), :html => html_options}, &block)
         ### FIXME: couldn't get obstrusive js working, i don't understand rails helpers.
         #html_options[:onSubmit] = js_generator.escape(js_generator.xhr(url_for_event(type, options)))
         #puts html_options.inspect
@@ -52,7 +53,7 @@ module Apotomo
         html_options.reverse_merge! :target         => :apotomo_iframe, :multipart => true
         
         # i hate rails:
-        concat('<iframe id="apotomo_iframe" name="apotomo_iframe" style="display: none;"></iframe>') << form_tag(@controller.event_address_for(@cell, type, options), html_options, &block)
+        concat('<iframe id="apotomo_iframe" name="apotomo_iframe" style="display: none;"></iframe>') << form_tag(url_for_event(type, options), html_options, &block)
       end
       
       # Returns the url to trigger a +type+ event from the currently rendered widget.
@@ -64,7 +65,8 @@ module Apotomo
       #   url_for_event(:paginate, :page => 2)
       #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
       def url_for_event(type, options={})
-        url_for @controller.event_address_for(@cell, type, options)
+        options.reverse_merge! :source => @cell.name
+        @controller.url_for_event(type, options)
       end
       
       ### TODO: test me.

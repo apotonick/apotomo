@@ -3,7 +3,10 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 class ControllerMethodsTest < ActionController::TestCase
   context "A Rails controller" do
     setup do
-      @controller = Class.new(ActionController::Base).new
+      @controller = Class.new(ActionController::Base) do
+        def self.default_url_options; {:controller => :barn}; end
+      end.new
+      @controller.extend ActionController::UrlWriter
       @controller.extend Apotomo::ControllerMethods
       @controller.session = {}
       @controller.params  = {}
@@ -66,6 +69,12 @@ class ControllerMethodsTest < ActionController::TestCase
       end
     end
     
+    context "invoking #url_for_event" do
+      should "compute an url for any widget" do
+        assert_equal "/barn/render_event_response?source=mouse&type=footsteps&volume=9", @controller.url_for_event(:footsteps, :source => :mouse, :volume => 9)
+      end
+    end
+    
     should "flush its bound_use_widgets_blocks with, guess, #flush_bound_use_widgets_blocks" do
       @controller.bound_use_widgets_blocks << Proc.new {}
       assert_equal 1, @controller.bound_use_widgets_blocks.size
@@ -84,6 +93,8 @@ class ControllerMethodsTest < ActionController::TestCase
       assert_equal '<div id="mum"><snuggle></snuggle></div>', @controller.render_widget('mum')
     end
   end
+  
+  
   
   context "invoking #apotomo_freeze" do
     should "freeze the widget tree to session" do
@@ -151,16 +162,6 @@ class ControllerMethodsTest < ActionController::TestCase
           assert_equal({:text => "squeak\n"}, @controller.render_event_response)
         end
       end
-    end
-  end
-  
-  context "responding to #event_address_for" do
-    setup do
-      @mum = mouse_mock
-    end
-    
-    should "per default add the :render_event_response action to the url" do
-      assert_equal({:action => :render_event_response, :type => :squeak, :source => 'mouse'}, @controller.event_address_for(@mum, :squeak))
     end
   end
   

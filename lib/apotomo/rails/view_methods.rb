@@ -1,9 +1,7 @@
 module Apotomo
   module Rails
     module ViewMethods
-      def render_widget(*args)
-        controller.render_widget(*args)
-      end
+      delegate :render_widget, :url_for_event, :to => :controller
     end
   end
 end

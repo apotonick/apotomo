@@ -89,5 +89,12 @@ module Apotomo
       
       widget.invoke(&block)
     end
+    
+    # Computes the address hash for a +:source+ widget and an event +:type+.
+    # Additional parameters will be merged.
+    def address_for(options)
+      raise "You forgot to provide :source or :type" unless options.has_key?(:source) and options.has_key?(:type)
+      options
+    end
   end
 end

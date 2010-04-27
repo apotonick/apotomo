@@ -161,4 +161,30 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
     end
   end
+  
+  context "invoking #address_for" do
+    setup do
+      @processor = Apotomo::RequestProcessor.new({})
+    end
+    
+    should "accept an event :type" do
+      assert_equal({:type => :squeak, :source => 'mum'}, @processor.address_for(:type => :squeak, :source => 'mum'))
+    end
+    
+    should "accept arbitrary options" do
+      assert_equal({:type => :squeak, :volume => 'loud', :source => 'mum'}, @processor.address_for(:type => :squeak, :volume => 'loud', :source => 'mum'))
+    end
+    
+    should "complain if no type given" do
+      assert_raises RuntimeError do
+        @processor.address_for(:source => 'mum')
+      end
+    end
+    
+    should "complain if no source given" do
+      assert_raises RuntimeError do
+        @processor.address_for(:type => :footsteps)
+      end
+    end
+  end
 end

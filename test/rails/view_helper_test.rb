@@ -41,18 +41,18 @@ class ViewHelperTest < ActionView::TestCase
     end
     
     should "respond to #trigger_event" do
-      assert_dom_equal "new Ajax.Request(\"/barn/render_event_response?source=mum&amp;type=footsteps\")",
+      assert_dom_equal "new Ajax.Request(\"/barn/render_event_response?source=mum&type=footsteps\")",
       trigger_event(:footsteps)
     end
     
     should "render RightJS if set" do
       Apotomo.js_framework = :right
       
-      assert_dom_equal "new Xhr(\"/barn/render_event_response?source=mum&amp;type=footsteps\", {evalScripts:true}).send()", trigger_event(:footsteps)
+      assert_dom_equal "new Xhr(\"/barn/render_event_response?source=mum&type=footsteps\", {evalScripts:true}).send()", trigger_event(:footsteps)
     end
     
     should "respond to #url_for_event" do
-      assert_equal("/barn/render_event_response?source=mum&amp;type=footsteps", url_for_event(:footsteps))
+      assert_equal("/barn/render_event_response?source=mum&type=footsteps", url_for_event(:footsteps))
     end
     
     context "#widget_javascript" do
@@ -61,9 +61,9 @@ class ViewHelperTest < ActionView::TestCase
         assert_equal "<script type=\"text/javascript\">\n//<![CDATA[\nalert(\"Beer!\")\n//]]>\n</script>", widget_javascript { 'alert("Beer!")' }
       end
       
-      should "be quiet if suppress_javascript is set" do
-        suppress_javascript = true
-        assert_equal "", widget_javascript { 'alert("Beer!")' }
+      should "be quiet if suppress_js is set" do
+        @suppress_js = true ### TODO: use a local, not an instance variable.
+        assert_equal nil, widget_javascript { 'alert("Beer!")' }
       end
       
       should_eventually "capture" do
