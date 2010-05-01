@@ -43,5 +43,13 @@ module Apotomo
       def update(id, markup);   element(id) + '.update("'+escape(markup)+'")'; end
       def replace(id, markup);  element(id) + '.replace("'+escape(markup)+'")'; end
     end
+    
+    module Jquery
+      def jquery;               end
+      def element(id);          "$(\"##{id}\")"; end
+      def xhr(url);             "$.ajax({url: \"#{url}\"})"; end
+      def update(id, markup);   element(id) + '.html("'+escape(markup)+'")'; end
+      def replace(id, markup);  element(id) + '.replaceWith("'+escape(markup)+'")'; end
+    end
   end
 end

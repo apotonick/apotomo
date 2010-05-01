@@ -60,5 +60,31 @@ class JavascriptGeneratorTest < Test::Unit::TestCase
         assert_equal "alert(\"Beer!\")", @gen << 'alert("Beer!")'
       end
     end
+    
+    context "in jquery mode" do
+      setup do
+        @gen = Apotomo::JavascriptGenerator.new(:jquery)
+      end
+      
+      should "respond to jquery" do
+        assert_respond_to @gen, :jquery
+      end
+    
+      should "respond to xhr" do
+        assert_equal "$.ajax({url: \"/drink/beer?source=nick\"})", @gen.xhr('/drink/beer?source=nick')
+      end
+      
+      should "respond to replace" do
+        assert_equal "$(\"#drinks\").replaceWith(\"EMPTY!\")", @gen.replace(:drinks, 'EMPTY!')
+      end
+      
+      should "respond to update" do
+        assert_equal "$(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\")", @gen.update(:drinks, '<li id="beer"></li>')
+      end
+      
+      should "respond to <<" do
+        assert_equal "alert(\"Beer!\")", @gen << 'alert("Beer!")'
+      end
+    end
   end
 end
