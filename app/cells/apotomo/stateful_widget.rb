@@ -1,4 +1,16 @@
 require 'onfire'
+require 'apotomo/tree_node'
+
+require 'apotomo/persistence'
+require 'apotomo/event'
+require 'apotomo/event_methods'
+require 'apotomo/transition'
+require 'apotomo/caching'
+require 'apotomo/deep_link_methods'
+require 'apotomo/widget_shortcuts'
+require 'apotomo/rails/view_helper'
+
+require 'apotomo/content'
 
 module Apotomo
   class StatefulWidget < Cell::Base
@@ -74,6 +86,9 @@ module Apotomo
       []
     end
     
+    ### FIXME:
+    def logger; self; end
+    def debug(*args); puts args; end
     
     # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
     # This might lead us to some other state since the state method could call #jump_to_state.

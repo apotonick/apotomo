@@ -1,5 +1,7 @@
 require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 
+require 'action_view/test_case'
+
 class ViewHelperTest < ActionView::TestCase
   tests Apotomo::Rails::ViewHelper
   

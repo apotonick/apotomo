@@ -1,3 +1,5 @@
+require 'apotomo/event_handler'
+
 module Apotomo
   # Introduces event-processing functions into the StatefulWidget.
   module EventMethods

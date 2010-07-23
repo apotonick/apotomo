@@ -2,9 +2,6 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
  
 #class RailsIntegrationTest < ActionController::IntegrationTest
 class RailsIntegrationTest < ActionController::TestCase
-  require 'responds_to_parent'
-  include RespondsToParent::SelectorAssertion
-  
   def simulate_request!
     @controller.instance_eval { @apotomo_request_processor = nil }
   end
@@ -12,7 +9,7 @@ class RailsIntegrationTest < ActionController::TestCase
   context "A Rails controller" do
     setup do
       @controller = ApotomoController.new
-      @controller.extend Apotomo::ControllerMethods
+      @controller.extend Apotomo::Rails::ControllerMethods
       @controller.session = {}
       @controller.params  = {}
       

@@ -1,3 +1,5 @@
+require 'apotomo/javascript_generator'
+
 module Apotomo
   class RequestProcessor
     include WidgetShortcuts

@@ -4,7 +4,7 @@ class ViewMethodsTest < ActionController::TestCase
   context "A Rails controller view" do
     setup do
       @controller = ApotomoController.new
-      @controller.extend Apotomo::ControllerMethods
+      @controller.extend Apotomo::Rails::ControllerMethods
       @controller.session = {}
       
       @controller.instance_variable_set(:@mum, mouse_mock('mum', 'snuggle') {def snuggle; render; end})

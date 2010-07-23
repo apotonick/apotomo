@@ -21,6 +21,9 @@
 #  THE SOFTWARE.
 #  
 
+
+require 'cells'
+
 begin
   require 'onfire'
 rescue
@@ -50,3 +53,6 @@ module Apotomo
     end
   end
 end
+
+require 'app/cells/apotomo/stateful_widget' ### FIXME: change to lib...
+require 'app/cells/apotomo/container_widget' ### FIXME: change to lib...

@@ -1,10 +1,27 @@
-require 'rubygems'
+# wycats says...
+require 'bundler'
+Bundler.setup
+
+#require 'rubygems'
 require 'shoulda'
 require 'mocha'
+require 'mocha/integration'
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
 
-Cell::Base.view_paths.unshift File.expand_path(File.dirname(__FILE__) + "/fixtures")
+require 'cells'
+Cell::Base.add_view_path File.expand_path(File.dirname(__FILE__) + "/fixtures")
+
+puts Cell::Base.view_paths
+
+require 'apotomo'
+require 'apotomo/widget_shortcuts'
+require 'apotomo/rails/controller_methods'
+require 'apotomo/rails/view_methods'
+#require 'apotomo/assertions_helper'
+
+#require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
+
+
 
 # Load test support files.
 Dir[File.join(File.dirname(__FILE__), *%w[support ** *.rb]).to_s].each { |f| require f }
@@ -27,7 +44,7 @@ Test::Unit::TestCase.class_eval do
 end
 
 class ApotomoController < ActionController::Base
-  include Apotomo::ControllerMethods
+  include Apotomo::Rails::ControllerMethods
 end
 
 class MouseCell < Apotomo::StatefulWidget
@@ -46,3 +63,13 @@ class RenderingTestCell < Apotomo::StatefulWidget
 end
 
 
+
+# We need to setup a fake route for the controller tests.
+ActionController::Routing::Routes.draw do |map|
+  map.connect 'apotomo/:action', :controller => 'apotomo'
+  map.connect 'barn/:action', :controller => 'barn'
+end
+
+module ::Rails
+  def logger(*args); end
+end

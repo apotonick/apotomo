@@ -1,5 +1,4 @@
 require File.join(File.dirname(__FILE__), *%w[.. test_helper])
-require 'javascript_generator'  # rails_generator fucks up autoloading for *Generator classes, so go by foot.
 require 'rails_generator'
 require 'rails_generator/scripts/generate'
 

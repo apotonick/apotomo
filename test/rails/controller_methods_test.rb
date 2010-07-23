@@ -7,7 +7,7 @@ class ControllerMethodsTest < ActionController::TestCase
         def self.default_url_options; {:controller => :barn}; end
       end.new
       @controller.extend ActionController::UrlWriter
-      @controller.extend Apotomo::ControllerMethods
+      @controller.extend Apotomo::Rails::ControllerMethods
       @controller.session = {}
       @controller.params  = {}
     end
@@ -167,7 +167,7 @@ class ControllerMethodsTest < ActionController::TestCase
   
   context "The ProcHash" do
     setup do
-      @procs = Apotomo::ControllerMethods::ProcHash.new
+      @procs = Apotomo::Rails::ControllerMethods::ProcHash.new
       @b = Proc.new{}; @d = Proc.new{}
       @c = Proc.new{}
       @procs << @b

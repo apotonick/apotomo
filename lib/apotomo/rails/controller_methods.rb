@@ -1,3 +1,5 @@
+require 'apotomo/request_processor'
+
   module Apotomo
     module Rails
       module ControllerMethods
