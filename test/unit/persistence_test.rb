@@ -75,6 +75,13 @@ class PersistenceTest < Test::Unit::TestCase
       assert_kind_of Apotomo::StatefulWidget, @storage[:apotomo_root]
     end
     
+    should "ignore stateless widgets when calling #freeze_to" do
+      @mum << Apotomo::Widget.new('berry', :eating)
+      @mum.freeze_to(@storage)
+      
+      assert_equal ['mum', 'mum/kid'], @storage[:apotomo_widget_ivars].keys
+    end
+    
     should "update @mum's ivars when calling #thaw_ivars_from" do
       @mum.instance_variable_set(:@name, "zombie mum")
       assert_equal 'zombie mum', @mum.name

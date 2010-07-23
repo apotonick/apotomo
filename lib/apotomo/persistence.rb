@@ -18,9 +18,10 @@ module Apotomo
       storage[path] = frozen
     end
     
+    ### FIXME: rewrite so that root might be stateless as well.
     def freeze_data_to(storage)
-      freeze_ivars_to(storage)
-      children.each { |child| child.freeze_data_to(storage) }
+      freeze_ivars_to(storage)# if self.kind_of?(StatefulWidget)
+      children.each { |child| child.freeze_data_to(storage)  if child.kind_of?(StatefulWidget) }
     end
     
     def freeze_to(storage)

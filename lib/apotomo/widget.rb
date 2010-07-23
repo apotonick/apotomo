@@ -1,7 +1,7 @@
 require 'onfire'
 require 'apotomo/tree_node'
 
-require 'apotomo/persistence'
+
 require 'apotomo/event'
 require 'apotomo/event_methods'
 require 'apotomo/transition'
@@ -22,7 +22,7 @@ module Apotomo
     attr_writer   :visible
     
     include TreeNode
-    include Persistence
+    
     
     include Onfire
     include EventMethods
