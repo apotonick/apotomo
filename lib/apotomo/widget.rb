@@ -13,7 +13,7 @@ require 'apotomo/rails/view_helper'
 require 'apotomo/content'
 
 module Apotomo
-  class StatefulWidget < Cell::Base
+  class Widget < Cell::Base
     
     class_inheritable_array :initialize_hooks, :instance_writer => false
     self.initialize_hooks = []

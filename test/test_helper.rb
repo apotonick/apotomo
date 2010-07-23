@@ -73,3 +73,5 @@ end
 module ::Rails
   def logger(*args); end
 end
+
+require 'app/cells/apotomo/container_widget' ### FIXME: change to lib...

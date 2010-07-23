@@ -54,5 +54,4 @@ module Apotomo
   end
 end
 
-require 'app/cells/apotomo/stateful_widget' ### FIXME: change to lib...
-require 'app/cells/apotomo/container_widget' ### FIXME: change to lib...
+require 'apotomo/stateful_widget'
