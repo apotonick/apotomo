@@ -1,6 +1,8 @@
-require File.join(File.dirname(__FILE__), *%w[.. test_helper])
+require File.join(File.dirname(__FILE__), %w(.. test_helper))
 require 'rails_generator'
 require 'rails_generator/scripts/generate'
+
+Rails::Generator::Base.append_sources Rails::Generator::PathSource.new(:apotomo, File.join(File.dirname(__FILE__)+'/../../generators'))
 
 class WidgetGeneratorTest < Test::Unit::TestCase
   context "Running script/generate widget" do
