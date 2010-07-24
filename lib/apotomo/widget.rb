@@ -12,6 +12,11 @@ require 'apotomo/rails/view_helper'
 
 require 'apotomo/content'
 
+### TODO: use load_hooks when switching to rails 3.
+# wycats@gmail.com: ActiveSupport.run_load_hooks(:name)
+# (21:01:17) wycats@gmail.com: ActiveSupport.on_load(:name) { … }
+#require 'active_support/lazy_load_hooks'
+
 module Apotomo
   class Widget < Cell::Base
     

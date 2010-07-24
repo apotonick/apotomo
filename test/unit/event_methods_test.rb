@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), *%w[.. test_helper])
+require File.join(File.dirname(__FILE__), %w(.. test_helper))
  
 class EventMethodsTest < Test::Unit::TestCase
 
@@ -36,6 +36,25 @@ class EventMethodsTest < Test::Unit::TestCase
       @mum.respond_to_event :peep, :with => :answer_squeak, :once => false
       @mum.fire :peep
       assert_equal ['answer squeak', 'answer squeak'], @mum.list
+    end
+    
+    context "#responds_to_event in class context" do
+      setup do
+        class AdultMouseCell < MouseCell
+          responds_to_event :peep, :with => :answer_squeak
+        end
+        class BabyMouseCell < AdultMouseCell
+          responds_to_event :footsteps, :with => :squeak
+        end
+      end
+      
+      should "add the handlers at creation time" do
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouseCell.new('mum', :show).event_table.all_handlers_for(:peep, 'mum')
+      end
+      
+      should "not inherit handlers for now" do
+        assert_equal [], BabyMouseCell.new('kid', :show).event_table.all_handlers_for(:peep, 'kid')
+      end
     end
     
     

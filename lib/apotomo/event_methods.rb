@@ -2,6 +2,7 @@ require 'apotomo/event_handler'
 
 module Apotomo
   # Introduces event-processing functions into the StatefulWidget.
+  
   module EventMethods
     attr_writer :page_updates
     # Replacement for the EventProcessor singleton queue.
@@ -9,6 +10,25 @@ module Apotomo
       @page_updates ||= []
     end
     
+    def self.included(base)
+      base.extend(ClassMethods)
+      base.initialize_hooks << :add_class_event_handlers
+    end
+    
+    def add_class_event_handlers(*)
+      self.class.responds_to_event_options.each { |options| respond_to_event(*options) }
+    end
+    
+    module ClassMethods
+      def responds_to_event(*options)
+        responds_to_event_options << options
+      end
+      alias_method :respond_to_event, :responds_to_event
+      
+      def responds_to_event_options
+        @responds_to_event_options ||= []
+      end
+    end
     # Instructs the widget to look out for <tt>type</tt> Events that are passing by while bubbling.
     # If an appropriate event is encountered the widget will send the targeted widget (or itself) to another
     # state, which implies an update of the invoked widget.
