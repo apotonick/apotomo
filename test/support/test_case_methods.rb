@@ -41,6 +41,15 @@ module Apotomo
       @mum
     end
     
+    def barn_controller!
+      @controller = Class.new(ActionController::Base) do
+        def self.default_url_options; {:controller => :barn}; end
+      end.new
+      @controller.class.instance_eval { include Apotomo::Rails::ControllerMethods }
+      @controller.extend ActionController::UrlWriter
+      @controller.params  = {}
+      @controller.session = {}
+    end
     
     def hibernate_widget(widget)
       session = {}

@@ -3,13 +3,7 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 class ControllerMethodsTest < ActionController::TestCase
   context "A Rails controller" do
     setup do
-      @controller = Class.new(ActionController::Base) do
-        def self.default_url_options; {:controller => :barn}; end
-      end.new
-      @controller.extend ActionController::UrlWriter
-      @controller.extend Apotomo::Rails::ControllerMethods
-      @controller.session = {}
-      @controller.params  = {}
+      barn_controller!
     end
     
     context "responding to #apotomo_root" do
@@ -27,6 +21,45 @@ class ControllerMethodsTest < ActionController::TestCase
       should "initially return the processor which has a flushed root" do
         assert_kind_of Apotomo::RequestProcessor, @controller.apotomo_request_processor
         assert_equal 1, @controller.apotomo_request_processor.root.size
+      end
+    end
+    
+    context "invoking #uses_widgets" do
+      setup do
+        @controller.class.uses_widgets do |root|
+          root << mouse_mock('mum')
+        end
+      end
+      
+      should "add the widgets to apotomo_root" do
+        assert_equal 'mum', @controller.apotomo_root['mum'].name
+      end
+      
+      should "add the widgets only once in apotomo_root" do
+        @controller.apotomo_root
+        assert @controller.apotomo_root['mum']
+      end
+      
+      should "allow multiple calls to uses_widgets" do
+        @controller.class.uses_widgets do |root|
+          root << mouse_mock('kid')
+        end
+        
+        assert @controller.apotomo_root['mum']
+        assert @controller.apotomo_root['kid']
+      end
+      
+      should "inherit uses_widgets blocks to sub-controllers" do
+        berry = mouse_mock('berry')
+        @sub_controller = Class.new(@controller.class) do
+          include Apotomo::Rails::ControllerMethods
+          uses_widgets { |root| root << berry }
+        end.new
+        @sub_controller.params  = {}
+        @sub_controller.session = {}
+        
+        assert @sub_controller.apotomo_root['mum']
+        assert @sub_controller.apotomo_root['berry']
       end
     end
     

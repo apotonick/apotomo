@@ -7,13 +7,7 @@ class ViewHelperTest < ActionView::TestCase
   
   context "A widget state view" do
     setup do
-      @controller = Class.new(ActionController::Base) do
-        def self.default_url_options; {:controller => :barn}; end
-      end.new
-      @controller.extend Apotomo::Rails::ControllerMethods
-      @controller.extend ActionController::UrlWriter
-      @controller.params  = {}
-      @controller.session = {}
+      barn_controller!
       
       @cell = mouse_mock('mum')
     end

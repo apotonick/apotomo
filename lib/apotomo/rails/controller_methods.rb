@@ -8,10 +8,20 @@ require 'apotomo/request_processor'
         def self.included(base) #:nodoc:
           base.class_eval do
             extend WidgetShortcuts
+            extend ClassMethods
+            
+            class_inheritable_array :uses_widgets_blocks
+            self.uses_widgets_blocks = []
             
             helper ::Apotomo::Rails::ViewMethods
             
             after_filter :apotomo_freeze
+          end
+        end
+        
+        module ClassMethods
+          def uses_widgets(&block)
+            uses_widgets_blocks << block
           end
         end
         
@@ -21,6 +31,10 @@ require 'apotomo/request_processor'
         
         def flush_bound_use_widgets_blocks
           session[:bound_use_widgets_blocks] = nil
+        end
+        
+        def add_uses_widgets_blocks
+          self.class.uses_widgets_blocks.each { |block| use_widgets(&block) }
         end
         
         def apotomo_request_processor
@@ -35,6 +49,7 @@ require 'apotomo/request_processor'
           @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options)
           
           flush_bound_use_widgets_blocks if @apotomo_request_processor.widgets_flushed?
+          add_uses_widgets_blocks
           
           @apotomo_request_processor
         end
