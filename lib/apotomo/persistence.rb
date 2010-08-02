@@ -88,6 +88,27 @@ module Apotomo
       def frozen_widget_in?(storage)
         storage[:apotomo_root].kind_of? Apotomo::StatefulWidget
       end
+      
+      def flush_storage(storage)
+        storage[:apotomo_root]          = nil
+        storage[:apotomo_widget_ivars]  = nil
+      end
+      
+      # Find the first stateful widgets on each branch from +root+.
+      def stateful_branches_for(root)
+        to_traverse     = [root]
+        stateful_roots  = []
+        
+        while node = to_traverse.shift
+          if node.kind_of?(StatefulWidget)
+            stateful_roots << node and next
+          end
+          to_traverse += node.children
+        end
+        
+        stateful_roots
+      end
+      
     end
   end
 end

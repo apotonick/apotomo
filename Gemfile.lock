@@ -1,0 +1,36 @@
+GEM
+  specs:
+    actionmailer (2.3.8)
+      actionpack (= 2.3.8)
+    actionpack (2.3.8)
+      activesupport (= 2.3.8)
+      rack (~> 1.1.0)
+    activerecord (2.3.8)
+      activesupport (= 2.3.8)
+    activeresource (2.3.8)
+      activesupport (= 2.3.8)
+    activesupport (2.3.8)
+    cells (3.3.4)
+    mocha (0.9.8)
+      rake
+    onfire (0.1.0)
+    rack (1.1.0)
+    rails (2.3.8)
+      actionmailer (= 2.3.8)
+      actionpack (= 2.3.8)
+      activerecord (= 2.3.8)
+      activeresource (= 2.3.8)
+      activesupport (= 2.3.8)
+      rake (>= 0.8.3)
+    rake (0.8.7)
+    shoulda (2.11.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  cells (= 3.3.4)
+  mocha
+  onfire
+  rails (= 2.3.8)
+  shoulda

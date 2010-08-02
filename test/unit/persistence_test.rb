@@ -14,6 +14,19 @@ class PersistenceTest < Test::Unit::TestCase
     def recap;  render :nothing => true; end
   end
   
+  context "StatefulWidget" do
+  
+    context ".stateful_branches_for" do
+      should "provide all stateful branch-roots seen from root" do
+        @root = Apotomo::Widget.new('root', :eat)
+        @root << mum_and_kid!
+        @root << Apotomo::Widget.new('berry', :eat) << @jerry = mouse_mock('jerry', :eat)
+        
+        assert_equal ['mum', 'jerry'], Apotomo::StatefulWidget.stateful_branches_for(@root).collect {|n| n.name}
+      end
+    end
+  end
+  
   context "After #hibernate_widget (request) the widget" do
     should "still have the same ivars" do
       @mum = PersistentMouse.new('mum', :educate)
@@ -52,6 +65,16 @@ class PersistenceTest < Test::Unit::TestCase
       @storage = {}
     end
     
+    context "and calling #flush_storage" do
+      should "clear the storage from frozen data" do
+        @mum.freeze_to(@storage)
+        Apotomo::StatefulWidget.flush_storage(@storage)
+        
+        assert_not @storage[:apotomo_root]
+        assert_not @storage[:apotomo_widget_ivars]
+      end
+    end
+    
     should "push @mum's freezable ivars to the storage when calling #freeze_ivars_to" do
       @mum.freeze_ivars_to(@storage)
       
@@ -77,7 +100,7 @@ class PersistenceTest < Test::Unit::TestCase
     
     should "ignore stateless widgets when calling #freeze_to" do
       @mum << Apotomo::Widget.new('berry', :eating)
-      @mum.freeze_to(@storage)
+      @mum = hibernate_widget(@mum, @storage)
       
       assert_equal ['mum', 'mum/kid'], @storage[:apotomo_widget_ivars].keys
     end
@@ -120,7 +143,7 @@ class PersistenceTest < Test::Unit::TestCase
       @mum << @kid = PersistentMouse.new('kid', :eating)
     end
     
-    context "a single widget" do
+    context "a single stateful widget" do
       should "provide a serialized widget on #node_dump" do
         assert_equal "mum|PersistenceTest::PersistentMouse|mum", @mum.dump_node
         assert_equal "kid|PersistenceTest::PersistentMouse|mum", @kid.dump_node
@@ -135,7 +158,7 @@ class PersistenceTest < Test::Unit::TestCase
       end
     end
     
-    context "a widget family" do
+    context "a stateful widget family" do
       should "provide the serialized tree on _dump" do
         assert_equal "mum|PersistenceTest::PersistentMouse|mum\nkid|PersistenceTest::PersistentMouse|mum\n", @mum._dump(10)
       end

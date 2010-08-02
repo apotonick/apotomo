@@ -51,8 +51,7 @@ module Apotomo
       @controller.session = {}
     end
     
-    def hibernate_widget(widget)
-      session = {}
+    def hibernate_widget(widget, session = {})
       widget.freeze_to(session)
       
       session = Marshal.load(Marshal.dump(session))

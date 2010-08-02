@@ -25,6 +25,7 @@ module Apotomo
     end
     
     def flushed_root
+      StatefulWidget.flush_storage(session)
       @widgets_flushed = true
       widget('apotomo/stateful_widget', :content, 'root')
     end
