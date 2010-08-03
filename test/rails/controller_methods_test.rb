@@ -133,8 +133,8 @@ class ControllerMethodsTest < ActionController::TestCase
     should "freeze the widget tree to session" do
       assert_equal 0, @controller.session.size
       @controller.send :apotomo_freeze
-      assert @controller.session[:apotomo_root]
       assert @controller.session[:apotomo_widget_ivars]
+      assert @controller.session[:apotomo_stateful_branches]
     end
   end
     

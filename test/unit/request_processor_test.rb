@@ -33,33 +33,22 @@ class RequestProcessorTest < Test::Unit::TestCase
       setup do
         mum_and_kid!
         @mum.version = 1
-        @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum})
+        @session = {:apotomo_stateful_branches => [[@mum, 'root']]}
+        @processor = Apotomo::RequestProcessor.new(@session)
       end
       
       should "provide a widget family for #root" do
-        assert_equal 2, @processor.root.size
-        assert_equal 1, @processor.root.version
+        assert_equal 3, @processor.root.size
+        assert_equal 1, @processor.root['mum'].version
         assert_not @processor.widgets_flushed?
       end
       
       context "having a flush flag set" do
         should "provide a single root for #root when :flush_widgets is set" do
-          @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :flush_widgets => true)
+          @processor = Apotomo::RequestProcessor.new(@session, :flush_widgets => true)
           assert_equal 1, @processor.root.size
           assert @processor.widgets_flushed?
         end
-        
-        should "provide a single root for #root when :version differs" do
-          @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :version => 0)
-          assert_equal 1, @processor.root.size
-          assert @processor.widgets_flushed?
-        end
-      end
-      
-      should "provide a widget family for #root when :version is correct" do
-        @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :version => 1)
-        assert_equal 2, @processor.root.size
-        assert_not @processor.widgets_flushed?
       end
     end
     
@@ -81,7 +70,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       ### FIXME: what about that automatic @controller everywhere?
       mum_and_kid!
       @mum.controller = nil # check if controller gets connected.
-      @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum}, :js_framework => :prototype)
+      @processor = Apotomo::RequestProcessor.new({:apotomo_stateful_branches => [[@mum, 'root']]}, :js_framework => :prototype)
       
       
       
@@ -128,7 +117,7 @@ class RequestProcessorTest < Test::Unit::TestCase
   
   
   context "#freeze!" do
-    should "serialize the widget family to @session" do
+    should "serialize stateful branches to @session" do
       @processor = Apotomo::RequestProcessor.new({})
       @processor.root << mum_and_kid!
       assert_equal 3, @processor.root.size
@@ -146,7 +135,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
       @mum.controller = nil
       
-      @processor = Apotomo::RequestProcessor.new({:apotomo_root => @mum})
+      @processor = Apotomo::RequestProcessor.new({:apotomo_stateful_branches => [[@mum, 'root']]})
     end
     
     should "render the widget when passing an existing widget id" do

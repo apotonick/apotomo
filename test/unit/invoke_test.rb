@@ -1,12 +1,14 @@
 require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 
 class InvokeTest < Test::Unit::TestCase
+  class LocalMouse < MouseCell
+    def snuggle; render; end
+    def educate; render :view => :snuggle; end
+  end
+  
   context "Invoking a single widget" do
     setup do
-      @mum = mouse_mock('mum', :snuggle) do
-        def snuggle; render; end
-        def educate; render :view => :snuggle; end
-      end
+      @mum = LocalMouse.new('mum', :snuggle)
     end
     
     context "implicitely" do
@@ -53,10 +55,7 @@ class InvokeTest < Test::Unit::TestCase
   
   context "Invoking a widget family" do
     setup do
-      @mum = mouse_mock('mum', :snuggle) do
-        def snuggle; render; end
-        def educate; render :view => :snuggle; end
-      end
+      @mum = LocalMouse.new('mum', :snuggle)
       
       # create an anonym class for @kid so we don't pollute with #transition's.
       @mum << @kid = mouse_class_mock.new('kid', :snooze)

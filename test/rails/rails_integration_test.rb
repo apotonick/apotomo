@@ -1,6 +1,5 @@
-require File.join(File.dirname(__FILE__), *%w[.. test_helper])
- 
-#class RailsIntegrationTest < ActionController::IntegrationTest
+require File.join(File.dirname(__FILE__), %w(.. test_helper))
+
 class RailsIntegrationTest < ActionController::TestCase
   def simulate_request!
     @controller.instance_eval { @apotomo_request_processor = nil }
@@ -9,7 +8,6 @@ class RailsIntegrationTest < ActionController::TestCase
   context "A Rails controller" do
     setup do
       @controller = ApotomoController.new
-      @controller.extend Apotomo::Rails::ControllerMethods
       @controller.session = {}
       @controller.params  = {}
       
@@ -23,26 +21,36 @@ class RailsIntegrationTest < ActionController::TestCase
           use_widgets do |root|
             root << @mum
           end
+          
           render :text => render_widget('mum')
         end
       end
     end
     
-    should "freeze the widget tree after each request" do
+    should "freeze the widget tree once after each request" do
       assert_equal 0, @controller.session.size
       
       get 'widget'
-      
-      assert @controller.session[:apotomo_root]
+      assert_equal 1, @controller.session[:apotomo_stateful_branches].size
     end
     
     should "invoke a #use_widgets block only once per session" do
-      assert_equal 1, @controller.apotomo_root.size
+      #assert_equal 1, @controller.apotomo_root.size
+      
       get 'widget'
+      assert_response :success
+      assert_equal 1, @controller.session[:apotomo_stateful_branches].size
+      
       simulate_request!
+      
       get 'widget'
+      assert_equal 1, @controller.session[:apotomo_stateful_branches].size
+      assert_response :success
+      
       simulate_request!
+      
       get 'widget'
+      assert_response :success
       assert_equal 2, @controller.apotomo_root.size, "mum added multiple times"
     end
     
@@ -55,12 +63,14 @@ class RailsIntegrationTest < ActionController::TestCase
       assert_select "a", "Squeak!"
     end
     
-    should "contain a freshly flushed tree when ?flush_tree=1 is set" do
+    should "contain a freshly flushed tree when ?flush_widgets=1 is set" do
       get 'widget'
+      assert_response :success
       assert @controller.apotomo_request_processor.widgets_flushed?
       
       simulate_request!
       get 'widget'
+      assert_response :success
       assert_not @controller.apotomo_request_processor.widgets_flushed?
       
       simulate_request!

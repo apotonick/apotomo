@@ -11,13 +11,13 @@ module Apotomo
       @widgets_flushed      = false
       @js_framework         = options[:js_framework]
       
-      if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)
-        @root = ::Apotomo::StatefulWidget.thaw_from(session)
+      if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)  
+        @root = ::Apotomo::StatefulWidget.thaw_for(session, widget('apotomo/widget', 'root'))
       else
         @root = flushed_root 
       end
       
-      handle_version!(options[:version])
+      #handle_version!(options[:version])
     end
     
     def js_generator
@@ -27,9 +27,10 @@ module Apotomo
     def flushed_root
       StatefulWidget.flush_storage(session)
       @widgets_flushed = true
-      widget('apotomo/stateful_widget', :content, 'root')
+      widget('apotomo/widget', 'root')
     end
     
+    ### DISCUSS: do we need the version feature, or should we push that into user code?
     def handle_version!(version)
       return if version.blank?
       return if root.version == version
@@ -70,13 +71,13 @@ module Apotomo
     # Serializes the current widget tree to the storage that was passed in the constructor.
     # Call this at the end of a request.
     def freeze!
-      root.freeze_to(@session)
+      Apotomo::StatefulWidget.freeze_for(@session, root)
     end
     
     # Renders the widget named <tt>widget_id</tt>, passing optional <tt>opts</tt> and a block to it.
     # Use this in your #render_widget wrapper.
     def render_widget_for(widget_id, opts, controller, &block)
-      if widget_id.kind_of?(::Apotomo::StatefulWidget)
+      if widget_id.kind_of?(::Apotomo::Widget)
         widget = widget_id
       else
         widget = root.find_widget(widget_id)

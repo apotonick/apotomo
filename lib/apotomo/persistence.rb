@@ -78,6 +78,28 @@ module Apotomo
         end
         root
       end
+      
+      def freeze_for(storage, root)
+        storage[:apotomo_stateful_branches] = []
+        storage[:apotomo_widget_ivars]      = {}
+        
+        stateful_branches_for(root).each do |branch|
+          branch.freeze_data_to(storage[:apotomo_widget_ivars])  # save ivars.
+          storage[:apotomo_stateful_branches] << [branch, branch.parent.name]
+        end
+      end
+      
+      def thaw_for(storage, root)
+        branches = storage[:apotomo_stateful_branches] || []
+        branches.each do |config|
+          branch = config.first
+          root.find_widget(config.last) << branch
+          
+          branch.thaw_ivars_from(storage.fetch(:apotomo_widget_ivars, {}))
+        end
+        
+        root
+      end
   
       def thaw_from(storage)
         root = storage[:apotomo_root]
@@ -86,7 +108,8 @@ module Apotomo
       end
       
       def frozen_widget_in?(storage)
-        storage[:apotomo_root].kind_of? Apotomo::StatefulWidget
+        branches = storage[:apotomo_stateful_branches]
+        branches.present? and branches.first.first.kind_of? Apotomo::StatefulWidget
       end
       
       def flush_storage(storage)

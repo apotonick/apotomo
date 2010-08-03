@@ -98,11 +98,32 @@ class PersistenceTest < Test::Unit::TestCase
       assert_kind_of Apotomo::StatefulWidget, @storage[:apotomo_root]
     end
     
-    should "ignore stateless widgets when calling #freeze_to" do
-      @mum << Apotomo::Widget.new('berry', :eating)
-      @mum = hibernate_widget(@mum, @storage)
+    context "that has also stateless widgets" do
+      setup do
+        @root = Apotomo::Widget.new('root', :eat)
+          @root << mum_and_kid!
+          @root << Apotomo::Widget.new('berry', :eat) << @jerry = mouse_mock('jerry', :eat)
+        @mum << Apotomo::Widget.new('tom', :eating)
+        
+        Apotomo::StatefulWidget.freeze_for(@storage, @root)
+      end
       
-      assert_equal ['mum', 'mum/kid'], @storage[:apotomo_widget_ivars].keys
+      should "ignore stateless widgets when calling #freeze_for" do
+        assert_equal(['root/mum', 'root/mum/kid', "root/berry/jerry"], @storage[:apotomo_widget_ivars].keys)
+      end
+      
+      should "save stateful branches only" do
+        assert_equal([[@mum, 'root'], [@jerry, 'berry']], @storage[:apotomo_stateful_branches])
+      end
+      
+      should "attach stateful branches to the tree in thaw_for" do
+        @new_root = Apotomo::Widget.new('root', :eat)
+          @new_root << Apotomo::Widget.new('berry', :eat)
+        assert_equal @new_root, Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+        
+        assert_equal @root.size, @new_root.size
+      end
+      
     end
     
     should "update @mum's ivars when calling #thaw_ivars_from" do
@@ -174,7 +195,7 @@ class PersistenceTest < Test::Unit::TestCase
   context "#frozen_widget_in?" do
     should "return true if a valid widget is passed" do
       assert_not Apotomo::StatefulWidget.frozen_widget_in?({})
-      assert Apotomo::StatefulWidget.frozen_widget_in?({:apotomo_root => mouse_mock})
+      assert Apotomo::StatefulWidget.frozen_widget_in?({:apotomo_stateful_branches => [[mouse_mock, 'root']]})
     end
   end
   
