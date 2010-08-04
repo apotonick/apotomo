@@ -3,6 +3,7 @@ require File.join(File.dirname(__FILE__), %w(.. test_helper))
 class RailsIntegrationTest < ActionController::TestCase
   def simulate_request!
     @controller.instance_eval { @apotomo_request_processor = nil }
+    @controller.session = Marshal.load(Marshal.dump(@controller.session))
   end
   
   context "A Rails controller" do
@@ -69,11 +70,13 @@ class RailsIntegrationTest < ActionController::TestCase
       assert @controller.apotomo_request_processor.widgets_flushed?
       
       simulate_request!
+      
       get 'widget'
       assert_response :success
       assert_not @controller.apotomo_request_processor.widgets_flushed?
       
       simulate_request!
+      
       get 'widget', :flush_widgets => 1
       assert_response :success  # will fail if no #use_widgets block invoked
       assert @controller.apotomo_request_processor.widgets_flushed?

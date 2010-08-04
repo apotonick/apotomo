@@ -103,7 +103,7 @@ class PersistenceTest < Test::Unit::TestCase
         @root = Apotomo::Widget.new('root', :eat)
           @root << mum_and_kid!
           @root << Apotomo::Widget.new('berry', :eat) << @jerry = mouse_mock('jerry', :eat)
-        @mum << Apotomo::Widget.new('tom', :eating)
+        @root << Apotomo::Widget.new('tom', :eating)
         
         Apotomo::StatefulWidget.freeze_for(@storage, @root)
       end
@@ -113,7 +113,12 @@ class PersistenceTest < Test::Unit::TestCase
       end
       
       should "save stateful branches only" do
+        #@mum.root!
+        #@jerry.root!  # disconnect stateful branches.
+        
         assert_equal([[@mum, 'root'], [@jerry, 'berry']], @storage[:apotomo_stateful_branches])
+        assert @storage[:apotomo_stateful_branches].first.first.root?, "mum not disconnected from root"
+        assert @storage[:apotomo_stateful_branches].last.first.root?, "jerry not disconnected from berry"
       end
       
       should "attach stateful branches to the tree in thaw_for" do
@@ -121,9 +126,27 @@ class PersistenceTest < Test::Unit::TestCase
           @new_root << Apotomo::Widget.new('berry', :eat)
         assert_equal @new_root, Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
         
-        assert_equal @root.size, @new_root.size
+        assert_equal 5, @new_root.size  # without tom.
       end
       
+      should "re-establish ivars recursivly when calling #thaw_for" do
+        @storage[:apotomo_stateful_branches] = Marshal.load(Marshal.dump(@storage[:apotomo_stateful_branches]))
+        
+        @new_root = Apotomo::Widget.new('root', :eat)
+          @new_root << Apotomo::Widget.new('berry', :eat)
+        @new_root = Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+        
+        assert_equal :answer_squeak,  @new_root['mum'].instance_variable_get(:@start_state)
+        assert_equal :peek,           @new_root['mum']['kid'].instance_variable_get(:@start_state)
+      end
+      
+      should "raise an exception when thaw_for can't find the branch's parent" do
+        @new_root = Apotomo::Widget.new('dad', :eat)
+        
+        assert_raises RuntimeError do
+           Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+        end
+      end
     end
     
     should "update @mum's ivars when calling #thaw_ivars_from" do
@@ -146,16 +169,7 @@ class PersistenceTest < Test::Unit::TestCase
       assert_equal 'pet', @pet.name
     end
     
-    should "recreate it when calling #thaw_from" do
-      @kid << @pet = mouse_mock('pet', :bark)
-      @mum.freeze_to(@storage)
-      
-      mum = Apotomo::StatefulWidget.thaw_from(@storage)
-      assert_equal 3, mum.size
-      assert_equal :answer_squeak,  mum.instance_variable_get(:@start_state)
-      assert_equal :peek,           mum.children.first.instance_variable_get(:@start_state)
-      assert_equal :bark,           mum.children.first.children.first.instance_variable_get(:@start_state)
-    end
+    
   end
   
   context "dumping and loading" do

@@ -6,15 +6,20 @@ module Apotomo
     
     attr_reader :session, :root
     
-    def initialize(session, options={})
+    def initialize(session, options={}, uses_widgets_blocks=[])
       @session              = session
       @widgets_flushed      = false
       @js_framework         = options[:js_framework]
       
+      @root = widget('apotomo/widget', 'root')
+      
+      uses_widgets_blocks.each { |blk| blk.call(@root) } # add stateless widgets.
+      
       if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)  
-        @root = ::Apotomo::StatefulWidget.thaw_for(session, widget('apotomo/widget', 'root'))
+        @root = ::Apotomo::StatefulWidget.thaw_for(session, @root)
       else
-        @root = flushed_root 
+        #@root = flushed_root
+        flushed_root  ### FIXME: set internal mode to flushed 
       end
       
       #handle_version!(options[:version])
@@ -24,10 +29,11 @@ module Apotomo
       @js_generator ||= ::Apotomo::JavascriptGenerator.new(@js_framework)
     end
     
+    
     def flushed_root
       StatefulWidget.flush_storage(session)
       @widgets_flushed = true
-      widget('apotomo/widget', 'root')
+      #widget('apotomo/widget', 'root')
     end
     
     ### DISCUSS: do we need the version feature, or should we push that into user code?

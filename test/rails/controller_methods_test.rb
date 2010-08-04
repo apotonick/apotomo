@@ -52,7 +52,6 @@ class ControllerMethodsTest < ActionController::TestCase
       should "inherit uses_widgets blocks to sub-controllers" do
         berry = mouse_mock('berry')
         @sub_controller = Class.new(@controller.class) do
-          include Apotomo::Rails::ControllerMethods
           uses_widgets { |root| root << berry }
         end.new
         @sub_controller.params  = {}

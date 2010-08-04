@@ -84,6 +84,10 @@ module TreeNode
   def setAsRoot!
       @parent = nil
   end
+  
+  def root!
+    setAsRoot!
+  end
 
   # Indicates whether this node is a root node. Note that
   # orphaned children will also be reported as root nodes.

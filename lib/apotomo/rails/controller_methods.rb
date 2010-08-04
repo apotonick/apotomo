@@ -33,10 +33,6 @@ require 'apotomo/request_processor'
           session[:bound_use_widgets_blocks] = nil
         end
         
-        def add_uses_widgets_blocks
-          self.class.uses_widgets_blocks.each { |block| use_widgets(&block) }
-        end
-        
         def apotomo_request_processor
           return @apotomo_request_processor if @apotomo_request_processor
           
@@ -46,10 +42,10 @@ require 'apotomo/request_processor'
                       :js_framework   => Apotomo.js_framework || :prototype,
           }  ### TODO: process rails options (flush_tree, version)
           
-          @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options)
+          @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options, self.class.uses_widgets_blocks)
           
           flush_bound_use_widgets_blocks if @apotomo_request_processor.widgets_flushed?
-          add_uses_widgets_blocks
+          
           
           @apotomo_request_processor
         end

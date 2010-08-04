@@ -50,6 +50,17 @@ class RequestProcessorTest < Test::Unit::TestCase
           assert @processor.widgets_flushed?
         end
       end
+      
+      context "and with stateless widgets" do
+        setup do
+          @session = {:apotomo_stateful_branches => [[@mum, 'grandma']]}
+          @processor = Apotomo::RequestProcessor.new(@session, {}, [Proc.new { |root| root << Apotomo::Widget.new('grandma', :eating) }])
+        end
+        
+        should "first attach passed stateless, then stateful widgets to root" do
+          assert_equal 4, @processor.root.size
+        end
+      end
     end
     
     context "js_generator" do

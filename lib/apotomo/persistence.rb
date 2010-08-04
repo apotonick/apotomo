@@ -86,6 +86,7 @@ module Apotomo
         stateful_branches_for(root).each do |branch|
           branch.freeze_data_to(storage[:apotomo_widget_ivars])  # save ivars.
           storage[:apotomo_stateful_branches] << [branch, branch.parent.name]
+          branch.root!  # disconnect from tree.
         end
       end
       
@@ -93,9 +94,10 @@ module Apotomo
         branches = storage[:apotomo_stateful_branches] || []
         branches.each do |config|
           branch = config.first
-          root.find_widget(config.last) << branch
+          parent = root.find_widget(config.last) or raise "Couldn't find parent `#{config.last}` for `#{branch.name}`"
           
-          branch.thaw_ivars_from(storage.fetch(:apotomo_widget_ivars, {}))
+          parent << branch
+          branch.thaw_data_from(storage.fetch(:apotomo_widget_ivars, {}))
         end
         
         root
