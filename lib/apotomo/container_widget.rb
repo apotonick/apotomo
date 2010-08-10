@@ -1,3 +1,5 @@
+require 'apotomo/widget'
+
 module Apotomo
   class ContainerWidget < Widget
     def display

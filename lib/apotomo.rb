@@ -23,13 +23,7 @@
 
 
 require 'cells'
-
-begin
-  require 'onfire'
-rescue
-  gem 'onfire'
-  require 'onfire'
-end
+require 'onfire'
 
 module Apotomo
   class << self
@@ -54,4 +48,8 @@ module Apotomo
   end
 end
 
+### DISCUSS: move to 'apotomo/widgets'?
+require 'apotomo/widget'
 require 'apotomo/stateful_widget'
+require 'apotomo/container_widget'
+require 'apotomo/widget_shortcuts'

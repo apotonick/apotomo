@@ -1,4 +1,5 @@
 require 'apotomo/request_processor'
+require 'apotomo/rails/view_methods'
 
   module Apotomo
     module Rails

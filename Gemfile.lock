@@ -1,4 +1,5 @@
 GEM
+  remote: http://rubygems.org/
   specs:
     actionmailer (2.3.8)
       actionpack (= 2.3.8)
@@ -11,6 +12,13 @@ GEM
       activesupport (= 2.3.8)
     activesupport (2.3.8)
     cells (3.3.4)
+    gemcutter (0.6.1)
+    git (1.2.5)
+    jeweler (1.4.0)
+      gemcutter (>= 0.1.0)
+      git (>= 1.2.5)
+      rubyforge (>= 2.0.0)
+    json_pure (1.4.6)
     mocha (0.9.8)
       rake
     onfire (0.1.0)
@@ -23,14 +31,17 @@ GEM
       activesupport (= 2.3.8)
       rake (>= 0.8.3)
     rake (0.8.7)
-    shoulda (2.11.1)
+    rubyforge (2.0.4)
+      json_pure (>= 1.1.7)
+    shoulda (2.11.3)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   cells (= 3.3.4)
+  jeweler
   mocha
   onfire
-  rails (= 2.3.8)
+  rails (~> 2.3.8)
   shoulda

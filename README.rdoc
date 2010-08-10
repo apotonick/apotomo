@@ -5,6 +5,25 @@ framework abstraction with JavascriptGenerator
 
 Apotomo is a stateful widget component framework for Rails.
 
+
+It is suitable for iGoogle-like widgets, dashboards, portals, or even full-blown interactive web apps.
+
+
+== Widgets
+
+=== Widget Trees
+
+
+== Events
+
+=== Event Handlers
+
+== AJAX
+
+== Statefulness
+
+
+
 A stateful WHAT?
 
 Well, you know that. In Rails, people tend to have fat controllers. One controller action renders the complete page. While many programmers try to separate their code into helpers, controller actions, RJS logic and partials, it is still the controller that has to care about when to update what, and how!

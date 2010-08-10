@@ -1,3 +1,6 @@
+require "rubygems"
+require "bundler/setup"
+
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
@@ -53,28 +56,23 @@ end
 #
 #   rake gemcutter:release
 #
-begin
-  gem 'jeweler'
-  require 'jeweler'
+require 'jeweler'
+require 'lib/apotomo/version'
 
-  Jeweler::Tasks.new do |spec|
-    spec.name         = "apotomo"
-    #spec.version      = ::Apotomo::VERSION
-    spec.summary      = %{Stateful widgets for Ruby and Rails.}
-    spec.description  = spec.summary
-    spec.homepage     = "http://apotomo.de"
-    spec.authors      = ["Nick Sutterer"]
-    spec.email        = "apotonick@gmail.com"
+Jeweler::Tasks.new do |spec|
+  spec.name         = "apotomo"
+  spec.version      = ::Apotomo::VERSION
+  spec.summary      = %{Event-driven Widgets for Rails with optional Statefulness.}
+  spec.description  = "A generic widget framework for Rails that provides interactive view components listening to events. Free optional statefulness included."
+  spec.homepage     = "http://apotomo.de"
+  spec.authors      = ["Nick Sutterer"]
+  spec.email        = "apotonick@gmail.com"
 
-    spec.files = FileList["[A-Z]*", File.join(*%w[{generators,lib,rails} ** *]).to_s]
-    
-    spec.add_dependency 'cells', '~> 3.3'
-    spec.add_dependency 'activesupport', '>= 2.3.0'
-    spec.add_dependency 'onfire', '>= 0.1.0'
-  end
-
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler - or one of its dependencies - is not available. " <<
-  "Install it with: sudo gem install jeweler -s http://gemcutter.org"
+  spec.files = FileList["[A-Z]*", File.join(*%w[{generators,lib,rails} ** *]).to_s]
+  
+  spec.add_dependency 'cells', '~> 3.3'
+  spec.add_dependency 'activesupport', '>= 2.3.0'
+  spec.add_dependency 'onfire', '>= 0.1.0'
 end
+
+Jeweler::GemcutterTasks.new

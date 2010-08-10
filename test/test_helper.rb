@@ -19,7 +19,6 @@ require 'apotomo/rails/controller_methods'
 require 'apotomo/rails/view_methods'
 #require 'apotomo/assertions_helper'
 
-#require File.expand_path(File.dirname(__FILE__) + '/../../../../test/test_helper')
 
 
 
@@ -73,5 +72,3 @@ end
 module ::Rails
   def logger(*args); end
 end
-
-require 'app/cells/apotomo/container_widget' ### FIXME: change to lib...
