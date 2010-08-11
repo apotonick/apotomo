@@ -44,11 +44,21 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
       
       context "having a flush flag set" do
-        should "provide a single root for #root when :flush_widgets is set" do
+        setup do
           @processor = Apotomo::RequestProcessor.new(@session, :flush_widgets => true)
+        end
+        
+        should "provide a single root for #root when :flush_widgets is set" do
           assert_equal 1, @processor.root.size
           assert @processor.widgets_flushed?
         end
+        
+        should "wipe-out our session variables" do
+          assert_nil @session[:apotomo_stateful_branches]
+          assert_nil @session[:apotomo_widget_ivars]
+        end
+        
+        should ""
       end
       
       context "and with stateless widgets" do

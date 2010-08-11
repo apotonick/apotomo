@@ -12,13 +12,13 @@ module Apotomo
       @js_framework         = options[:js_framework]
       
       @root = widget('apotomo/widget', 'root')
-      
       uses_widgets_blocks.each { |blk| blk.call(@root) } # add stateless widgets.
       
       if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)  
         @root = ::Apotomo::StatefulWidget.thaw_for(session, @root)
       else
         #@root = flushed_root
+        
         flushed_root  ### FIXME: set internal mode to flushed 
       end
       

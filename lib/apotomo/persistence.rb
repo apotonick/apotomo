@@ -115,8 +115,8 @@ module Apotomo
       end
       
       def flush_storage(storage)
-        storage[:apotomo_root]          = nil
-        storage[:apotomo_widget_ivars]  = nil
+        storage[:apotomo_stateful_branches] = nil
+        storage[:apotomo_widget_ivars]      = nil
       end
       
       # Find the first stateful widgets on each branch from +root+.

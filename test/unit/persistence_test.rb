@@ -67,11 +67,18 @@ class PersistenceTest < Test::Unit::TestCase
     
     context "and calling #flush_storage" do
       should "clear the storage from frozen data" do
-        @mum.freeze_to(@storage)
+        @root = Apotomo::Widget.new('root', :eat)
+        @root << @mum
+          
+        Apotomo::StatefulWidget.freeze_for(@storage, @root)
+        
+        assert @storage[:apotomo_stateful_branches]
+        assert @storage[:apotomo_widget_ivars]
+        
         Apotomo::StatefulWidget.flush_storage(@storage)
         
-        assert_not @storage[:apotomo_root]
-        assert_not @storage[:apotomo_widget_ivars]
+        assert_nil @storage[:apotomo_stateful_branches]
+        assert_nil @storage[:apotomo_widget_ivars]
       end
     end
     

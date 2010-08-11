@@ -37,7 +37,7 @@ module Apotomo
     
     # Apotomo setup/configuration helper for initializer.
     #
-    # == Usage/Exmaples:
+    # == Usage/Examples:
     #
     #   Apotomo.setup do |config|
     #     config.js_framework = :jquery
