@@ -154,6 +154,16 @@ class PersistenceTest < Test::Unit::TestCase
            Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
         end
       end
+      
+      should "clear the fields in the storage when fetching in #thaw_for" do
+        @new_root = Apotomo::Widget.new('root', :eat)
+          @new_root << Apotomo::Widget.new('berry', :eat)
+        
+        Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+        
+        assert_nil @storage[:apotomo_stateful_branches]
+        assert_nil @storage[:apotomo_widget_ivars]
+      end
     end
     
     should "update @mum's ivars when calling #thaw_ivars_from" do

@@ -91,13 +91,13 @@ module Apotomo
       end
       
       def thaw_for(storage, root)
-        branches = storage[:apotomo_stateful_branches] || []
+        branches = storage.delete(:apotomo_stateful_branches) || []
         branches.each do |config|
           branch = config.first
           parent = root.find_widget(config.last) or raise "Couldn't find parent `#{config.last}` for `#{branch.name}`"
           
           parent << branch
-          branch.thaw_data_from(storage.fetch(:apotomo_widget_ivars, {}))
+          branch.thaw_data_from(storage.delete(:apotomo_widget_ivars) || {})
         end
         
         root
