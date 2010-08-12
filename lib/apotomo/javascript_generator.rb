@@ -20,12 +20,14 @@ module Apotomo
       "'"     => "\\'" }
 
     # Escape carrier returns and single and double quotes for JavaScript segments.
+    def self.escape(javascript)
+      return javascript.gsub(/(\\|<\/|\r\n|[\n\r"'])/) { JS_ESCAPE_MAP[$1] } if javascript
+      
+      ''
+    end
+    
     def escape(javascript)
-      if javascript
-        javascript.gsub(/(\\|<\/|\r\n|[\n\r"'])/) { JS_ESCAPE_MAP[$1] }
-      else
-        ''
-      end
+      self.class.escape(javascript)
     end
     
     module Prototype
