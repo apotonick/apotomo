@@ -9,7 +9,7 @@ require 'apotomo/rails/view_methods'
         def self.included(base) #:nodoc:
           base.class_eval do
             extend WidgetShortcuts
-            extend ClassMethods
+            extend ClassMethods      
             
             class_inheritable_array :uses_widgets_blocks
             self.uses_widgets_blocks = []
@@ -24,6 +24,8 @@ require 'apotomo/rails/view_methods'
           def uses_widgets(&block)
             uses_widgets_blocks << block
           end
+          
+          alias_method :has_widgets, :uses_widgets
         end
         
         def bound_use_widgets_blocks

@@ -60,6 +60,15 @@ class ControllerMethodsTest < ActionController::TestCase
         assert @sub_controller.apotomo_root['mum']
         assert @sub_controller.apotomo_root['berry']
       end
+      
+      should "be aliased to has_widgets" do
+        @controller.class.has_widgets do |root|
+          root << mouse_mock('kid')
+        end
+        
+        assert @controller.apotomo_root['mum']
+        assert @controller.apotomo_root['kid']
+      end
     end
     
     context "invoking #use_widgets" do
