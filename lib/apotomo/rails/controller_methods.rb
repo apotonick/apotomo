@@ -107,10 +107,9 @@ require 'apotomo/rails/view_methods'
         #   url_for_event(:paginate, :source => 'mouse', :page => 2)
         #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
         def url_for_event(type, options)
-          options.reverse_merge!  :action     => :render_event_response,
-                                  :type       => type,
-                                  :only_path  => true
-          url_for apotomo_request_processor.address_for(options)
+          options.reverse_merge!(:type => type)
+          
+          apotomo_event_path(apotomo_request_processor.address_for(options))
         end
         
         protected

@@ -109,6 +109,16 @@ class RenderTest < ActionView::TestCase
       end
     end
     
+    context "with :view" do
+      setup do
+        @mum.instance_eval do
+          def squeak; render :view => 'squeak();'; end
+        end
+      end
+      
+      should ""
+    end
+    
     should "expose its instance variables in the rendered view" do
       @mum = mouse_mock('mum', :educate) do
         def educate

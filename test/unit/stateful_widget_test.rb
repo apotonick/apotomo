@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), *%w[.. test_helper])
+require File.join(File.dirname(__FILE__), '..', 'test_helper')
 
 class StatefulWidgetTest < Test::Unit::TestCase
   context "The StatefulWidget" do

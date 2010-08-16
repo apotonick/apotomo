@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-08-10}
+  s.date = %q{2010-08-13}
   s.description = %q{A generic widget framework for Rails that provides interactive view components listening to events. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
      "generators/widget/widget_generator.rb",
      "lib/apotomo.rb",
      "lib/apotomo/caching.rb",
+     "lib/apotomo/container_widget.rb",
      "lib/apotomo/content.rb",
      "lib/apotomo/deep_link_methods.rb",
      "lib/apotomo/event.rb",

@@ -223,4 +223,14 @@ class ControllerMethodsTest < ActionController::TestCase
       assert ! @procs.include?(@c)
     end
   end
+  
+  ### FIXME: could somebody get that working?
+  context "Routing" do
+    should_eventually "generate routes to the render_event_response action" do
+      assert_generates "/barn/render_event_response?type=squeak", { :controller => "barn", :action => "render_event_response", :type => "squeak" }
+      
+      assert_recognizes({ :controller => "apotomo", :action => "render_event_response", :type => "squeak" }, "/apotomo/render_event_response?type=squeak")
+    end
+  end
+  
 end

@@ -68,6 +68,9 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'apotomo/:action', :controller => 'apotomo'
   map.connect 'barn/:action', :controller => 'barn'
 end
+require File.join(File.dirname(__FILE__), '..', 'config/routes.rb') ### TODO: let rails engine handle that.
+
+
 
 module ::Rails
   def logger(*args); end
