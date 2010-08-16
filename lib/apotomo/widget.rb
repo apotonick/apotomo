@@ -44,7 +44,28 @@ module Apotomo
     attr_writer   :controller
     attr_accessor :version
     
-        
+    ### DISCUSS: extract to has_widgets_methods for both Widget and Controller?
+    #class_inheritable_array :has_widgets_blocks
+    
+    class << self
+      include WidgetShortcuts
+      
+      def has_widgets_blocks
+        @has_widgets_blocks ||= []
+      end
+      
+      def has_widgets(&block)
+        puts "as you are!"
+        has_widgets_blocks << block
+      end
+    end
+    self.initialize_hooks << :add_has_widgets_blocks
+    
+    def add_has_widgets_blocks(*)
+      self.class.has_widgets_blocks.each { |block| block.call(self) }
+    end
+    
+    
     # Constructor which needs a unique id for the widget and one or multiple start states.
     # <tt>start_state</tt> may be a symbol or an array of symbols.    
     def initialize(id, start_state, opts={})
