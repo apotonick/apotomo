@@ -87,6 +87,8 @@ class RailsIntegrationTest < ActionController::TestCase
       assert_response :success
       @controller.apotomo_root['mum'].respond_to_event :squeak, :with => :snuggle
       
+      simulate_request!
+      
       get 'render_event_response', :source => 'mum', :type => :squeak, :apotomo_iframe => true
       
       assert_response :success

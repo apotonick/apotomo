@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-08-13}
+  s.date = %q{2010-08-18}
   s.description = %q{A generic widget framework for Rails that provides interactive view components listening to events. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -51,7 +51,8 @@ Gem::Specification.new do |s|
      "lib/apotomo/tree_node.rb",
      "lib/apotomo/version.rb",
      "lib/apotomo/widget.rb",
-     "lib/apotomo/widget_shortcuts.rb"
+     "lib/apotomo/widget_shortcuts.rb",
+     "rails/init.rb"
   ]
   s.homepage = %q{http://apotomo.de}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -87,7 +88,8 @@ Gem::Specification.new do |s|
      "test/unit/persistence_test.rb",
      "test/unit/transition_test.rb",
      "test/unit/event_test.rb",
-     "test/unit/event_methods_test.rb"
+     "test/unit/event_methods_test.rb",
+     "test/unit/widget_test.rb"
   ]
 
   if s.respond_to? :specification_version then

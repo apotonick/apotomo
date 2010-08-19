@@ -112,7 +112,7 @@ class RenderTest < ActionView::TestCase
     context "with :view" do
       setup do
         @mum.instance_eval do
-          def squeak; render :view => 'squeak();'; end
+          def squeak; render :view => :squeak; end
         end
       end
       
