@@ -29,11 +29,10 @@ module Apotomo
   class << self
     def js_framework=(js_framework)
       @js_framework = js_framework
+      @js_generator = ::Apotomo::JavascriptGenerator.new(js_framework)
     end
     
-    def js_framework
-      @js_framework
-    end
+    attr_reader :js_generator, :js_framework
     
     # Apotomo setup/configuration helper for initializer.
     #
@@ -47,6 +46,11 @@ module Apotomo
     end
   end
 end
+
+### FIXME: move to rails.rb
+
+require 'apotomo/javascript_generator'
+Apotomo.js_framework = :prototype ### DISCUSS: move to rails.rb
 
 ### DISCUSS: move to 'apotomo/widgets'?
 require 'apotomo/widget'

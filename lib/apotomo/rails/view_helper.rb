@@ -5,7 +5,7 @@ module Apotomo
       
       # Returns the app JavaScript generator.
       def js_generator
-        @controller.apotomo_request_processor.js_generator  ### DISCUSS: move to controller.
+        Apotomo.js_generator
       end
       
       

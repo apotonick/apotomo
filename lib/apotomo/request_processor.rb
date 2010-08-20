@@ -1,5 +1,3 @@
-require 'apotomo/javascript_generator'
-
 module Apotomo
   class RequestProcessor
     include WidgetShortcuts
@@ -9,7 +7,6 @@ module Apotomo
     def initialize(session, options={}, uses_widgets_blocks=[])
       @session              = session
       @widgets_flushed      = false
-      @js_framework         = options[:js_framework]
       
       @root = widget('apotomo/widget', 'root')
       uses_widgets_blocks.each { |blk| blk.call(@root) } # add stateless widgets.
@@ -23,10 +20,6 @@ module Apotomo
       end
       
       #handle_version!(options[:version])
-    end
-    
-    def js_generator
-      @js_generator ||= ::Apotomo::JavascriptGenerator.new(@js_framework)
     end
     
     

@@ -116,7 +116,7 @@ require 'apotomo/rails/view_methods'
         # see http://github.com/markcatley/responds_to_parent .
         def render_iframe_updates(page_updates)
           script = apotomo_request_processor.render_page_updates(page_updates)
-          escaped_script = apotomo_request_processor.js_generator.escape(script)
+          escaped_script = Apotomo::JavascriptGenerator.escape(script)
           
           render :text => "<html><body><script type='text/javascript' charset='utf-8'>
 var loc = document.location;

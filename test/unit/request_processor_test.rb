@@ -73,17 +73,6 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
     end
     
-    context "js_generator" do
-      #should "set a default javascript framework" do
-      #  @processor = Apotomo::RequestProcessor.new({})
-      #  assert_respond_to @processor.javascript_generator, :prototype
-      #end
-      
-      should "return the passed framework" do
-        @processor = Apotomo::RequestProcessor.new({}, :js_framework => :right)
-        assert_respond_to @processor.js_generator, :right
-      end
-    end
   end
   
   context "#process_for" do

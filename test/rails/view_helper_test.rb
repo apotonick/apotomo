@@ -13,7 +13,7 @@ class ViewHelperTest < ActionView::TestCase
     end
     
     teardown do
-      Apotomo.js_framework = nil
+      Apotomo.js_framework = :prototype
     end
     
     should "respond to #link_to_event" do

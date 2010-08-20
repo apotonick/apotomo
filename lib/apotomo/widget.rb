@@ -200,12 +200,12 @@ module Apotomo
     
     def replace(options={})
       content = render(options)
-      JavascriptGenerator.new(:prototype).replace(self.name, content) 
+      Apotomo.js_generator.replace(self.name, content) 
     end
     
     def update(options={})
       content = render(options)
-      JavascriptGenerator.new(:prototype).update(self.name, content)
+      Apotomo.js_generator.update(self.name, content)
     end
 
     # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 

@@ -146,6 +146,10 @@ class RenderTest < ActionView::TestCase
     end
     
     context "with #update" do
+      setup do
+        Apotomo.js_framework = :prototype
+      end
+      
       should "wrap the :text in an update statement" do
         @mum.instance_eval do
           def squeak
@@ -157,6 +161,10 @@ class RenderTest < ActionView::TestCase
     end
     
     context "with #replace" do
+      setup do
+        Apotomo.js_framework = :prototype
+      end
+      
       should "wrap the :text in a replace statement" do
         @mum.instance_eval do
           def squeak

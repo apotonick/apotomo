@@ -1,23 +1,20 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ApotomoTest < Test::Unit::TestCase
-  context "The main module" do
-    teardown do
-      Apotomo.js_framework = nil
+  context "The main module" do    
+    should "save the JavascriptGenerator instance when setting js_framework" do
+      Apotomo.js_framework = :jquery
+      assert_respond_to Apotomo.js_generator, :jquery
     end
     
-    should "not have a default js_framework" do
-      assert_nil Apotomo.js_framework
-    end
-    
-    should "have accessors for js_framework" do
-      Apotomo.js_framework = :right
-      assert_equal :right, Apotomo.js_framework
+    should "have an accessor for js_framework" do
+      Apotomo.js_framework = :jquery
+      assert_equal :jquery, Apotomo.js_framework
     end
     
     should "have a setup method" do
       Apotomo.setup { |config| config.js_framework = :prototype }
-      assert_equal :prototype, Apotomo.js_framework
+      assert_respond_to Apotomo.js_generator, :prototype
     end
   end
 end
