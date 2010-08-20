@@ -108,24 +108,11 @@ class RequestProcessorTest < Test::Unit::TestCase
             def squeak; render :text => 'squeak!', :update => :true; end
           end
     end
-    
-    context "calling #render_page_updates" do
-      should "return escaped JavaScript" do
-        assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();",
-        @processor.render_page_updates([
-          Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => '<div id="mum">burp!</div>'),
-          Apotomo::Content::PageUpdate.new(:update => 'kid', :with => 'squeak!'),
-          Apotomo::Content::Javascript.new('squeak();')
-        ])
-      end
-    end
-  
+      
     should "return 2 page_updates when @kid squeaks" do
       res = @processor.process_for({:type => :squeak, :source => 'kid'}, @controller)
       
-      assert_equal 2, res.size
-      assert_equal(Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => 'alert!'), res[0])
-      assert_equal(Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => 'squeak'), res[1])
+      assert_equal ["alert!", "squeak"], res
     end
     
     should "raise an exception when :source is unknown" do

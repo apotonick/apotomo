@@ -10,8 +10,6 @@ require 'apotomo/deep_link_methods'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/view_helper'
 
-require 'apotomo/content'
-
 ### TODO: use load_hooks when switching to rails 3.
 # wycats@gmail.com: ActiveSupport.run_load_hooks(:name)
 # (21:01:17) wycats@gmail.com: ActiveSupport.on_load(:name) { … }
@@ -55,7 +53,6 @@ module Apotomo
       end
       
       def has_widgets(&block)
-        puts "as you are!"
         has_widgets_blocks << block
       end
     end
@@ -146,12 +143,7 @@ module Apotomo
     # * <tt>:view</tt> - Specifies the name of the view file to render. Defaults to the current state name.
     # * <tt>:template_format</tt> - Allows using a format different to <tt>:html</tt>.
     # * <tt>:layout</tt> - If set to a valid filename inside your cell's view_paths, the current state view will be rendered inside the layout (as known from controller actions). Layouts should reside in <tt>app/cells/layouts</tt>.
-    # * <tt>:html_options</tt> - Pass a hash to add html attributes to the widgets container tag.
-    # * <tt>:js</tt> - Executes the string as JavaScript on the page. If set, no view will be rendered.
-    # * <tt>:raw</tt> - Will send the string directly to the browser, no view will be rendered.
-    # * <tt>:update</tt> - If true, the new content updates the innerHtml of the widget's div. Defaults to false, which replaces the complete div.
     # * <tt>:render_children</tt> - If false, automatic rendering of child widgets is turned off. Defaults to true.
-    # * <tt>:frame</tt> - If false, automatic framing of the widget is turned off. Pass some valid tag name if you prefer some other container tag in place of the div.
     # * <tt>:invoke</tt> - Explicitly define the state to be invoked on a child when rendering.
     # * see Cell::Base#render for additional options
     #
@@ -177,75 +169,44 @@ module Apotomo
     #  render :js => "alert('SQUEAK!');"
     #
     # issues a squeaking alert dialog on the page.
-    #
-    #  render :html_options => {:class => :highlighted}
-    # will result in
-    #  <div id="mouse" class="highlighted"...>
-    #
-    #  render :frame => :p
-    # will result in
-    #  <p id="mouse">...</p>
-    def render(*args, &block)
-      options = args.extract_options!
-      
-      if args.first == :js
-        options.reverse_merge!(:render_children => false)
-        options[:js] = true
+    def render(options={}, &block)
+      if options[:nothing]
+        return "" 
       end
       
-      if options[:text] or options[:update] # per default, disable framing for :text/:update
-        options.reverse_merge!(:frame => false)
+      if options[:text]
+        options.reverse_merge!(:render_children => false)
       end
       
       options.reverse_merge!  :render_children  => true,
-                              :frame            => :div,
-                              :html_options     => {},
                               :locals           => {},
-                              :update           => false,
                               :invoke           => {},
                               :suppress_js      => false
                               
       
       rendered_children = render_children_for(options)
       
-      options[:html_options].reverse_merge!(:id => name)
       options[:locals].reverse_merge!(:rendered_children => rendered_children)
       
       @controller = controller # that dependency SUCKS.
       @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
       
-      if content = options[:js]
-        return ::Apotomo::Content::Javascript.new(content)
-      end
       
-      if content = options[:raw]
-        return ::Apotomo::Content::Raw.new(content)
-      end
-      
-      if options[:nothing]
-        return "" 
-      end
-      
-      
-      content = render_view_for(options, @state_name) # defined in Cell::Base.
-      content = frame_content_for(content, options)
-      
-      page_update_for(content, options[:update])
+      render_view_for(options, @state_name) # defined in Cell::Base.
     end
     
-    def page_update_for(content, update)
-      mode = update ? :update : :replace
-      ::Apotomo::Content::PageUpdate.new(mode => name, :with => content)
-    end
-
-    # Wrap the content into a div frame.
-    def frame_content_for(content, options)
-      return content unless options[:frame]
-      
-      ### TODO: i'd love to see a real API for helpers in rails.
-      Object.new.extend(ActionView::Helpers::TagHelper).content_tag(options[:frame], content, options[:html_options])
+    alias_method :emit, :render
+    
+    
+    def replace(options={})
+      content = render(options)
+      JavascriptGenerator.new(:prototype).replace(self.name, content) 
     end
     
+    def update(options={})
+      content = render(options)
+      JavascriptGenerator.new(:prototype).update(self.name, content)
+    end
 
     # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 
     # transition or not.

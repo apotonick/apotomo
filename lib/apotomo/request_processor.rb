@@ -58,20 +58,9 @@ module Apotomo
       source.root.page_updates ### DISCUSS: that's another dependency.
     end
     
-    # Compiles the PageUpdates to JavaScript by utilizing JavascriptGenerator.
+    ### FIXME: remove me!
     def render_page_updates(page_updates)
-      page_updates.collect do |page_update|
-        next if page_update.blank?
-        
-        ### DISCUSS: provide proper PageUpdate API.
-        if page_update.kind_of? ::Apotomo::Content::Javascript
-          js_generator << "#{page_update}"
-        elsif page_update.replace?
-          js_generator.replace page_update.target, "#{page_update}"
-        elsif page_update.update?
-          js_generator.update page_update.target, "#{page_update}"
-        end
-      end.join("\n")
+      page_updates.join("\n")
     end
     
     # Serializes the current widget tree to the storage that was passed in the constructor.

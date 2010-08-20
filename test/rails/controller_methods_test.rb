@@ -163,45 +163,15 @@ class ControllerMethodsTest < ActionController::TestCase
       end
     end
     
+    ### DISCUSS: needed?
     context "in event mode" do
-      should "set the MIME type to text/javascript" do
+      should_eventually "set the MIME type to text/javascript" do
         @controller.apotomo_root << @mum
         
         get :render_event_response, :source => :kid, :type => :doorSlam
         
         assert_equal Mime::JS, @response.content_type
         assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
-      end
-    end
-    
-    
-    context "for a data push event and" do
-      setup do
-        @controller.instance_eval do
-          def render(options); options; end
-        end
-      end
-      
-      context "invoking render_raw" do
-        should "pass-through the content to render :text" do
-          assert_equal({:text => "squeak\n"}, @controller.send(:render_raw, [Apotomo::Content::Raw.new("squeak\n")]))
-        end
-      end
-      
-      context "processing it in #render_event_response" do
-        setup do
-          @mum = mouse_mock('mum') do
-            def squeak; render :raw => "squeak\n"; end
-          end
-          
-          @mum.respond_to_event :dataLoad, :with => :squeak
-        end
-        
-        should "render :text" do
-          @controller.params = {:source => :mum, :type => :dataLoad}
-          @controller.apotomo_root << @mum
-          assert_equal({:text => "squeak\n"}, @controller.render_event_response)
-        end
       end
     end
   end

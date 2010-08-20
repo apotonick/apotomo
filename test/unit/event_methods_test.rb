@@ -74,7 +74,7 @@ class EventMethodsTest < Test::Unit::TestCase
       
       should "be queued in root#page_updates after #fire" do
         @mum.fire :footsteps
-        assert_equal([Apotomo::Content::PageUpdate.new(:replace => 'mum', :with => "escape")], @mum.page_updates)
+        assert_equal ["escape"], @mum.page_updates
       end
       
     end

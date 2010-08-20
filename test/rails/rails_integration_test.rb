@@ -93,7 +93,7 @@ class RailsIntegrationTest < ActionController::TestCase
       
       assert_response :success
       assert_equal 'text/html', @response.content_type
-      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('$(\\\"mum\\\").replace(\\\"<div id=\\\\\\\"mum\\\\\\\"><snuggle><\\\\/snuggle><\\\\/div>\\\")'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
+      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<div id=\\\"mum\\\"><snuggle><\\/snuggle><\\/div>'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
     end
   end
 end

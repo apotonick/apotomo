@@ -90,9 +90,6 @@ require 'apotomo/rails/view_methods'
         def render_event_response
           page_updates = apotomo_request_processor.process_for({:type => params[:type], :source => params[:source]}, self)
           
-          ### DISCUSS: how to properly handle multiple/mixed contents (raw data, page updates)? 
-          return render_raw(page_updates) if page_updates.first.kind_of? Apotomo::Content::Raw
-          
           return render_iframe_updates(page_updates) if params[:apotomo_iframe]
           
           render :text => apotomo_request_processor.render_page_updates(page_updates), :content_type => Mime::JS
@@ -114,11 +111,6 @@ require 'apotomo/rails/view_methods'
         
         protected
         
-        # Returns the raw content to the browser. This is needed when a widget send data to its
-        # JavaScript model in the browser, eg when paging a grid.
-        def render_raw(data)
-          render :text => data.first
-        end
         
         # Renders the page updates through an iframe. Copied from responds_to_parent,
         # see http://github.com/markcatley/responds_to_parent .

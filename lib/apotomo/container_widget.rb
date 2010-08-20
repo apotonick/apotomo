@@ -3,7 +3,8 @@ require 'apotomo/widget'
 module Apotomo
   class ContainerWidget < Widget
     def display
-      render :text => render_children.collect{|v| v.last}.join("\n"), :frame => :div, :render_children => false
+      content = render_children.collect{ |v| v.last }.join("\n")
+      render :text => "<div id=\"#{self.name}\">#{content}</div>"
     end
   end
 end
