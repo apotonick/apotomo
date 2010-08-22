@@ -1,4 +1,4 @@
-class <%= class_name %> < Apotomo::StatefulWidget
+class <%= class_name %> < Apotomo::Widget
 <% for action in actions -%>
   def <%= action %>
     render
