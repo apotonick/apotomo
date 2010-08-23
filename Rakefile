@@ -68,7 +68,7 @@ Jeweler::Tasks.new do |spec|
   spec.authors      = ["Nick Sutterer"]
   spec.email        = "apotonick@gmail.com"
 
-  spec.files = FileList["[A-Z]*", File.join(*%w[{generators,lib,rails} ** *]).to_s]
+  spec.files = FileList["[A-Z]*", File.join(*%w[{generators,lib,rails,app,config} ** *]).to_s]
   
   spec.add_dependency 'cells', '~> 3.3'
   spec.add_dependency 'activesupport', '>= 2.3.0'

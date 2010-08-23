@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-08-22}
+  s.date = %q{2010-08-23}
   s.description = %q{A generic widget framework for Rails that provides interactive view components listening to events. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -24,6 +24,16 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "TODO",
+     "app/cells/apotomo/child_switch_widget/switch.html.erb",
+     "app/cells/apotomo/child_switch_widget/switch.rhtml",
+     "app/cells/apotomo/deep_link_widget.rb",
+     "app/cells/apotomo/deep_link_widget/setup.html.erb",
+     "app/cells/apotomo/java_script_widget.rb",
+     "app/cells/apotomo/tab_panel_widget.rb",
+     "app/cells/apotomo/tab_panel_widget/display.html.erb",
+     "app/cells/apotomo/tab_widget.rb",
+     "app/cells/apotomo/tab_widget/display.html.erb",
+     "config/routes.rb",
      "generators/widget/USAGE",
      "generators/widget/templates/functional_test.rb",
      "generators/widget/templates/view.html.erb",
