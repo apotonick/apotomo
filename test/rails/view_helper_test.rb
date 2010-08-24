@@ -51,6 +51,10 @@ class ViewHelperTest < ActionView::TestCase
       assert_equal("/barn/render_event_response?source=mum&type=footsteps", url_for_event(:footsteps))
     end
     
+    should "respond to #widget_div" do
+      assert_equal '<div class="widget" id="mum">squeak!</div>', widget_div { "squeak!" }
+    end
+    
     context "#widget_javascript" do
       
       should "usually render a javascript block" do

@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{apotomo}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-08-23}
-  s.description = %q{A generic widget framework for Rails that provides interactive view components listening to events. Free optional statefulness included.}
+  s.date = %q{2010-08-24}
+  s.description = %q{A generic widget framework for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
     "README",

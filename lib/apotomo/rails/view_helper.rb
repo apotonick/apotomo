@@ -86,6 +86,10 @@ module Apotomo
         
         javascript_tag(*args, &block)
       end
+      
+      def widget_div(*args, &block)
+        content_tag(:div, :id => @cell.name, :class => :widget, &block)
+      end
     end  
   end
 end
