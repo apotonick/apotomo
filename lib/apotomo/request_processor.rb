@@ -4,12 +4,14 @@ module Apotomo
     
     attr_reader :session, :root
     
-    def initialize(session, options={}, uses_widgets_blocks=[])
+    def initialize(controller, session, options={}, uses_widgets_blocks=[])
       @session              = session
       @widgets_flushed      = false
       
       @root = widget('apotomo/widget', 'root')
-      uses_widgets_blocks.each { |blk| blk.call(@root) } # add stateless widgets.
+      @root.controller = controller
+      
+      uses_widgets_blocks.each { |blk| blk.call(@root, controller) } # add stateless widgets.
       
       if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)  
         @root = ::Apotomo::StatefulWidget.thaw_for(session, @root)
@@ -41,10 +43,7 @@ module Apotomo
     def widgets_flushed?;  @widgets_flushed; end
     
     # Fires the request event in the widget tree and collects the rendered page updates.
-    def process_for(request_params, controller)
-      ### TODO: move controller dependency to rails/merb/sinatra layer only!
-      self.root.controller = controller
-      
+    def process_for(request_params)
       source = self.root.find_widget(request_params[:source]) or raise "Source #{request_params[:source].inspect} non-existent."
       
       source.fire(request_params[:type].to_sym)
@@ -64,7 +63,7 @@ module Apotomo
     
     # Renders the widget named <tt>widget_id</tt>, passing optional <tt>opts</tt> and a block to it.
     # Use this in your #render_widget wrapper.
-    def render_widget_for(widget_id, opts, controller, &block)
+    def render_widget_for(widget_id, opts, &block)
       if widget_id.kind_of?(::Apotomo::Widget)
         widget = widget_id
       else
@@ -75,9 +74,6 @@ module Apotomo
       
       ### TODO: pass options in invoke.
       widget.opts = opts unless opts.empty?
-      
-      ### TODO: move controller dependency to rails/merb/sinatra layer only!
-      widget.root.controller = controller
       
       widget.invoke(&block)
     end

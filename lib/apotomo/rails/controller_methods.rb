@@ -45,7 +45,7 @@ require 'apotomo/rails/view_methods'
                       :js_framework   => Apotomo.js_framework || :prototype,
           }  ### TODO: process rails options (flush_tree, version)
           
-          @apotomo_request_processor = Apotomo::RequestProcessor.new(session, options, self.class.uses_widgets_blocks)
+          @apotomo_request_processor = Apotomo::RequestProcessor.new(self, session, options, self.class.uses_widgets_blocks)
           
           flush_bound_use_widgets_blocks if @apotomo_request_processor.widgets_flushed?
           
@@ -80,7 +80,7 @@ require 'apotomo/rails/view_methods'
         
         
         def render_widget(widget, options={}, &block)
-          apotomo_request_processor.render_widget_for(widget, options, self, &block)
+          apotomo_request_processor.render_widget_for(widget, options, &block)
         end
         
         def apotomo_freeze
@@ -88,7 +88,7 @@ require 'apotomo/rails/view_methods'
         end
       
         def render_event_response
-          page_updates = apotomo_request_processor.process_for({:type => params[:type], :source => params[:source]}, self)
+          page_updates = apotomo_request_processor.process_for({:type => params[:type], :source => params[:source]})
           
           return render_iframe_updates(page_updates) if params[:apotomo_iframe]
           

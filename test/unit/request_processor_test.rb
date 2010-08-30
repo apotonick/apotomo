@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 class RequestProcessorTest < Test::Unit::TestCase
   context "#root" do
     should "allow external modification of the tree" do
-      @processor = Apotomo::RequestProcessor.new({})
+      @processor = Apotomo::RequestProcessor.new(nil, {})
       root = @processor.root
       root << mouse_mock
       assert_equal 2, @processor.root.size
@@ -13,7 +13,7 @@ class RequestProcessorTest < Test::Unit::TestCase
   context "option processing at construction time" do
     context "with empty session and options" do
       setup do
-        @processor = Apotomo::RequestProcessor.new({})
+        @processor = Apotomo::RequestProcessor.new(nil, {})
       end
       
       should "mark the tree as flushed" do
@@ -29,12 +29,18 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
     end
     
+    context "with controller" do
+      should "attach the passed controller to root" do
+        assert_equal "controller", Apotomo::RequestProcessor.new("controller", {}, {}, []).root.controller
+      end
+    end
+    
     context "with session" do
       setup do
         mum_and_kid!
         @mum.version = 1
         @session = {:apotomo_stateful_branches => [[@mum, 'root']]}
-        @processor = Apotomo::RequestProcessor.new(@session)
+        @processor = Apotomo::RequestProcessor.new(nil, @session)
       end
       
       should "provide a widget family for #root" do
@@ -45,7 +51,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       
       context "having a flush flag set" do
         setup do
-          @processor = Apotomo::RequestProcessor.new(@session, :flush_widgets => true)
+          @processor = Apotomo::RequestProcessor.new(nil, @session, :flush_widgets => true)
         end
         
         should "provide a single root for #root when :flush_widgets is set" do
@@ -64,7 +70,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       context "and with stateless widgets" do
         setup do
           @session = {:apotomo_stateful_branches => [[@mum, 'grandma']]}
-          @processor = Apotomo::RequestProcessor.new(@session, {}, [Proc.new { |root| root << Apotomo::Widget.new('grandma', :eating) }])
+          @processor = Apotomo::RequestProcessor.new(nil, @session, {}, [Proc.new { |root| root << Apotomo::Widget.new('grandma', :eating) }])
         end
         
         should "first attach passed stateless, then stateful widgets to root" do
@@ -80,7 +86,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       ### FIXME: what about that automatic @controller everywhere?
       mum_and_kid!
       @mum.controller = nil # check if controller gets connected.
-      @processor = Apotomo::RequestProcessor.new({:apotomo_stateful_branches => [[@mum, 'root']]}, :js_framework => :prototype)
+      @processor = Apotomo::RequestProcessor.new(nil, {:apotomo_stateful_branches => [[@mum, 'root']]}, :js_framework => :prototype)
       
       
       
@@ -99,14 +105,14 @@ class RequestProcessorTest < Test::Unit::TestCase
     end
       
     should "return 2 page_updates when @kid squeaks" do
-      res = @processor.process_for({:type => :squeak, :source => 'kid'}, @controller)
+      res = @processor.process_for({:type => :squeak, :source => 'kid'})
       
       assert_equal ["alert!", "squeak"], res
     end
     
     should "raise an exception when :source is unknown" do
       assert_raises RuntimeError do
-        @processor.process_for({:type => :squeak, :source => 'tom'}, @controller)
+        @processor.process_for({:type => :squeak, :source => 'tom'})
       end
     end
   end
@@ -115,12 +121,12 @@ class RequestProcessorTest < Test::Unit::TestCase
   
   context "#freeze!" do
     should "serialize stateful branches to @session" do
-      @processor = Apotomo::RequestProcessor.new({})
+      @processor = Apotomo::RequestProcessor.new(nil, {})
       @processor.root << mum_and_kid!
       assert_equal 3, @processor.root.size
       @processor.freeze!
       
-      @processor = Apotomo::RequestProcessor.new(@processor.session)
+      @processor = Apotomo::RequestProcessor.new(nil, @processor.session)
       assert_equal 3, @processor.root.size
     end
   end
@@ -132,27 +138,27 @@ class RequestProcessorTest < Test::Unit::TestCase
       end
       @mum.controller = nil
       
-      @processor = Apotomo::RequestProcessor.new({:apotomo_stateful_branches => [[@mum, 'root']]})
+      @processor = Apotomo::RequestProcessor.new(nil, {:apotomo_stateful_branches => [[@mum, 'root']]})
     end
     
     should "render the widget when passing an existing widget id" do
-      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for('mum', {}, @controller)
+      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for('mum', {})
     end
     
     should "render the widget when passing an existing widget instance" do
-      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for(@mum, {}, @controller)
+      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for(@mum, {})
     end
     
     should "raise an exception when a non-existent widget id id passed" do
       assert_raises RuntimeError do
-        @processor.render_widget_for('mummy', {}, @controller)
+        @processor.render_widget_for('mummy', {})
       end
     end
   end
   
   context "invoking #address_for" do
     setup do
-      @processor = Apotomo::RequestProcessor.new({})
+      @processor = Apotomo::RequestProcessor.new(nil, {})
     end
     
     should "accept an event :type" do
