@@ -7,8 +7,12 @@ module Apotomo
     # Example:
     #   widget(:form, 'uploads', :build_form) do |form|
     #     form << widget(:upload_field)
+    # 
+    # You can also use namespaces.
+    #
+    #   widget('jquery/tabs', 'panel')
     def widget(class_name, id, state=:display, *args)
-      object = class_name.to_s.classify.constantize.new(id, state, *args)
+      object = constant_for(class_name).new(id, state, *args)
       yield object if block_given?
       object
     end
@@ -32,5 +36,10 @@ module Apotomo
     def tab(id, *args)
       widget('apotomo/tab_widget', :display, id, *args)
     end
+    
+    private
+      def constant_for(class_name)
+        class_name.to_s.camelize.constantize
+      end
   end
 end

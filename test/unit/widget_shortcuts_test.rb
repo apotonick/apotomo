@@ -1,8 +1,20 @@
 require File.join(File.dirname(__FILE__), *%w[.. test_helper])
 
 class MumWidget < MouseCell; end
+class MouseTabs;end
 
 class WidgetShortcutsTest < Test::Unit::TestCase
+  context "#constant_for" do
+    
+    should "constantize symbols" do
+      assert_equal MumWidget, constant_for(:mum_widget)
+    end
+    
+    should "not try to singularize the widget class" do
+      assert_equal MouseTabs, constant_for(:mouse_tabs)
+    end
+  end
+  
   context "#cell" do
     should "create a MouseCell instance for backward-compatibility" do
       assert_kind_of MouseCell, cell(:mouse, :eating, 'mum')
