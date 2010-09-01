@@ -24,21 +24,6 @@ module Apotomo
     attr_accessor :opts
     attr_writer   :visible
     
-    include TreeNode
-    
-    
-    include Onfire
-    include EventMethods
-    
-    include Transition
-    include Caching
-    
-    include DeepLinkMethods
-    include WidgetShortcuts
-    
-    helper Apotomo::Rails::ViewHelper
-    
-    
     attr_writer   :controller
     attr_accessor :version
     
@@ -55,12 +40,41 @@ module Apotomo
       def has_widgets(&block)
         has_widgets_blocks << block
       end
+      
+      # Use this for setup code you're calling in every state. Almost like a +before_filter+ except that it's
+      # invoked after the initialization in #has_widgets.
+      #
+      # Example:
+      #
+      #   class MouseWidget < Apotomo::Widget
+      #     after_initialize :setup_cheese
+      #     
+      #     # we need @cheese in every state:
+      #     def setup_cheese(*)
+      #       @cheese = Cheese.find @opts[:cheese_id]
+      def after_initialize(method)
+        self.initialize_hooks << method
+      end
     end
-    self.initialize_hooks << :add_has_widgets_blocks
+    
+    include TreeNode
+    
+    include Onfire
+    include EventMethods
+    
+    include Transition
+    include Caching
+    
+    include DeepLinkMethods
+    include WidgetShortcuts
+    
+    helper Apotomo::Rails::ViewHelper
+    
     
     def add_has_widgets_blocks(*)
       self.class.has_widgets_blocks.each { |block| block.call(self) }
     end
+    after_initialize :add_has_widgets_blocks
     
     
     # Constructor which needs a unique id for the widget and one or multiple start states.

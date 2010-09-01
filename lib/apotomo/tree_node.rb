@@ -8,7 +8,7 @@ module TreeNode
   attr_writer :content, :parent
   
   def self.included(base)
-    base.initialize_hooks << :initialize_tree_node_for
+    base.after_initialize :initialize_tree_node_for
   end
   
   # Constructor which expects the name of the node

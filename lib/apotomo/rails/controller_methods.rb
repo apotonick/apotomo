@@ -21,11 +21,11 @@ require 'apotomo/rails/view_methods'
         end
         
         module ClassMethods
-          def uses_widgets(&block)
+          def has_widgets(&block)
             uses_widgets_blocks << block
           end
           
-          alias_method :has_widgets, :uses_widgets
+          alias_method :uses_widgets, :has_widgets
         end
         
         def bound_use_widgets_blocks
