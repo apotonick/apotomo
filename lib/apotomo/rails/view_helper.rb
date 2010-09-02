@@ -38,10 +38,6 @@ module Apotomo
         return multipart_form_to_event(type, options, html_options, &block) if options.delete(:multipart)
         
         form_remote_tag({:url => url_for_event(type, options), :html => html_options}, &block)
-        ### FIXME: couldn't get obstrusive js working, i don't understand rails helpers.
-        #html_options[:onSubmit] = js_generator.escape(js_generator.xhr(url_for_event(type, options)))
-        #puts html_options.inspect
-        #form_tag(url_for_event(type, options), html_options, &block)
       end
       
       # Creates a form that submits itself via an iFrame and executes the response
@@ -66,7 +62,7 @@ module Apotomo
       #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
       def url_for_event(type, options={})
         options.reverse_merge! :source => @cell.name
-        @controller.url_for_event(type, options)
+        controller.url_for_event(type, options)
       end
       
       ### TODO: test me.
