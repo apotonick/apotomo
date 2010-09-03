@@ -9,6 +9,24 @@ class RequestProcessorTest < Test::Unit::TestCase
       assert_equal 2, @processor.root.size
     end
   end
+  
+  context "#attach_stateless_blocks_for" do
+    setup do
+      @processor  = Apotomo::RequestProcessor.new("controller", {})
+      @root       = @processor.root
+      @controller = "yo"
+    end
+    
+    should "allow has_widgets blocks with root parameter, only" do
+      @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root| root.add mouse_mock }], @root, @controller)
+      assert_equal 'mouse', @processor.root['mouse'].name
+    end
+    
+    should "allow has_widgets blocks with both root and controller parameter" do
+      @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root,controller| root.add mouse_mock }], @root, @controller)
+      assert_equal 'mouse', @processor.root['mouse'].name
+    end
+  end
     
   context "option processing at construction time" do
     context "with empty session and options" do
@@ -64,7 +82,6 @@ class RequestProcessorTest < Test::Unit::TestCase
           assert_nil @session[:apotomo_widget_ivars]
         end
         
-        should ""
       end
       
       context "and with stateless widgets" do

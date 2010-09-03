@@ -1,4 +1,5 @@
 # wycats says...
+require 'rubygems'
 require 'bundler'
 Bundler.setup
 

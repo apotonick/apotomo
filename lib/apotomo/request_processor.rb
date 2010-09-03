@@ -11,7 +11,7 @@ module Apotomo
       @root = widget('apotomo/widget', 'root')
       @root.controller = controller
       
-      uses_widgets_blocks.each { |blk| blk.call(@root, controller) } # add stateless widgets.
+      attach_stateless_blocks_for(uses_widgets_blocks, @root, controller)
       
       if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)  
         @root = ::Apotomo::StatefulWidget.thaw_for(session, @root)
@@ -22,6 +22,16 @@ module Apotomo
       end
       
       #handle_version!(options[:version])
+    end
+    
+    def attach_stateless_blocks_for(blocks, root, controller)
+      blocks.each do |blk|
+        if blk.arity == 1
+          blk.call(root) and next # fixes misbehaviour in ruby 1.8.
+        end
+        
+        blk.call(root, controller)  
+      end
     end
     
     
