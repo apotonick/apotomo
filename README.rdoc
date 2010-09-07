@@ -1,88 +1,147 @@
-how does Apotomo handle Ajax and JavaScript?
-framework abstraction with JavascriptGenerator
+Do you need an interactive user interface for your Rails or Sinatra application? Do you want a framework to make the implementation easier? You want Apotomo.
 
 = Apotomo
 
-Apotomo is a stateful widget component framework for Rails.
+Apotomo is a widget component framework for Rails.
 
-It is good for you if you
-It is perfect for building AJAXed Rich Client Applications.
+It is good for making skinny controllers.
+It is perfect for building Rich Client Applications using Ajax.
 It is suitable for iGoogle-like widgets, dashboards, portals, or even full-blown interactive web apps.
-* Development Teams, where separate teams can work on separate components
+It supports Development Teams, where separate teams can work on separate components.
 
 == Widgets
 
+You want a skinny controller that is RESTful, where one controller action renders the complete page. But you want Rich Client Applications with Ajax. While many programmers will separate their Ajax code into helpers, controller actions, RJS logic, javascript files and partials, it is still the controller that has to care about when to update what, where and how! Oh no, fat controllers again!
+
+In Apotomo, it is the opposite. Widgets are small, autonomous components that look and feel like controllers. These tiny monsters listen to client events and update themselves in the page via Ajax goodness. No javascript to deal with, no routes to add, no controller actions to write - and they're pure Ruby!
+
 === Widget Trees
 
+You can nest widgets in hierarchical trees so that events bubble up from children to parents, similar to the DOM model. The topmost widget is called <tt>root</tt> and all your topmost widgets will be inserted into <tt>root</tt>. Thereafter, any child widgets can be added to parents, like so:
+
+ class SomeController < ApplicationController
+ 
+   include Apotomo::Rails::ControllerMethods
+ 
+   has_widgets do |root|
+     root << parent_widget = widget(:some_widget, 'some_widget_id')
+     parent_widget << child_widget = widget(:some_other_widget, 'some_other_widget_id')
+   end
+ 
+   ...
+ end
+
+This creates a widget tree with SomeWidget as the parent and SomeOtherWidget as the child. Now, events that happen in the child will bubble up to the parent. Awesome!
 
 == Events
 
+You know what events are if you've messed around at all with the DOM and our friend Javascript. Events are the things that happen, usually as the result of user action, like clicking a button, hovering over an image or submitting a form. You can respond to any DOM event, whether a standard event (:click, :submit) or custom event (:my_own_event).
+
+Before the days of Apotomo, you had to write Javascript that hooks into that event and fires off an Ajax request, catch that route in config/routes.rb, and handles to that event in some controller action (making the controller fat).
+
+Now, with Apotomo, all you do is declare your event handler in your widget class:
+
+ class SomeWidget < ApotomoWidget
+   responds_to_event :linkClick, :with => :process
+ 
+   def display
+     render
+   end
+ end
+
+And in your widget view:
+
+  = link_to_event "Click Me", :linkClick
+
+That's all you have to do! No code in your controller (other than declaring your widget with <tt>has_widget</tt>). And no routes in config.rb -- the <tt>responds_to_event</tt> and <tt>link_to_event</tt> are helpers provided by Apotomo to sync up the widget and the event.
+
+There are many helpers that let you create events in the widget view code and, if you can find the one you need, you can use <tt>url_for_event(:event_name)</tt> to get the url path for your custom Ajax call (more on this later).
+
 === Event Handlers
 
-== AJAX
+Okay, but what happens to that event once it's clicked? That's the next step in the process. Here's the code:
+
+ class SomeWidget < ApotomoWidget
+   responds_to_event :linkClick, :with => :process
+ 
+   def display
+     render
+   end
+ 
+   def process
+     # do something for the event
+     replace :view => :display
+   end
+ end
+
+Yep, it's that simple! And you can do several things at the end of the <tt>process</tt> method, like insert, append, etc. And you can use any javascript framework, whether prototype, jQuery, MooTools, whatever!
+
+== Ajax
+
+Ajax is what all the cool kids are using. It's amazing that some other mechanism hasn't replaced Ajax, but then again, Ajax is pretty solid. It uses http requests and we're pretty much cranking along with it. The biggest disadvantage to using Ajax is the back button, but there are ways to restore the back button functionality. But I digress...
+
+Apotomo uses Ajax to connect your widget down in the client's browser to the widget code running on the server. That's pretty much all there is to it, you don't even have to learn the internals of Ajax to use Apotomo! Of course, there may be times when you want to take charge of the process and insert some extra parameters into the Ajax call, but even that can be done in the link_to_event.
+
+As always, you can get the url for your widget event using <tt>url_for_event(:event_name)</tt> if there isn't an Apotomo helper that can create your event. You can even add parameters like this:
+
+  url_for_event(:event_name, "some_param" => "hello", "some_other_param" => "world")
+
+and have the url send those params in the <tt>params</tt> hash.
 
 == Statefulness vs. Stateless
 
+There are times when you want to preserve a state from Ajax call to Ajax call. That's statefulness. There's some overhead that comes with this feature, like the limit on variable size in your sessions. Statefulness has other issues not associated with Apotomo that might cause you to lose sleep at night on critical applications.
 
+Stateless is the cleaner way to roll with your Ajax applications. It may take a bit more work but having a stateless widget means never having to worry about session stores.
 
-A stateful WHAT?
-
-Well, you know that. In Rails, people tend to have fat controllers. One controller action renders the complete page. While many programmers try to separate their code into helpers, controller actions, RJS logic and partials, it is still the controller that has to care about when to update what, and how!
-
-
-In Apotomo, it is the opposite. Widgets are small, autonomous components that look and feel like controllers. These tiny monsters listen to events and thus keep updating themselves on the page via AJAX. However, there's no JavaScript for you - they're pure Ruby.
-
-
-== Man, gimme code!
+== Man, show me the code!
 
 Let's use the famous and tiresome counter example.
 
- class CounterCell < Apotomo::StatefulWidget
-   transition :from => :display, :to => :increment
-   
+ class CounterWidget < Apotomo::Widget
+ 
+   respond_to_event :counterClick, :with => :increment
+ 
    def display
-     respond_to_event :counterClick, :with => :increment
-  	  
      @count = 0
-     render		# renders display.html.erb
+     render		# renders display.html.erb (or display.html.haml)
    end
-
+ 
    def increment
      @count += 1	# @count is simply there - that's stateful.
-     render :view => :display
+     replace :view => :display
    end
  end
   
 Since this widget calls <tt>render</tt> it surely needs a view.
 
  <!-- I'm display.html.erb -->
-  
- <h1><%= @count %></h1>
- 
- <%= link_to_event "Increment me!", :counterClick %>
 
+ <h1><%= @count %></h1>
+
+ <%= link_to_event "Increment me!", :counterClick %>
 
 We now plug the widget in a page.
 
  class ExistingController < ApplicationController
-   include Apotomo::ControllerHelper
-
+   include Apotomo::Rails::ControllerMethods
+ 
+   use_widgets do |root|
+     root << widget(:counter, :display, 'my_first_counter')
+   end
+ 
    def some_action
-     # do what you want...
-     
-     use_widgets do |root|
-       root << cell(:counter, :display, 'my_first_counter')
-     end
+     # do whatever you want...
    end
  end
 
 As soon as the widget is rendered it will jump to its <tt>:display</tt> state which initializes the counter and renders itself.
 
-Speaking of rendering: how do we place the widget in our controller?
+Speaking of rendering: how do we place the widget in our controller's view?
 
-  <!-- I'm some_action.html.erb -->
-  <p>
-  	<%= render_widget 'my_first_counter' %>
+  <!-- I'm some_controller/some_action.html.erb -->
+
+  <%= render_widget 'my_first_counter' %>
 
 Ok, so this renders the widget in our controller page.
 
@@ -93,15 +152,15 @@ When clicking the link it updates automatically on the screen showing the increm
 Yes, it is.
 
 == Is there more?
-Apotomo got a load of features.
+Apotomo has got loads of features.
 
-[Composability]     Widgets can range from small standalone components to nested widget trees like dashboards or forms. Remember that each widget can have any number of children.
+[Composability]     Widgets can range from small standalone components to nested widget trees like dashboards or forms. Remember that each widget can have any number of children and each widget can be rendered multiple times on the same page.
   
-[Bubbling events]   Widgets can trigger events and watch out for them. While events bubble up from their triggering source to root they can be observed, providing a way to implement loosely coupled, distributable components.
+[Bubbling events]   Widgets can trigger events and watch out for them. As the events bubble up from their triggering source to the widget root, they can be observed by parent widgets, providing a way to implement loosely coupled, distributable components.
   
 [Deep Linking]      Apotomo deals with deep links (or url fragments) out-of-the-box while using SWFAddress. Components that register for deep linking will update as soon as the deep link changes. That makes your application back-button-safe!
   
-[Testing]           Needless to say that it is simply easier to test small components instead of fat do-it-all controllers.
+[Testing]           Needless to say, it is simply easier to test small components instead of fat do-it-all controllers. You can even test your custom javascript in your widget using a testing framework like Harmony.
 
 
 Give it a try- you will love the power and simplicity of real stateful components!
@@ -135,5 +194,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-
