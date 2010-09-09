@@ -61,7 +61,7 @@ module Apotomo
       #   url_for_event(:paginate, :page => 2)
       #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
       def url_for_event(type, options={})
-        options.reverse_merge! :source => @cell.name
+        options.reverse_merge! :source => widget_id
         controller.url_for_event(type, options)
       end
       
@@ -83,8 +83,26 @@ module Apotomo
         javascript_tag(*args, &block)
       end
       
-      def widget_div(*args, &block)
-        content_tag(:div, :id => @cell.name, :class => :widget, &block)
+      # Wraps your content in a +div+ and sets the id. Feel free to pass additional html options.
+      #
+      # Example:
+      #
+      #   - widget_div do
+      #     %p I'm wrapped
+      #
+      # will render
+      #
+      #   <div id="mouse">
+      #     <p>I'm wrapped</p>
+      #   </div>
+      def widget_div(options={}, &block)
+        options.reverse_merge!(:id => widget_id) 
+        content_tag(:div, options, &block)
+      end
+      
+      # Returns the widget id you passed in a has_widgets block.
+      def widget_id
+        @cell.name
       end
     end  
   end

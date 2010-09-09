@@ -52,7 +52,15 @@ class ViewHelperTest < ActionView::TestCase
     end
     
     should "respond to #widget_div" do
-      assert_equal '<div class="widget" id="mum">squeak!</div>', widget_div { "squeak!" }
+      assert_equal '<div id="mum">squeak!</div>', widget_div { "squeak!" }
+    end
+    
+    should "respond to #widget_div with options" do
+      assert_equal '<div class="mouse" id="kid">squeak!</div>', widget_div(:id => 'kid', :class => "mouse") { "squeak!" }
+    end
+    
+    should "respond to #widget_id" do
+      assert_equal 'mum', widget_id
     end
     
     context "#widget_javascript" do
