@@ -1,6 +1,8 @@
 how does Apotomo handle Ajax and JavaScript?
 framework abstraction with JavascriptGenerator
 
+no manual AJAX-routes for dozens of controllers, one generic route to rule them all
+
 = Apotomo
 
 Apotomo is a stateful widget component framework for Rails.

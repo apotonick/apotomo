@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{apotomo}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-08-24}
+  s.date = %q{2010-09-16}
   s.description = %q{A generic widget framework for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -70,34 +70,34 @@ Gem::Specification.new do |s|
   s.summary = %q{Event-driven Widgets for Rails with optional Statefulness.}
   s.test_files = [
     "test/fixtures/application_widget_tree.rb",
-     "test/test_helper.rb",
-     "test/support/test_case_methods.rb",
-     "test/support/assertions_helper.rb",
-     "test/rails/rails_integration_test.rb",
      "test/rails/view_methods_test.rb",
      "test/rails/controller_methods_test.rb",
      "test/rails/view_helper_test.rb",
      "test/rails/widget_generator_test.rb",
-     "test/unit/onfire_integration_test.rb",
+     "test/rails/rails_integration_test.rb",
+     "test/test_helper.rb",
+     "test/support/assertions_helper.rb",
+     "test/support/test_case_methods.rb",
+     "test/unit/test_widget_shortcuts.rb",
+     "test/unit/event_handler_test.rb",
+     "test/unit/widget_shortcuts_test.rb",
+     "test/unit/stateful_widget_test.rb",
+     "test/unit/test_addressing.rb",
      "test/unit/invoke_test.rb",
-     "test/unit/request_processor_test.rb",
+     "test/unit/container_test.rb",
+     "test/unit/test_tab_panel.rb",
+     "test/unit/test_jump_to_state.rb",
      "test/unit/render_test.rb",
      "test/unit/apotomo_test.rb",
+     "test/unit/request_processor_test.rb",
+     "test/unit/test_caching.rb",
      "test/unit/javascript_generator_test.rb",
-     "test/unit/stateful_widget_test.rb",
-     "test/unit/event_methods_test.rb",
+     "test/unit/onfire_integration_test.rb",
      "test/unit/persistence_test.rb",
-     "test/unit/event_handler_test.rb",
      "test/unit/transition_test.rb",
      "test/unit/event_test.rb",
-     "test/unit/widget_test.rb",
-     "test/unit/widget_shortcuts_test.rb",
-     "test/unit/test_caching.rb",
-     "test/unit/test_widget_shortcuts.rb",
-     "test/unit/test_tab_panel.rb",
-     "test/unit/test_addressing.rb",
-     "test/unit/container_test.rb",
-     "test/unit/test_jump_to_state.rb"
+     "test/unit/event_methods_test.rb",
+     "test/unit/widget_test.rb"
   ]
 
   if s.respond_to? :specification_version then
