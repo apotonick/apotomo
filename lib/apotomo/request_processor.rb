@@ -4,14 +4,14 @@ module Apotomo
     
     attr_reader :session, :root
     
-    def initialize(controller, session, options={}, uses_widgets_blocks=[])
+    def initialize(controller, session, options={}, has_widgets_blocks=[])
       @session              = session
       @widgets_flushed      = false
       
       @root = widget('apotomo/widget', 'root')
       @root.controller = controller
       
-      attach_stateless_blocks_for(uses_widgets_blocks, @root, controller)
+      attach_stateless_blocks_for(has_widgets_blocks, @root, controller)
       
       if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)  
         @root = ::Apotomo::StatefulWidget.thaw_for(session, @root)

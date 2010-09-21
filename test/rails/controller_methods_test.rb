@@ -24,9 +24,9 @@ class ControllerMethodsTest < ActionController::TestCase
       end
     end
     
-    context "invoking #uses_widgets" do
+    context "invoking #has_widgets" do
       setup do
-        @controller.class.uses_widgets do |root|
+        @controller.class.has_widgets do |root|
           root << mouse_mock('mum')
         end
       end
@@ -40,8 +40,8 @@ class ControllerMethodsTest < ActionController::TestCase
         assert @controller.apotomo_root['mum']
       end
       
-      should "allow multiple calls to uses_widgets" do
-        @controller.class.uses_widgets do |root|
+      should "allow multiple calls to has_widgets" do
+        @controller.class.has_widgets do |root|
           root << mouse_mock('kid')
         end
         
@@ -49,10 +49,10 @@ class ControllerMethodsTest < ActionController::TestCase
         assert @controller.apotomo_root['kid']
       end
       
-      should "inherit uses_widgets blocks to sub-controllers" do
+      should "inherit has_widgets blocks to sub-controllers" do
         berry = mouse_mock('berry')
         @sub_controller = Class.new(@controller.class) do
-          uses_widgets { |root| root << berry }
+          has_widgets { |root| root << berry }
         end.new
         @sub_controller.params  = {}
         @sub_controller.session = {}

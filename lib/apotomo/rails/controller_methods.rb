@@ -11,8 +11,8 @@ require 'apotomo/rails/view_methods'
             extend WidgetShortcuts
             extend ClassMethods      
             
-            class_inheritable_array :uses_widgets_blocks
-            self.uses_widgets_blocks = []
+            class_inheritable_array :has_widgets_blocks
+            self.has_widgets_blocks = []
             
             helper ::Apotomo::Rails::ViewMethods
             
@@ -22,7 +22,7 @@ require 'apotomo/rails/view_methods'
         
         module ClassMethods
           def has_widgets(&block)
-            uses_widgets_blocks << block
+            has_widgets_blocks << block
           end
           
           alias_method :uses_widgets, :has_widgets
@@ -45,7 +45,7 @@ require 'apotomo/rails/view_methods'
                       :js_framework   => Apotomo.js_framework || :prototype,
           }  ### TODO: process rails options (flush_tree, version)
           
-          @apotomo_request_processor = Apotomo::RequestProcessor.new(self, session, options, self.class.uses_widgets_blocks)
+          @apotomo_request_processor = Apotomo::RequestProcessor.new(self, session, options, self.class.has_widgets_blocks)
           
           flush_bound_use_widgets_blocks if @apotomo_request_processor.widgets_flushed?
           
