@@ -12,7 +12,7 @@ module Apotomo
     
     def self.included(base)
       base.extend(ClassMethods)
-      base.initialize_hooks << :add_class_event_handlers
+      base.after_initialize :add_class_event_handlers
     end
     
     def add_class_event_handlers(*)

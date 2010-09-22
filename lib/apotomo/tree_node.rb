@@ -8,14 +8,10 @@ module TreeNode
   attr_writer :content, :parent
   
   def self.included(base)
-    base.after_initialize :initialize_tree_node_for
+    base.after_initialize :initialize_tree_node
   end
   
-  # Constructor which expects the name of the node
-  #
-  # name of the node is expected to be unique across the
-  # tree.
-  def initialize_tree_node_for(name, *args)
+  def initialize_tree_node(*)
     self.setAsRoot!
 
     @childrenHash = Hash.new
@@ -49,7 +45,9 @@ module TreeNode
       @childrenHash[child.name]  = child
       @children << child
       child.parent = self
-      return child
+      
+      child.run_hook :after_add, self  
+    child
   end
 
   # Removes the specified child node from the receiver node.

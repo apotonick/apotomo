@@ -6,20 +6,29 @@ require 'apotomo/event'
 require 'apotomo/event_methods'
 require 'apotomo/transition'
 require 'apotomo/caching'
-require 'apotomo/deep_link_methods'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/view_helper'
+require 'apotomo/hooks'
 
-### TODO: use load_hooks when switching to rails 3.
-# wycats@gmail.com: ActiveSupport.run_load_hooks(:name)
-# (21:01:17) wycats@gmail.com: ActiveSupport.on_load(:name) { … }
-#require 'active_support/lazy_load_hooks'
 
 module Apotomo
   class Widget < Cell::Base
+    include Hooks
     
-    class_inheritable_array :initialize_hooks, :instance_writer => false
-    self.initialize_hooks = []
+    # Use this for setup code you're calling in every state. Almost like a +before_filter+ except that it's
+    # invoked after the initialization in #has_widgets.
+    #
+    # Example:
+    #
+    #   class MouseWidget < Apotomo::Widget
+    #     after_initialize :setup_cheese
+    #     
+    #     # we need @cheese in every state:
+    #     def setup_cheese(*)
+    #       @cheese = Cheese.find @opts[:cheese_id]
+    define_hook :after_initialize
+    define_hook :has_widgets
+    define_hook :after_add
     
     attr_accessor :opts
     attr_writer   :visible
@@ -27,34 +36,8 @@ module Apotomo
     attr_writer   :controller
     attr_accessor :version
     
-    ### DISCUSS: extract to has_widgets_methods for both Widget and Controller?
-    #class_inheritable_array :has_widgets_blocks
-    
     class << self
       include WidgetShortcuts
-      
-      def has_widgets_blocks
-        @has_widgets_blocks ||= []
-      end
-      
-      def has_widgets(&block)
-        has_widgets_blocks << block
-      end
-      
-      # Use this for setup code you're calling in every state. Almost like a +before_filter+ except that it's
-      # invoked after the initialization in #has_widgets.
-      #
-      # Example:
-      #
-      #   class MouseWidget < Apotomo::Widget
-      #     after_initialize :setup_cheese
-      #     
-      #     # we need @cheese in every state:
-      #     def setup_cheese(*)
-      #       @cheese = Cheese.find @opts[:cheese_id]
-      def after_initialize(method)
-        self.initialize_hooks << method
-      end
     end
     
     include TreeNode
@@ -64,15 +47,15 @@ module Apotomo
     
     include Transition
     include Caching
-    
-    include DeepLinkMethods
     include WidgetShortcuts
     
     helper Apotomo::Rails::ViewHelper
     
     
+    
+    
     def add_has_widgets_blocks(*)
-      self.class.has_widgets_blocks.each { |block| block.call(self) }
+      run_hook :has_widgets, self
     end
     after_initialize :add_has_widgets_blocks
     
@@ -89,11 +72,7 @@ module Apotomo
       
       @cell         = self
       
-      process_initialize_hooks(id, start_state, opts)
-    end
-    
-    def process_initialize_hooks(*args)
-      self.class.initialize_hooks.each { |method| send(method, *args) }
+      run_hook(:after_initialize, id, start_state, opts)
     end
     
     def last_state

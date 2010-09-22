@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), '..', 'test_helper')
 
 class WidgetTest < ActiveSupport::TestCase
-  context "#has_widgets in class context" do
+  context "Widget.has_widgets" do
     setup do
       @mum = Class.new(MouseCell) do
         has_widgets do |me|
@@ -17,8 +17,35 @@ class WidgetTest < ActiveSupport::TestCase
       assert_kind_of Apotomo::StatefulWidget, @mum['baby']
     end
     
-    should "not inherit trees for now" do
-      assert_equal [], @kid.children
+    should "inherit trees for now" do
+      assert_equal 1, @mum.children.size
+      assert_kind_of Apotomo::StatefulWidget, @mum['baby']
+    end
+  end
+  
+  context "Widget.after_add" do
+    setup do
+      @mum = Class.new(MouseCell) do
+        after_add do |parent|
+          parent << widget('mouse_cell', 'kid', :squeak)
+        end
+      end.new('mum', :squeak)
+      
+      @root = mouse_mock('root')
+    end
+    
+    should "be invoked after mum is added" do
+      assert_equal [], @root.children
+      @root << @mum
+      
+      assert_equal ['mum', 'kid'], @root.children.collect { |w| w.name }
+    end
+    
+    should "inherit callbacks for now" do
+      @berry = Class.new(@mum.class).new('berry', :squeak)
+      @root << @berry
+      
+      assert_equal ['berry', 'kid'], @root.children.collect { |w| w.name }
     end
   end
   
@@ -83,38 +110,6 @@ class WidgetTest < ActiveSupport::TestCase
       
       should "respond to the WidgetShortcuts methods, like #widget" do
         assert_respond_to @mum, :widget
-      end
-      
-      context "with initialize_hooks" do
-        should "expose its class_inheritable_array with #initialize_hooks" do
-          @mum = mouse_class_mock.new('mum', :eating)
-          @mum.class.instance_eval { self.initialize_hooks << :initialize_mouse }
-          assert ::Apotomo::StatefulWidget.initialize_hooks.size + 1 == @mum.class.initialize_hooks.size
-        end
-        
-        should "execute the initialize_hooks in the correct order in #process_initialize_hooks" do
-          @mum = mouse_class_mock.new('mum', :eating)
-          @mum.class.instance_eval do
-            define_method(:executed) { |*args| @executed ||= [] }
-            define_method(:setup) { |*args| executed << :setup }
-            define_method(:configure) { |*args| executed << :configure }
-            initialize_hooks << :setup
-            initialize_hooks << :configure
-          end
-          
-          assert_equal [:setup, :configure], @mum.class.new('zombie', nil).executed
-        end
-        
-        should "provide after_initialize" do
-          @mum = mouse_class_mock.new('mum', :eat)
-          @mum.class.instance_eval do
-            after_initialize :first
-            after_initialize :second
-          end
-          
-          assert_equal @mum.class.initialize_hooks[-1], :second
-          assert_equal @mum.class.initialize_hooks[-2], :first
-        end
       end
     end
 end
