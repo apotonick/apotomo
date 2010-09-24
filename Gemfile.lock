@@ -14,6 +14,8 @@ GEM
     cells (3.3.4)
     gemcutter (0.6.1)
     git (1.2.5)
+    hooks (0.1)
+      activesupport (>= 2.3.0)
     jeweler (1.4.0)
       gemcutter (>= 0.1.0)
       git (>= 1.2.5)
@@ -40,6 +42,7 @@ PLATFORMS
 
 DEPENDENCIES
   cells (= 3.3.4)
+  hooks (~> 0.1)
   jeweler
   mocha
   onfire

@@ -1,4 +1,6 @@
 require 'onfire'
+require 'hooks'
+
 require 'apotomo/tree_node'
 
 
@@ -8,8 +10,6 @@ require 'apotomo/transition'
 require 'apotomo/caching'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/view_helper'
-require 'apotomo/hooks'
-
 
 module Apotomo
   class Widget < Cell::Base

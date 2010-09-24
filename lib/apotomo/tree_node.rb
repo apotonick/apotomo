@@ -46,7 +46,7 @@ module TreeNode
       @children << child
       child.parent = self
       
-      child.run_hook :after_add, self  
+      child.run_hook :after_add, child, self
     child
   end
 

@@ -26,7 +26,7 @@ class WidgetTest < ActiveSupport::TestCase
   context "Widget.after_add" do
     setup do
       @mum = Class.new(MouseCell) do
-        after_add do |parent|
+        after_add do |me, parent|
           parent << widget('mouse_cell', 'kid', :squeak)
         end
       end.new('mum', :squeak)
