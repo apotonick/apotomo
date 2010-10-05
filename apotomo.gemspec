@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-09-16}
+  s.date = %q{2010-09-22}
   s.description = %q{A generic widget framework for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
      "lib/apotomo/event.rb",
      "lib/apotomo/event_handler.rb",
      "lib/apotomo/event_methods.rb",
+     "lib/apotomo/hooks.rb",
      "lib/apotomo/invoke_event_handler.rb",
      "lib/apotomo/javascript_generator.rb",
      "lib/apotomo/persistence.rb",
@@ -87,6 +88,7 @@ Gem::Specification.new do |s|
      "test/unit/container_test.rb",
      "test/unit/test_tab_panel.rb",
      "test/unit/test_jump_to_state.rb",
+     "test/unit/hooks_test.rb",
      "test/unit/render_test.rb",
      "test/unit/apotomo_test.rb",
      "test/unit/request_processor_test.rb",

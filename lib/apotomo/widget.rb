@@ -1,9 +1,8 @@
+require 'cells'
 require 'onfire'
 require 'hooks'
 
 require 'apotomo/tree_node'
-
-
 require 'apotomo/event'
 require 'apotomo/event_methods'
 require 'apotomo/transition'

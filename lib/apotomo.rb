@@ -19,11 +19,6 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
-#  
-
-
-require 'cells'
-require 'onfire'
 
 module Apotomo
   class << self
@@ -47,12 +42,9 @@ module Apotomo
   end
 end
 
-### FIXME: move to rails.rb
-
 require 'apotomo/javascript_generator'
 Apotomo.js_framework = :prototype ### DISCUSS: move to rails.rb
 
-### DISCUSS: move to 'apotomo/widgets'?
 require 'apotomo/widget'
 require 'apotomo/stateful_widget'
 require 'apotomo/container_widget'

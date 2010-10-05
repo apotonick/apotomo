@@ -1,5 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
-
+require 'test_helper'
 
 class JavascriptGeneratorTest < Test::Unit::TestCase
   context "The JavascriptGenerator" do

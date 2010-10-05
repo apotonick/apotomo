@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '..', 'test_helper')
+require 'test_helper'
 
 class WidgetTest < ActiveSupport::TestCase
   context "Widget.has_widgets" do
@@ -105,7 +105,7 @@ class WidgetTest < ActiveSupport::TestCase
       should "respond to #find_widget" do
         mum_and_kid!
         assert_not @mum.find_widget('pet')
-        assert @kid, @mum.find_widget('kid')
+        assert_equal @kid, @mum.find_widget('kid')
       end
       
       should "respond to the WidgetShortcuts methods, like #widget" do

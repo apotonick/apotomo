@@ -1,5 +1,4 @@
-require File.join(File.dirname(__FILE__), *%w[.. test_helper])
-
+require 'test_helper'
 
 class EventHandlerTest < Test::Unit::TestCase
   context "an abstract EventHandler" do

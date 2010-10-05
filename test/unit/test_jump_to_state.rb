@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
+require 'test_helper'
 
 ### DISCUSS: move some tests from PersistenceTest to this test file.
 

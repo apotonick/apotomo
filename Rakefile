@@ -5,59 +5,21 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 
+$:.unshift File.dirname(__FILE__)+"/lib" # add current dir to LOAD_PATHS
+
 desc 'Default: run unit tests.'
 task :default => :test
 
 desc 'Test the Apotomo plugin.'
 Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
+  t.libs << 'test'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
 
-namespace 'rdoc' do
-	desc 'Generate documentation for Apotomo.'
-	Rake::RDocTask.new(:build) do |rdoc|
-		rdoc.rdoc_dir = 'rdoc'
-		rdoc.title    = 'Apotomo API'
-		rdoc.options << '--line-numbers' << '--inline-source' << '-m README'
-		
-		rdoc.rdoc_files.include('lib/**/*.rb')
-		rdoc.rdoc_files.include('app/**/*.rb')
-		rdoc.rdoc_files.include('test/*.rb')
-		rdoc.rdoc_files.include('README')
-	end
-	
-	desc 'Upload the rdocs to apotomo.rubyforge.org.'
-	task :upload do
-		sh %{ scp -r rdoc nix@rubyforge.org:/var/www/gforge-projects/apotomo/ }
-	end
-end
 
-# Gem managment tasks.
-#
-# == Bump gem version (any):
-#
-#   rake version:bump:major
-#   rake version:bump:minor
-#   rake version:bump:patch
-#
-# == Generate gemspec, build & install locally:
-#
-#   rake gemspec
-#   rake build
-#   sudo rake install
-#
-# == Git tag & push to origin/master
-#
-#   rake release
-#
-# == Release to Gemcutter.org:
-#
-#   rake gemcutter:release
-#
 require 'jeweler'
-require 'lib/apotomo/version'
+require 'apotomo/version'
 
 Jeweler::Tasks.new do |spec|
   spec.name         = "apotomo"

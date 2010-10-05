@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), *%w[.. test_helper])
+require 'test_helper'
 
 class TransitionTest < Test::Unit::TestCase
   context "Calling #next_state_for" do
