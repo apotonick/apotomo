@@ -2,36 +2,28 @@ require 'test_helper'
 require 'action_view/test_case'
 
 class ViewHelperTest < ActionView::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   tests Apotomo::Rails::ViewHelper
   
   context "A widget state view" do
     setup do
-      barn_controller!
-      
       @cell = mouse_mock('mum')
+      @parent_controller = @controller
     end
     
     teardown do
       Apotomo.js_framework = :prototype
     end
     
-    should "respond to #link_to_event" do
-      assert_dom_equal "<a href=\"#\" onclick=\"new Ajax.Request('/barn/render_event_response?source=mum&amp;type=footsteps', {asynchronous:true, evalScripts:true}); return false;\">Walk!</a>",
-      link_to_event("Walk!", :footsteps)
-    end
-    
-    should "respond to #form_to_event" do
-      assert_dom_equal "<form onsubmit=\"new Ajax.Request('/barn/render_event_response?source=mum&amp;type=footsteps', {asynchronous:true, evalScripts:true, parameters:Form.serialize(this)}); return false;\" method=\"post\" action=\"/barn/render_event_response?source=mum&amp;type=footsteps\">",
-      form_to_event(:footsteps)
-    end
     
     should "respond to #multipart_form_to_event" do
-      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\" style=\"display: none;\"></iframe><form enctype=\"multipart/form-data\" method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
+      assert_dom_equal "<iframe id=\"apotomo_iframe\" name=\"apotomo_iframe\" style=\"display: none;\"></iframe><form accept-charset=\"UTF-8\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" enctype=\"multipart/form-data\" method=\"post\" target=\"apotomo_iframe\"><div style=\"margin:0;padding:0;display:inline\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" /></div></form>",
       multipart_form_to_event(:footsteps)
     end
     
     should "render multipart form if :multipart => true" do
-      assert_dom_equal "<iframe name=\"apotomo_iframe\" id=\"apotomo_iframe\" style=\"display: none;\"></iframe><form enctype=\"multipart/form-data\" method=\"post\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" target=\"apotomo_iframe\">",
+      assert_dom_equal "<iframe id=\"apotomo_iframe\" name=\"apotomo_iframe\" style=\"display: none;\"></iframe><form accept-charset=\"UTF-8\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" enctype=\"multipart/form-data\" method=\"post\" target=\"apotomo_iframe\"><div style=\"margin:0;padding:0;display:inline\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" /></div></form>",
       form_to_event(:footsteps, :multipart => true)
     end
     
@@ -86,6 +78,7 @@ class ViewHelperTest < ActionView::TestCase
     setup do
       barn_controller!
       @mum = mouse_mock
+      @mum.parent_controller = @controller
       @mum.class_eval do
         include Apotomo::Rails::ViewHelper
       end

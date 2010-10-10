@@ -22,14 +22,6 @@ module Apotomo
         js_generator.xhr(url_for_event(type, options))
       end
       
-      # Creates a link that triggers an event via AJAX.
-      # This link will <em>only</em> work in JavaScript-able browsers.
-      #
-      # Note that the link is created using #link_to_remote.
-      def link_to_event(title, type, options={}, html_options={})
-        link_to_remote(title, {:url => url_for_event(type, options)}, html_options)
-      end
-      
       # Creates a form tag that triggers an event via AJAX when submitted.
       # See StatefulWidget::address_for_event for options.
       #
@@ -49,7 +41,7 @@ module Apotomo
         html_options.reverse_merge! :target         => :apotomo_iframe, :multipart => true
         
         # i hate rails:
-        concat('<iframe id="apotomo_iframe" name="apotomo_iframe" style="display: none;"></iframe>') << form_tag(url_for_event(type, options), html_options, &block)
+        concat('<iframe id="apotomo_iframe" name="apotomo_iframe" style="display: none;"></iframe>'.html_safe) << form_tag(url_for_event(type, options), html_options, &block)
       end
       
       # Returns the url to trigger a +type+ event from the currently rendered widget.
@@ -62,7 +54,7 @@ module Apotomo
       #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
       def url_for_event(type, options={})
         options.reverse_merge! :source => widget_id
-        controller.url_for_event(type, options)
+        @parent_controller.url_for_event(type, options) # FIXME: don't access @parent_controller but @cell.
       end
       
       ### TODO: test me.
@@ -73,7 +65,7 @@ module Apotomo
       ### TODO: test me.
       ### DISCUSS: rename to rendered_children ?
       def content
-        @rendered_children.collect{|e| e.last}.join("\n")
+        @rendered_children.collect{|e| e.last}.join("\n").html_safe
       end
       
       # needs: suppress_javascript
