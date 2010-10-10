@@ -13,7 +13,7 @@ task :default => :test
 desc 'Test the Apotomo plugin.'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
-  t.pattern = 'test/**/*_test.rb'
+  t.test_files = FileList['test/unit/*_test.rb', 'test/rails/*_test.rb']# - ['test/rails/capture_test.rb']
   t.verbose = true
 end
 

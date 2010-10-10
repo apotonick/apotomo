@@ -1,12 +1,10 @@
 require 'test_helper'
- 
+
 class ViewMethodsTest < ActionController::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "A Rails controller view" do
     setup do
-      @controller = ApotomoController.new
-      @controller.extend Apotomo::Rails::ControllerMethods
-      @controller.session = {}
-      
       @controller.instance_variable_set(:@mum, mouse_mock('mum', 'snuggle') {def snuggle; render; end})
       @controller.instance_eval do
         def widget
@@ -34,7 +32,7 @@ class ViewMethodsTest < ActionController::TestCase
       end
       
       get :widget
-      assert_equal "/apotomo/render_event_response?source=mum&type=footsteps", @response.body
+      assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", @response.body
     end
   end
 end

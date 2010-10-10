@@ -3,16 +3,14 @@ require 'test_helper'
 class RailsIntegrationTest < ActionController::TestCase
   def simulate_request!
     @controller.instance_eval { @apotomo_request_processor = nil }
-    @controller.session = Marshal.load(Marshal.dump(@controller.session))
+    
+    ### FIXME: @controller.session = Marshal.load(Marshal.dump(@controller.session))
   end
+  
+  include Apotomo::TestCaseMethods::TestController
   
   context "A Rails controller" do
     setup do
-      @controller = ApotomoController.new
-      @controller.session = {}
-      @controller.params  = {}
-      
-      #@mum = mouse_mock('mum', 'snuggle') { def snuggle; render; end }
       @mum = MouseCell.new('mum', :snuggle)
       @mum.instance_eval{ def snuggle; render; end }
       
@@ -61,7 +59,7 @@ class RailsIntegrationTest < ActionController::TestCase
       end
       
       get 'widget'
-      assert_select "a", "Squeak!"
+      assert_select "a", "mum"
     end
     
     should "contain a freshly flushed tree when ?flush_widgets=1 is set" do

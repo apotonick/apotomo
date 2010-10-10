@@ -26,7 +26,7 @@ module Apotomo::Transition
     # to the start state.
     def transition(options)
       if from = options[:from]
-        class_transitions[from] = options[:to]
+        class_transitions[from.to_s] = options[:to]
       elsif loop = options[:in]
         transition :from => loop, :to => loop
       end
@@ -41,6 +41,6 @@ module Apotomo::Transition
     # Returns the next state for <tt>state</tt> or nil. A next state must have been defined 
     # with #transition.
     def next_state_for(state)
-      self.class.class_transitions[state]
+      self.class.class_transitions[state.to_s]
     end
 end

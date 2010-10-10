@@ -14,20 +14,20 @@ class InvokeTest < Test::Unit::TestCase
     context "implicitely" do
       should "always enter the given state" do
         @mum.invoke :snuggle
-        assert_equal :snuggle, @mum.last_state
+        assert_equal 'snuggle', @mum.last_state
         
         @mum.invoke :educate
-        assert_equal :educate, @mum.last_state
+        assert_equal 'educate', @mum.last_state
       end
     end
     
     context "explicitely" do
       should "per default enter the start state" do
         @mum.invoke
-        assert_equal :snuggle, @mum.last_state
+        assert_equal 'snuggle', @mum.last_state
         
         @mum.invoke
-        assert_equal :snuggle, @mum.last_state
+        assert_equal 'snuggle', @mum.last_state
       end
       
       context "with defined transitions" do
@@ -37,17 +37,20 @@ class InvokeTest < Test::Unit::TestCase
           end
           
           @mum.invoke
-          assert_equal :snuggle, @mum.last_state
+          assert_equal 'snuggle', @mum.last_state
         end
         
         should "automatically follow the transitions if defined" do
+          assert_equal 'snuggle', @mum.last_state
+          puts "invoooooooooooooogue"
+          puts @mum.last_state.inspect
           @mum.invoke
-          assert_equal :educate, @mum.last_state
+          assert_equal 'educate', @mum.last_state
         end
         
         should "nevertheless allow undefined implicit invokes" do
           @mum.invoke :snuggle
-          assert_equal :snuggle, @mum.last_state
+          assert_equal 'snuggle', @mum.last_state
         end
       end
     end
@@ -68,12 +71,12 @@ class InvokeTest < Test::Unit::TestCase
     context "implicitely" do
       should "per default send kid to its start state" do
         @mum.invoke :snuggle
-        assert_equal :snuggle,  @mum.last_state
-        assert_equal :snooze,   @kid.last_state
+        assert_equal 'snuggle',  @mum.last_state
+        assert_equal 'snooze',   @kid.last_state
         
         @mum.invoke :educate
-        assert_equal :educate,  @mum.last_state
-        assert_equal :snooze,   @kid.last_state
+        assert_equal 'educate',  @mum.last_state
+        assert_equal 'snooze',   @kid.last_state
       end
       
       should "follow the kid's transition if defined" do
@@ -83,8 +86,8 @@ class InvokeTest < Test::Unit::TestCase
         
         @mum.invoke :snuggle
         @mum.invoke :educate
-        assert_equal :educate,  @mum.last_state
-        assert_equal :listen,   @kid.last_state
+        assert_equal 'educate',  @mum.last_state
+        assert_equal 'listen',   @kid.last_state
       end
       
       should "send kid to the given state passed to #render" do
@@ -95,8 +98,8 @@ class InvokeTest < Test::Unit::TestCase
         end
         
         @mum.invoke :snuggle
-        assert_equal :snuggle,  @mum.last_state
-        assert_equal :listen,   @kid.last_state
+        assert_equal 'snuggle',  @mum.last_state
+        assert_equal 'listen',   @kid.last_state
       end
       
       should "send kid to the :invoke state as it overrides #transition" do
@@ -111,12 +114,12 @@ class InvokeTest < Test::Unit::TestCase
         end
         
         @mum.invoke :snuggle
-        assert_equal :snuggle,  @mum.last_state
-        assert_equal :snooze,   @kid.last_state
+        assert_equal 'snuggle',  @mum.last_state
+        assert_equal 'snooze',   @kid.last_state
         
         @mum.invoke :educate
-        assert_equal :educate,  @mum.last_state
-        assert_equal :snooze,   @kid.last_state
+        assert_equal 'educate',  @mum.last_state
+        assert_equal 'snooze',   @kid.last_state
       end
     end
   end

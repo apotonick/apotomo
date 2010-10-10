@@ -59,23 +59,24 @@ module Apotomo
     after_initialize :add_has_widgets_blocks
     
     
-    # Constructor which needs a unique id for the widget and one or multiple start states.
-    # <tt>start_state</tt> may be a symbol or an array of symbols.    
+    # Constructor which needs a unique id for the widget and one or multiple start states.  
     def initialize(id, start_state, opts={})
-      @opts         = opts
+      #super(nil, opts)  # pass nil as long as cells do need a parent_controller.
+      @opts = opts
+      
       @name         = id
       @start_state  = start_state
 
       @visible      = true
-      @version      = 0
+      @version      = 0 ### DISCUSS: neeed in stateLESS?
       
-      @cell         = self
+      @cell         = self  ### DISCUSS: needed?
       
       run_hook(:after_initialize, id, start_state, opts)
     end
     
     def last_state
-      @state_name
+      action_name
     end
     
     def visible?
@@ -89,7 +90,7 @@ module Apotomo
     end
     
     def unfreezable_ivars
-      [:@childrenHash, :@children, :@parent, :@controller, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts,
+      [:@childrenHash, :@children, :@parent, :@parent_controller, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts,
       :@suppress_javascript ### FIXME: implement with ActiveHelper and :locals.
       
       ]
@@ -119,13 +120,6 @@ module Apotomo
       logger.debug "                                    ...#{state}"
       
       render_state(state)
-    end
-    
-    
-    
-    # called in Cell::Base#render_state
-    def dispatch_state(state)
-      send(state, &@invoke_block)
     end
     
     
@@ -180,11 +174,11 @@ module Apotomo
       
       options[:locals].reverse_merge!(:rendered_children => rendered_children)
       
-      @controller = controller # that dependency SUCKS.
+      #@controller = controller # that dependency SUCKS.
       @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
       
       
-      render_view_for(options, @state_name) # defined in Cell::Base.
+      render_view_for(options, action_name) # defined in Cell::Base.
     end
     
     alias_method :emit, :render
@@ -221,7 +215,7 @@ module Apotomo
     end
     
     def render_children(invoke_options={})
-      returning rendered_children = ActiveSupport::OrderedHash.new do
+      ActiveSupport::OrderedHash.new.tap do |rendered_children|
         visible_children.each do |kid|
           child_state = decide_state_for(kid, invoke_options)
           logger.debug "    #{kid.name} -> #{child_state}"
@@ -273,9 +267,16 @@ module Apotomo
     def find_widget(widget_id)
       find {|node| node.name.to_s == widget_id.to_s}
     end
-    
-    def controller
-      root? ? @controller : root.controller
+
+    module LameController    
+      attr_writer :parent_controller
+      
+      def parent_controller
+        self.root? ? @parent_controller : root.parent_controller
+      end
     end
+    
+    include LameController
+    
   end
 end

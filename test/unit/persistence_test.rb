@@ -30,16 +30,14 @@ class PersistenceTest < Test::Unit::TestCase
   context "After #hibernate_widget (request) the widget" do
     should "still have the same ivars" do
       @mum = PersistentMouse.new('mum', :educate)
-      @mum.controller = @controller ### FIXME: remove that dependency
       
       @mum.invoke(:educate)
       
-      assert_equal @mum.last_state, :educate
+      assert_equal @mum.last_state, "educate"
       assert_equal @mum.who,  "the cat"
       assert_equal @mum.what, "run away"
       
       @mum = hibernate_widget(@mum)
-      @mum.controller = @controller ### FIXME: remove that dependency
       
       @mum.invoke(:recap)
       

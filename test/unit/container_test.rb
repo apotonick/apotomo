@@ -1,10 +1,11 @@
 require 'test_helper'
 
 class ContainerTest < Test::Unit::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "Rendering a container" do
     setup do
       @family = container('family')
-      @family.controller = @controller
     end
     
     should "return an empty view if childless" do

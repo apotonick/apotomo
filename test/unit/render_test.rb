@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class RenderTest < ActionView::TestCase
+  
   context "Rendering a single widget" do
     setup do
       @mum = mouse_mock

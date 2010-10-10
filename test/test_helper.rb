@@ -10,36 +10,26 @@ require 'mocha/integration'
 
 
 require 'cells'
-Cell::Base.add_view_path File.expand_path(File.dirname(__FILE__) + "/fixtures")
-
-puts Cell::Base.view_paths
+Cell::Base.append_view_path File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
 require 'apotomo'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'
 require 'apotomo/rails/view_methods'
-#require 'apotomo/assertions_helper'
 
 
 
 
 # Load test support files.
-Dir[File.join(File.dirname(__FILE__), *%w[support ** *.rb]).to_s].each { |f| require f }
+require File.join(File.dirname(__FILE__), "support/test_case_methods")
 
 
 Test::Unit::TestCase.class_eval do
   include Apotomo::WidgetShortcuts
   include Apotomo::TestCaseMethods
-  include Apotomo::AssertionsHelper
   
-  def setup
-    @controller = ApotomoController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-    @controller.request   = @request
-    @controller.response  = @response
-    @controller.params    = {}
-    @controller.session   = @session = {}
+  def assert_not(assertion)
+    assert !assertion
   end
 end
 
@@ -63,16 +53,12 @@ class RenderingTestCell < Apotomo::StatefulWidget
 end
 
 
-
-# We need to setup a fake route for the controller tests.
-ActionController::Routing::Routes.draw do |map|
-  map.connect 'apotomo/:action', :controller => 'apotomo'
-  map.connect 'barn/:action', :controller => 'barn'
+# Enable dynamic states so we can do Cell.class_eval { def ... } at runtime.
+class Apotomo::Widget
+  def action_method?(*); true; end
 end
-require File.join(File.dirname(__FILE__), '..', 'config/routes.rb') ### TODO: let rails engine handle that.
 
-
-
-module ::Rails
-  def logger(*args); end
-end
+ENV['RAILS_ENV'] = 'test'
+require "dummy/config/environment"
+#require File.join(File.dirname(__FILE__), '..', 'config/routes.rb') ### TODO: let rails engine handle that.
+require "rails/test_help" # sets up ActionController::TestCase's @routes

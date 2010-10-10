@@ -2,10 +2,8 @@ module Apotomo
   module TestCaseMethods
     # Provides a ready-to-use mouse widget instance.
     def mouse_mock(id='mouse', start_state=:eating, opts={}, &block)
-      #mouse = mouse_class_mock.new(id, start_state, opts)
       mouse = MouseCell.new(id, start_state, opts)
       mouse.instance_eval &block if block_given?
-      mouse.controller = @controller
       mouse
     end
     
@@ -48,7 +46,7 @@ module Apotomo
       @controller.class.instance_eval { include Apotomo::Rails::ControllerMethods }
       @controller.extend ActionController::UrlWriter
       @controller.params  = {}
-      @controller.session = {}
+      ### FIXME: @controller.session = {}
     end
     
     def hibernate_widget(widget, session = {})
@@ -63,6 +61,35 @@ module Apotomo
       Apotomo::StatefulWidget.freeze_for(session, widget)
       session = Marshal.load(Marshal.dump(session))
       Apotomo::StatefulWidget.thaw_for(session, widget('apotomo/widget', 'root'))
+    end
+    
+    module TestController
+      def setup
+        barn_controller!
+      end
+      
+      # Creates a mock controller instance. Currently, each widget needs a parent controller instance due to some
+      # sucky dependency in cells.
+      def barn_controller!
+        @controller = Class.new(ActionController::Base) do
+          def initialize
+            extend ActionController::UrlWriter
+            self.params = {}
+            self.request = ActionController::TestRequest.new
+          end
+          
+          def self.name; "BarnController"; end
+          
+          def self.default_url_options; {:controller => :barn}; end
+          include Apotomo::Rails::ControllerMethods
+        end.new
+        ### FIXME: @controller.session = {}
+      end
+      
+      def parent_controller
+        @controller
+      end
+      
     end
   end
 end

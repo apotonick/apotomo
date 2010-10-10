@@ -9,7 +9,7 @@ module Apotomo
       @widgets_flushed      = false
       
       @root = widget('apotomo/widget', 'root')
-      @root.controller = controller
+      @root.parent_controller = controller  # FIXME: set this as long as Cells rely on parent_controller.
       
       attach_stateless_blocks_for(has_widgets_blocks, @root, controller)
       

@@ -5,7 +5,6 @@ class MouseTabs;end
 
 class WidgetShortcutsTest < Test::Unit::TestCase
   context "#constant_for" do
-    
     should "constantize symbols" do
       assert_equal MumWidget, constant_for(:mum_widget)
     end
@@ -21,7 +20,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
     end
   end
   
-  context "#widget" do
+  context "#widget" do   
     context "with all arguments" do
       setup do
         @mum = widget(:mum_widget, 'mum', :eating)

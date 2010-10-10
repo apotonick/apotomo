@@ -19,6 +19,7 @@ class TransitionTest < Test::Unit::TestCase
       end
       
       assert_equal :sleep, @mum.send(:next_state_for, :snuggle)
+      assert_equal :sleep, @mum.send(:next_state_for, "snuggle")
     end
     
     should "return the state that was defined last" do

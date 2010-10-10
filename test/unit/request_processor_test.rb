@@ -1,9 +1,11 @@
 require 'test_helper'
 
-class RequestProcessorTest < Test::Unit::TestCase
+class RequestProcessorTest < ActiveSupport::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "#root" do
     should "allow external modification of the tree" do
-      @processor = Apotomo::RequestProcessor.new(nil, {})
+      @processor = Apotomo::RequestProcessor.new(@controller, {})
       root = @processor.root
       root << mouse_mock
       assert_equal 2, @processor.root.size
@@ -48,8 +50,8 @@ class RequestProcessorTest < Test::Unit::TestCase
     end
     
     context "with controller" do
-      should "attach the passed controller to root" do
-        assert_equal "controller", Apotomo::RequestProcessor.new("controller", {}, {}, []).root.controller
+      should "attach the passed parent_controller to root" do
+        assert_equal @controller, Apotomo::RequestProcessor.new(@controller, {}, {}, []).root.parent_controller
       end
     end
     
@@ -87,7 +89,7 @@ class RequestProcessorTest < Test::Unit::TestCase
       context "and with stateless widgets" do
         setup do
           @session = {:apotomo_stateful_branches => [[@mum, 'grandma']]}
-          @processor = Apotomo::RequestProcessor.new(nil, @session, {}, [Proc.new { |root| root << Apotomo::Widget.new('grandma', :eating) }])
+          @processor = Apotomo::RequestProcessor.new(nil, @session, {}, [Proc.new { |root| root << Apotomo::Widget.new(@controller, 'grandma', :eating) }])
         end
         
         should "first attach passed stateless, then stateful widgets to root" do
@@ -100,10 +102,8 @@ class RequestProcessorTest < Test::Unit::TestCase
   
   context "#process_for" do
     setup do
-      ### FIXME: what about that automatic @controller everywhere?
       mum_and_kid!
-      @mum.controller = nil # check if controller gets connected.
-      @processor = Apotomo::RequestProcessor.new(nil, {:apotomo_stateful_branches => [[@mum, 'root']]}, :js_framework => :prototype)
+      @processor = Apotomo::RequestProcessor.new(@controller, {:apotomo_stateful_branches => [[@mum, 'root']]}, :js_framework => :prototype)
       
       
       
@@ -153,9 +153,8 @@ class RequestProcessorTest < Test::Unit::TestCase
       @mum = mouse_mock('mum', :snuggle) do
         def snuggle; render; end
       end
-      @mum.controller = nil
       
-      @processor = Apotomo::RequestProcessor.new(nil, {:apotomo_stateful_branches => [[@mum, 'root']]})
+      @processor = Apotomo::RequestProcessor.new(@controller, {:apotomo_stateful_branches => [[@mum, 'root']]})
     end
     
     should "render the widget when passing an existing widget id" do

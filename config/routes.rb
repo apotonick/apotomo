@@ -1,3 +1,3 @@
-ActionController::Routing::Routes.draw do |map|
-  map.apotomo_event ':controller/render_event_response', :action => 'render_event_response'
+Rails.application.routes.draw do |map|
+  match ":controller/render_event_response", :to => "#render_event_response", :as => "apotomo_event"
 end

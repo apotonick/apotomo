@@ -1,11 +1,9 @@
 require 'test_helper'
  
 class ControllerMethodsTest < ActionController::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "A Rails controller" do
-    setup do
-      barn_controller!
-    end
-    
     context "responding to #apotomo_root" do
       should "initially return a root widget" do
         assert_equal 1, @controller.apotomo_root.size
@@ -55,7 +53,6 @@ class ControllerMethodsTest < ActionController::TestCase
           has_widgets { |root| root << berry }
         end.new
         @sub_controller.params  = {}
-        @sub_controller.session = {}
         
         assert @sub_controller.apotomo_root['mum']
         assert @sub_controller.apotomo_root['berry']
@@ -112,7 +109,7 @@ class ControllerMethodsTest < ActionController::TestCase
     
     context "invoking #url_for_event" do
       should "compute an url for any widget" do
-        assert_equal "/barn/render_event_response?source=mouse&type=footsteps&volume=9", @controller.url_for_event(:footsteps, :source => :mouse, :volume => 9)
+        assert_equal "/barn/render_event_response?source=mouse&volume=9&type=footsteps", @controller.url_for_event(:footsteps, :source => :mouse, :volume => 9)
       end
     end
     

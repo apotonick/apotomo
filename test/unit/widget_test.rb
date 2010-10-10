@@ -1,6 +1,15 @@
 require 'test_helper'
 
 class WidgetTest < ActiveSupport::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
+  context "The constructor" do
+    should "accept the parent_controller as first arg" do
+      assert_kind_of ActionController::Base, @controller
+      @mum = Apotomo::Widget.new('mum', :squeak)
+    end
+  end
+  
   context "Widget.has_widgets" do
     setup do
       @mum = Class.new(MouseCell) do
@@ -110,6 +119,12 @@ class WidgetTest < ActiveSupport::TestCase
       
       should "respond to the WidgetShortcuts methods, like #widget" do
         assert_respond_to @mum, :widget
+      end
+      
+      should "respond to #parent_controller" do
+        assert_nil @mum.parent_controller
+        @mum.parent_controller = @controller
+        assert_equal @controller, @mum.parent_controller
       end
     end
 end
