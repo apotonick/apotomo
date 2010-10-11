@@ -11,7 +11,7 @@ desc 'Default: run unit tests.'
 task :default => :test
 
 desc 'Test the Apotomo plugin.'
-Rake::TestTask.new(:test) do |t|
+  Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
   t.test_files = FileList['test/unit/*_test.rb', 'test/rails/*_test.rb']# - ['test/rails/capture_test.rb']
   t.verbose = true

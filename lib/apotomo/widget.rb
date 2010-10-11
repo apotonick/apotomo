@@ -35,10 +35,6 @@ module Apotomo
     attr_writer   :controller
     attr_accessor :version
     
-    #class << self
-    #  include WidgetShortcuts
-    #end
-    
     include TreeNode
     
     include Onfire
@@ -55,7 +51,6 @@ module Apotomo
     def run_widget_hook(name, *args)
       self.class.callbacks_for_hook(name).each { |blk| instance_exec(*args, &blk) }
     end
-    
     
     def add_has_widgets_blocks(*)
       run_widget_hook(:has_widgets, self)
@@ -177,7 +172,6 @@ module Apotomo
       
       options[:locals].reverse_merge!(:rendered_children => rendered_children)
       
-      #@controller = controller # that dependency SUCKS.
       @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
       
       
@@ -270,16 +264,6 @@ module Apotomo
     def find_widget(widget_id)
       find {|node| node.name.to_s == widget_id.to_s}
     end
-
-   # module LameController    
-   #   attr_writer :parent_controller
-   #   
-   #   def parent_controller
-   #     self.root? ? @parent_controller : root.parent_controller
-   #   end
-   # end
-   # 
-    #include LameController
     
     def url_for_event(*args)
       parent_controller.url_for_event(*args)
