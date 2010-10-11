@@ -14,13 +14,21 @@ class PersistenceTest < Test::Unit::TestCase
     def recap;  render :nothing => true; end
   end
   
+  def stateless(name)
+    Apotomo::Widget.new(name, :eat)
+  end
+  
+  def stateful(name)
+    PersistentMouse.new(name, :educate)
+  end
+  
   context "StatefulWidget" do
   
     context ".stateful_branches_for" do
       should "provide all stateful branch-roots seen from root" do
-        @root = Apotomo::Widget.new('root', :eat)
+        @root = stateless('root')
         @root << mum_and_kid!
-        @root << Apotomo::Widget.new('berry', :eat) << @jerry = mouse_mock('jerry', :eat)
+        @root << stateless('berry') << @jerry = mouse_mock('jerry', :eat)
         
         assert_equal ['mum', 'jerry'], Apotomo::StatefulWidget.stateful_branches_for(@root).collect {|n| n.name}
       end
@@ -29,7 +37,7 @@ class PersistenceTest < Test::Unit::TestCase
   
   context "After #hibernate_widget (request) the widget" do
     should "still have the same ivars" do
-      @mum = PersistentMouse.new('mum', :educate)
+      @mum = stateful('mum')
       
       @mum.invoke(:educate)
       
@@ -47,7 +55,7 @@ class PersistenceTest < Test::Unit::TestCase
     end
     
     should "still have its event_table" do
-      @mum    = PersistentMouse.new('mum', :educate)
+      @mum    = stateful('mum')
       @event  = Apotomo::Event.new(:squeak, @mum)
       @mum.respond_to_event :squeak, :with => :educate
       
@@ -65,7 +73,7 @@ class PersistenceTest < Test::Unit::TestCase
     
     context "and calling #flush_storage" do
       should "clear the storage from frozen data" do
-        @root = Apotomo::Widget.new('root', :eat)
+        @root = stateless('root')
         @root << @mum
           
         Apotomo::StatefulWidget.freeze_for(@storage, @root)
@@ -105,10 +113,10 @@ class PersistenceTest < Test::Unit::TestCase
     
     context "that has also stateless widgets" do
       setup do
-        @root = Apotomo::Widget.new('root', :eat)
+        @root = stateless('root')
           @root << mum_and_kid!
-          @root << Apotomo::Widget.new('berry', :eat) << @jerry = mouse_mock('jerry', :eat)
-        @root << Apotomo::Widget.new('tom', :eating)
+          @root << stateless('berry') << @jerry = mouse_mock('jerry', :eat)
+        @root << stateless('tom')
         
         Apotomo::StatefulWidget.freeze_for(@storage, @root)
       end
@@ -127,8 +135,8 @@ class PersistenceTest < Test::Unit::TestCase
       end
       
       should "attach stateful branches to the tree in thaw_for" do
-        @new_root = Apotomo::Widget.new('root', :eat)
-          @new_root << Apotomo::Widget.new('berry', :eat)
+        @new_root = stateless('root')
+          @new_root << stateless('berry')
         assert_equal @new_root, Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
         
         assert_equal 5, @new_root.size  # without tom.
@@ -137,8 +145,8 @@ class PersistenceTest < Test::Unit::TestCase
       should "re-establish ivars recursivly when calling #thaw_for" do
         @storage[:apotomo_stateful_branches] = Marshal.load(Marshal.dump(@storage[:apotomo_stateful_branches]))
         
-        @new_root = Apotomo::Widget.new('root', :eat)
-          @new_root << Apotomo::Widget.new('berry', :eat)
+        @new_root = stateless('root')
+          @new_root << stateless('berry')
         @new_root = Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
         
         assert_equal :answer_squeak,  @new_root['mum'].instance_variable_get(:@start_state)
@@ -146,7 +154,7 @@ class PersistenceTest < Test::Unit::TestCase
       end
       
       should "raise an exception when thaw_for can't find the branch's parent" do
-        @new_root = Apotomo::Widget.new('dad', :eat)
+        @new_root = stateless('dad')
         
         assert_raises RuntimeError do
            Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
@@ -154,8 +162,8 @@ class PersistenceTest < Test::Unit::TestCase
       end
       
       should "clear the fields in the storage when fetching in #thaw_for" do
-        @new_root = Apotomo::Widget.new('root', :eat)
-          @new_root << Apotomo::Widget.new('berry', :eat)
+        @new_root = stateless('root')
+          @new_root << stateless('berry')
         
         Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
         
@@ -189,8 +197,8 @@ class PersistenceTest < Test::Unit::TestCase
   
   context "dumping and loading" do
     setup do
-      @mum = PersistentMouse.new('mum', :eating)
-      @mum << @kid = PersistentMouse.new('kid', :eating)
+      @mum = stateful('mum')
+      @mum << @kid = stateful('kid')
     end
     
     context "a single stateful widget" do
