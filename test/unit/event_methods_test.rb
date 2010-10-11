@@ -1,7 +1,8 @@
 require 'test_helper'
  
 class EventMethodsTest < Test::Unit::TestCase
-
+  include Apotomo::TestCaseMethods::TestController
+  
   context "#respond_to_event and #fire" do
     setup do
       mum_and_kid!
@@ -49,11 +50,11 @@ class EventMethodsTest < Test::Unit::TestCase
       end
       
       should "add the handlers at creation time" do
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouseCell.new('mum', :show).event_table.all_handlers_for(:peep, 'mum')
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouseCell.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
       end
       
       should "not inherit handlers for now" do
-        assert_equal [], BabyMouseCell.new('kid', :show).event_table.all_handlers_for(:peep, 'kid')
+        assert_equal [], BabyMouseCell.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
       end
     end
     

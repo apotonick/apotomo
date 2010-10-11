@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class InvokeTest < Test::Unit::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   class LocalMouse < MouseCell
     def snuggle; render; end
     def educate; render :view => :snuggle; end
@@ -8,7 +10,7 @@ class InvokeTest < Test::Unit::TestCase
   
   context "Invoking a single widget" do
     setup do
-      @mum = LocalMouse.new('mum', :snuggle)
+      @mum = LocalMouse.new(parent_controller, 'mum', :snuggle)
     end
     
     context "implicitely" do
@@ -58,10 +60,10 @@ class InvokeTest < Test::Unit::TestCase
   
   context "Invoking a widget family" do
     setup do
-      @mum = LocalMouse.new('mum', :snuggle)
+      @mum = LocalMouse.new(parent_controller, 'mum', :snuggle)
       
       # create an anonym class for @kid so we don't pollute with #transition's.
-      @mum << @kid = mouse_class_mock.new('kid', :snooze)
+      @mum << @kid = mouse_class_mock.new(parent_controller, 'kid', :snooze)
       @kid.instance_eval do
         def snooze; render :nothing => true; end
         def listen; render :nothing => true; end

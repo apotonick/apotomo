@@ -6,7 +6,7 @@ class WidgetTest < ActiveSupport::TestCase
   context "The constructor" do
     should "accept the parent_controller as first arg" do
       assert_kind_of ActionController::Base, @controller
-      @mum = Apotomo::Widget.new('mum', :squeak)
+      @mum = Apotomo::Widget.new(@controller, 'mum', :squeak)
     end
   end
   
@@ -16,9 +16,9 @@ class WidgetTest < ActiveSupport::TestCase
         has_widgets do |me|
           me << widget('mouse_cell', 'baby', :squeak)
         end
-      end.new('mum', :squeak)
+      end.new(@controller, 'mum', :squeak)
       
-      @kid = Class.new(@mum.class).new('mum', :squeak)
+      @kid = Class.new(@mum.class).new(@controller, 'mum', :squeak)
     end
     
     should "setup the widget family at creation time" do
@@ -38,7 +38,7 @@ class WidgetTest < ActiveSupport::TestCase
         after_add do |me, parent|
           parent << widget('mouse_cell', 'kid', :squeak)
         end
-      end.new('mum', :squeak)
+      end.new(@controller, 'mum', :squeak)
       
       @root = mouse_mock('root')
     end
@@ -51,7 +51,7 @@ class WidgetTest < ActiveSupport::TestCase
     end
     
     should "inherit callbacks for now" do
-      @berry = Class.new(@mum.class).new('berry', :squeak)
+      @berry = Class.new(@mum.class).new(@controller, 'berry', :squeak)
       @root << @berry
       
       assert_equal ['berry', 'kid'], @root.children.collect { |w| w.name }
@@ -60,7 +60,7 @@ class WidgetTest < ActiveSupport::TestCase
   
   context "A stateless widget" do
     setup do
-      @mum = Apotomo::Widget.new('mum', :squeak)
+      @mum = Apotomo::Widget.new(@controller, 'mum', :squeak)
     end
     
     context "responding to #address_for_event" do
@@ -122,8 +122,6 @@ class WidgetTest < ActiveSupport::TestCase
       end
       
       should "respond to #parent_controller" do
-        assert_nil @mum.parent_controller
-        @mum.parent_controller = @controller
         assert_equal @controller, @mum.parent_controller
       end
     end

@@ -1,15 +1,12 @@
 module Apotomo
   class RequestProcessor
-    include WidgetShortcuts
-    
     attr_reader :session, :root
     
     def initialize(controller, session, options={}, has_widgets_blocks=[])
       @session              = session
       @widgets_flushed      = false
       
-      @root = widget('apotomo/widget', 'root')
-      @root.parent_controller = controller  # FIXME: set this as long as Cells rely on parent_controller.
+      @root = Widget.new(controller, 'root', :display)
       
       attach_stateless_blocks_for(has_widgets_blocks, @root, controller)
       
@@ -27,13 +24,13 @@ module Apotomo
     def attach_stateless_blocks_for(blocks, root, controller)
       blocks.each do |blk|
         if blk.arity == 1
-          blk.call(root) and next # fixes misbehaviour in ruby 1.8.
+          #blk.call(root) and next # fixes misbehaviour in ruby 1.8.
+          root.instance_exec(root, &blk) and next
         end
-        
-        blk.call(root, controller)  
+        ### FIXME: use Widget.has_widgets func.
+        root.instance_exec(root, controller, &blk)  
       end
     end
-    
     
     def flushed_root
       StatefulWidget.flush_storage(session)

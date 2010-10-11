@@ -12,7 +12,7 @@ module Apotomo
     #
     #   widget('jquery/tabs', 'panel')
     def widget(class_name, id, state=:display, *args)
-      object = constant_for(class_name).new(id, state, *args)
+      object = constant_for(class_name).new(parent_controller, id, state, *args)
       yield object if block_given?
       object
     end

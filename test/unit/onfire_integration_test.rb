@@ -1,6 +1,8 @@
 require 'test_helper'
  
 class OnfireIntegrationTest < Test::Unit::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "including Onfire into the StatefulWidget it" do
     setup do
       @mum = mouse_mock('mum')

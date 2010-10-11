@@ -9,7 +9,6 @@ class ViewHelperTest < ActionView::TestCase
   context "A widget state view" do
     setup do
       @cell = mouse_mock('mum')
-      @parent_controller = @controller
     end
     
     teardown do
@@ -78,7 +77,6 @@ class ViewHelperTest < ActionView::TestCase
     setup do
       barn_controller!
       @mum = mouse_mock
-      @mum.parent_controller = @controller
       @mum.class_eval do
         include Apotomo::Rails::ViewHelper
       end

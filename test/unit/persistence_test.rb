@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class PersistenceTest < Test::Unit::TestCase
+  include Apotomo::TestCaseMethods::TestController
   
   class PersistentMouse < Apotomo::StatefulWidget # we need a named class for marshalling.
     attr_reader :who, :what
@@ -15,11 +16,11 @@ class PersistenceTest < Test::Unit::TestCase
   end
   
   def stateless(name)
-    Apotomo::Widget.new(name, :eat)
+    Apotomo::Widget.new(parent_controller, name, :eat)
   end
   
   def stateful(name)
-    PersistentMouse.new(name, :educate)
+    PersistentMouse.new(parent_controller, name, :educate)
   end
   
   context "StatefulWidget" do

@@ -1,7 +1,7 @@
 PATH
   remote: /home/nick/projects/cells
   specs:
-    cells (3.4.1)
+    cells (3.4.2)
 
 GEM
   remote: http://rubygems.org/

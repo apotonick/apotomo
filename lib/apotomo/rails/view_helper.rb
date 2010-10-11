@@ -54,7 +54,7 @@ module Apotomo
       #   #=> http://apotomo.de/mouse/process_event_request?type=paginate&source=mouse&page=2
       def url_for_event(type, options={})
         options.reverse_merge! :source => widget_id
-        @parent_controller.url_for_event(type, options) # FIXME: don't access @parent_controller but @cell.
+        @cell.url_for_event(type, options) # FIXME: don't access @parent_controller but @cell.
       end
       
       ### TODO: test me.

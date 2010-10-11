@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-09-22}
+  s.date = %q{2010-10-11}
   s.description = %q{A generic widget framework for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -24,22 +24,7 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "TODO",
-     "app/cells/apotomo/child_switch_widget/switch.html.erb",
-     "app/cells/apotomo/child_switch_widget/switch.rhtml",
-     "app/cells/apotomo/deep_link_widget.rb",
-     "app/cells/apotomo/deep_link_widget/setup.html.erb",
-     "app/cells/apotomo/java_script_widget.rb",
-     "app/cells/apotomo/tab_panel_widget.rb",
-     "app/cells/apotomo/tab_panel_widget/display.html.erb",
-     "app/cells/apotomo/tab_widget.rb",
-     "app/cells/apotomo/tab_widget/display.html.erb",
      "config/routes.rb",
-     "generators/widget/USAGE",
-     "generators/widget/templates/functional_test.rb",
-     "generators/widget/templates/view.html.erb",
-     "generators/widget/templates/view.html.haml",
-     "generators/widget/templates/widget.rb",
-     "generators/widget/widget_generator.rb",
      "lib/apotomo.rb",
      "lib/apotomo/caching.rb",
      "lib/apotomo/container_widget.rb",
@@ -47,7 +32,6 @@ Gem::Specification.new do |s|
      "lib/apotomo/event.rb",
      "lib/apotomo/event_handler.rb",
      "lib/apotomo/event_methods.rb",
-     "lib/apotomo/hooks.rb",
      "lib/apotomo/invoke_event_handler.rb",
      "lib/apotomo/javascript_generator.rb",
      "lib/apotomo/persistence.rb",
@@ -57,11 +41,18 @@ Gem::Specification.new do |s|
      "lib/apotomo/rails/view_methods.rb",
      "lib/apotomo/request_processor.rb",
      "lib/apotomo/stateful_widget.rb",
+     "lib/apotomo/test_methods.rb",
      "lib/apotomo/transition.rb",
      "lib/apotomo/tree_node.rb",
      "lib/apotomo/version.rb",
      "lib/apotomo/widget.rb",
      "lib/apotomo/widget_shortcuts.rb",
+     "lib/generators/apotomo/USAGE",
+     "lib/generators/apotomo/templates/view.erb",
+     "lib/generators/apotomo/templates/view.haml",
+     "lib/generators/apotomo/templates/widget.rb",
+     "lib/generators/apotomo/templates/widget_test.rb",
+     "lib/generators/apotomo/widget_generator.rb",
      "rails/init.rb"
   ]
   s.homepage = %q{http://apotomo.de}
@@ -77,18 +68,33 @@ Gem::Specification.new do |s|
      "test/rails/widget_generator_test.rb",
      "test/rails/rails_integration_test.rb",
      "test/test_helper.rb",
-     "test/support/assertions_helper.rb",
      "test/support/test_case_methods.rb",
+     "test/dummy/config/application.rb",
+     "test/dummy/config/initializers/session_store.rb",
+     "test/dummy/config/initializers/mime_types.rb",
+     "test/dummy/config/initializers/secret_token.rb",
+     "test/dummy/config/initializers/inflections.rb",
+     "test/dummy/config/initializers/backtrace_silencers.rb",
+     "test/dummy/config/routes.rb",
+     "test/dummy/config/boot.rb",
+     "test/dummy/config/environment.rb",
+     "test/dummy/config/environments/production.rb",
+     "test/dummy/config/environments/test.rb",
+     "test/dummy/config/environments/development.rb",
+     "test/dummy/tmp/test/widgets/mouse_widget_test.rb",
+     "test/dummy/tmp/app/cells/mouse_widget.rb",
+     "test/dummy/app/controllers/application_controller.rb",
+     "test/dummy/app/helpers/application_helper.rb",
      "test/unit/test_widget_shortcuts.rb",
      "test/unit/event_handler_test.rb",
      "test/unit/widget_shortcuts_test.rb",
      "test/unit/stateful_widget_test.rb",
+     "test/unit/test_methods_test.rb",
      "test/unit/test_addressing.rb",
      "test/unit/invoke_test.rb",
      "test/unit/container_test.rb",
      "test/unit/test_tab_panel.rb",
      "test/unit/test_jump_to_state.rb",
-     "test/unit/hooks_test.rb",
      "test/unit/render_test.rb",
      "test/unit/apotomo_test.rb",
      "test/unit/request_processor_test.rb",
@@ -107,18 +113,21 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<cells>, ["~> 3.3"])
-      s.add_runtime_dependency(%q<activesupport>, [">= 2.3.0"])
+      s.add_runtime_dependency(%q<cells>, ["~> 3.4.2"])
+      s.add_runtime_dependency(%q<rails>, [">= 3.0.0"])
       s.add_runtime_dependency(%q<onfire>, [">= 0.1.0"])
+      s.add_runtime_dependency(%q<hooks>, ["~> 0.1"])
     else
-      s.add_dependency(%q<cells>, ["~> 3.3"])
-      s.add_dependency(%q<activesupport>, [">= 2.3.0"])
+      s.add_dependency(%q<cells>, ["~> 3.4.2"])
+      s.add_dependency(%q<rails>, [">= 3.0.0"])
       s.add_dependency(%q<onfire>, [">= 0.1.0"])
+      s.add_dependency(%q<hooks>, ["~> 0.1"])
     end
   else
-    s.add_dependency(%q<cells>, ["~> 3.3"])
-    s.add_dependency(%q<activesupport>, [">= 2.3.0"])
+    s.add_dependency(%q<cells>, ["~> 3.4.2"])
+    s.add_dependency(%q<rails>, [">= 3.0.0"])
     s.add_dependency(%q<onfire>, [">= 0.1.0"])
+    s.add_dependency(%q<hooks>, ["~> 0.1"])
   end
 end
 

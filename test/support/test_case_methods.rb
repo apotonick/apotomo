@@ -2,7 +2,7 @@ module Apotomo
   module TestCaseMethods
     # Provides a ready-to-use mouse widget instance.
     def mouse_mock(id='mouse', start_state=:eating, opts={}, &block)
-      mouse = MouseCell.new(id, start_state, opts)
+      mouse = MouseCell.new(parent_controller, id, start_state, opts)
       mouse.instance_eval &block if block_given?
       mouse
     end

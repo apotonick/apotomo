@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class EventHandlerTest < Test::Unit::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "an abstract EventHandler" do
     should "push nil to root's ordered page_updates when #call'ed" do
       @mum = mouse_mock('mum')

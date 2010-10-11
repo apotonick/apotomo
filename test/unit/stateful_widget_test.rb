@@ -1,9 +1,11 @@
 require 'test_helper'
 
 class StatefulWidgetTest < Test::Unit::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "The StatefulWidget" do
     setup do
-      @mum = Apotomo::StatefulWidget.new('mum', :squeak)
+      @mum = Apotomo::StatefulWidget.new(parent_controller, 'mum', :squeak)
     end
     
     should "accept an id as first option" do

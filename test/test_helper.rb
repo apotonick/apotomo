@@ -12,6 +12,8 @@ require 'mocha/integration'
 require 'cells'
 Cell::Base.append_view_path File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
+require 'rails/engine'
+
 require 'apotomo'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'

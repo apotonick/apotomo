@@ -64,9 +64,8 @@ module Apotomo
     
     
     # Constructor which needs a unique id for the widget and one or multiple start states.  
-    def initialize(id, start_state, opts={})
-      #super(nil, opts)  # pass nil as long as cells do need a parent_controller.
-      @opts = opts
+    def initialize(parent_controller, id, start_state, opts={})
+      super(parent_controller, opts)  # do that as long as cells do need a parent_controller.
       
       @name         = id
       @start_state  = start_state
@@ -272,15 +271,15 @@ module Apotomo
       find {|node| node.name.to_s == widget_id.to_s}
     end
 
-    module LameController    
-      attr_writer :parent_controller
-      
-      def parent_controller
-        self.root? ? @parent_controller : root.parent_controller
-      end
-    end
-    
-    include LameController
+   # module LameController    
+   #   attr_writer :parent_controller
+   #   
+   #   def parent_controller
+   #     self.root? ? @parent_controller : root.parent_controller
+   #   end
+   # end
+   # 
+    #include LameController
     
     def url_for_event(*args)
       parent_controller.url_for_event(*args)

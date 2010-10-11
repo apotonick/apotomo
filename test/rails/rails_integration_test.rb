@@ -11,7 +11,7 @@ class RailsIntegrationTest < ActionController::TestCase
   
   context "A Rails controller" do
     setup do
-      @mum = MouseCell.new('mum', :snuggle)
+      @mum = MouseCell.new(@controller, 'mum', :snuggle)
       @mum.instance_eval{ def snuggle; render; end }
       
       @controller.instance_variable_set(:@mum, @mum)

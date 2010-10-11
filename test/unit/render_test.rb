@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class RenderTest < ActionView::TestCase
+  include Apotomo::TestCaseMethods::TestController
   
   context "Rendering a single widget" do
     setup do

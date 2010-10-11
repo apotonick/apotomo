@@ -4,6 +4,8 @@ class MumWidget < MouseCell; end
 class MouseTabs;end
 
 class WidgetShortcutsTest < Test::Unit::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  
   context "#constant_for" do
     should "constantize symbols" do
       assert_equal MumWidget, constant_for(:mum_widget)

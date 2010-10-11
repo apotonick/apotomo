@@ -3,7 +3,9 @@ source "http://rubygems.org"
 gem "rails", "~> 3.0.0"
 gem "cells", :path => "/home/nick/projects/cells"#"3.4.1"
 gem "onfire"
-gem "hooks"
+gem "hooks", "~> 0.1.2"
+
+
 gem "jeweler"
 
 # for test env:
