@@ -111,5 +111,9 @@ class WidgetTest < ActiveSupport::TestCase
       should "respond to the WidgetShortcuts methods, like #widget" do
         assert_respond_to @mum, :widget
       end
+      
+      should "alias #widget_id to #name" do
+        assert_equal @mum.name, @mum.widget_id
+      end
     end
 end

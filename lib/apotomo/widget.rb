@@ -294,5 +294,7 @@ module Apotomo
     def controller
       root? ? @controller : root.controller
     end
+    
+    alias_method :widget_id, :name
   end
 end
