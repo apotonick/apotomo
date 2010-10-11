@@ -285,5 +285,7 @@ module Apotomo
     def url_for_event(*args)
       parent_controller.url_for_event(*args)
     end
+    
+    alias_method :widget_id, :name
   end
 end

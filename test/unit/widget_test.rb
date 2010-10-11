@@ -64,65 +64,69 @@ class WidgetTest < ActiveSupport::TestCase
     end
     
     context "responding to #address_for_event" do
-        should "accept an event :type" do
-          assert_equal({:type => :squeak, :source => 'mum'}, @mum.address_for_event(:type => :squeak))
-        end
-        
-        should "accept a :source" do
-          assert_equal({:type => :squeak, :source => 'kid'}, @mum.address_for_event(:type => :squeak, :source => 'kid'))
-        end
-        
-        should "accept arbitrary options" do
-          assert_equal({:type => :squeak, :volume => 'loud', :source => 'mum'}, @mum.address_for_event(:type => :squeak, :volume => 'loud'))
-        end
-        
-        should "complain if no type given" do
-          assert_raises RuntimeError do
-            @mum.address_for_event(:source => 'mum')
-          end
-        end
+      should "accept an event :type" do
+        assert_equal({:type => :squeak, :source => 'mum'}, @mum.address_for_event(:type => :squeak))
       end
       
-      context "implementing visibility" do
-        should "per default respond to #visible?" do
-          assert @mum.visible?
-        end
-        
-        should "expose a setter therefore" do
-          @mum.visible = false
-          assert_not @mum.visible?
-        end
-        
-        context "in a widget family" do
-          setup do
-            @mum << @jerry = mouse_mock('jerry')
-            @mum << @berry = mouse_mock('berry')
-          end
-          
-          should "per default return all #visible_children" do
-            assert_equal [@jerry, @berry], @mum.visible_children
-            assert_equal [], @jerry.visible_children
-          end
-          
-          should "hide berry in #visible_children if he's invisible" do
-            @berry.visible = false
-            assert_equal [@jerry], @mum.visible_children
-          end
-        end
+      should "accept a :source" do
+        assert_equal({:type => :squeak, :source => 'kid'}, @mum.address_for_event(:type => :squeak, :source => 'kid'))
       end
       
-      should "respond to #find_widget" do
-        mum_and_kid!
-        assert_not @mum.find_widget('pet')
-        assert_equal @kid, @mum.find_widget('kid')
+      should "accept arbitrary options" do
+        assert_equal({:type => :squeak, :volume => 'loud', :source => 'mum'}, @mum.address_for_event(:type => :squeak, :volume => 'loud'))
       end
       
-      should "respond to the WidgetShortcuts methods, like #widget" do
-        assert_respond_to @mum, :widget
-      end
-      
-      should "respond to #parent_controller" do
-        assert_equal @controller, @mum.parent_controller
+      should "complain if no type given" do
+        assert_raises RuntimeError do
+          @mum.address_for_event(:source => 'mum')
+        end
       end
     end
+    
+    context "implementing visibility" do
+      should "per default respond to #visible?" do
+        assert @mum.visible?
+      end
+      
+      should "expose a setter therefore" do
+        @mum.visible = false
+        assert_not @mum.visible?
+      end
+      
+      context "in a widget family" do
+        setup do
+          @mum << @jerry = mouse_mock('jerry')
+          @mum << @berry = mouse_mock('berry')
+        end
+        
+        should "per default return all #visible_children" do
+          assert_equal [@jerry, @berry], @mum.visible_children
+          assert_equal [], @jerry.visible_children
+        end
+        
+        should "hide berry in #visible_children if he's invisible" do
+          @berry.visible = false
+          assert_equal [@jerry], @mum.visible_children
+        end
+      end
+    end
+    
+    should "respond to #find_widget" do
+      mum_and_kid!
+      assert_not @mum.find_widget('pet')
+      assert_equal @kid, @mum.find_widget('kid')
+    end
+    
+    should "respond to the WidgetShortcuts methods, like #widget" do
+      assert_respond_to @mum, :widget
+    end
+    
+    should "respond to #parent_controller" do
+      assert_equal @controller, @mum.parent_controller
+    end
+    
+    should "alias #widget_id to #name" do
+      assert_equal @mum.name, @mum.widget_id
+    end
+  end
 end
