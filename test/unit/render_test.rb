@@ -158,6 +158,15 @@ class RenderTest < ActionView::TestCase
         end
         assert_equal "$(\"mouse\").update(\"squeak!\")", @mum.invoke(:squeak)
       end
+      
+      should "accept :selector" do
+        @mum.instance_eval do
+          def squeak
+            update :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
+          end
+        end
+        assert_equal "$(\"div#mouse\").update(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+      end
     end
     
     context "with #replace" do
@@ -172,6 +181,15 @@ class RenderTest < ActionView::TestCase
           end
         end
         assert_equal "$(\"mouse\").replace(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+      end
+      
+      should "accept :selector" do
+        @mum.instance_eval do
+          def squeak
+            replace :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
+          end
+        end
+        assert_equal "$(\"div#mouse\").replace(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
       end
     end
   end
