@@ -35,9 +35,9 @@ module Apotomo
     attr_writer   :controller
     attr_accessor :version
     
-    class << self
-      include WidgetShortcuts
-    end
+    #class << self
+    #  include WidgetShortcuts
+    #end
     
     include TreeNode
     
@@ -51,10 +51,14 @@ module Apotomo
     helper Apotomo::Rails::ViewHelper
     
     
+    # Runs callbacks for +name+ hook in instance context.  
+    def run_widget_hook(name, *args)
+      self.class.callbacks_for_hook(name).each { |blk| instance_exec(*args, &blk) }
+    end
     
     
     def add_has_widgets_blocks(*)
-      run_hook :has_widgets, self
+      run_widget_hook(:has_widgets, self)
     end
     after_initialize :add_has_widgets_blocks
     
@@ -278,5 +282,8 @@ module Apotomo
     
     include LameController
     
+    def url_for_event(*args)
+      parent_controller.url_for_event(*args)
+    end
   end
 end

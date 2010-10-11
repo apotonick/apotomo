@@ -40,6 +40,9 @@ module Apotomo
       yield self
     end
   end
+  
+  class Engine < Rails::Engine
+  end
 end
 
 require 'apotomo/javascript_generator'
@@ -50,3 +53,5 @@ require 'apotomo/stateful_widget'
 require 'apotomo/container_widget'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'
+
+#require 'apotomo/engine' if defined?(Rails)
