@@ -25,7 +25,7 @@ class ControllerMethodsTest < ActionController::TestCase
     context "invoking #has_widgets" do
       setup do
         @controller.class.has_widgets do |root|
-          root << mouse_mock('mum')
+          root << widget(:mouse_cell, 'mum')
         end
       end
       
@@ -40,7 +40,7 @@ class ControllerMethodsTest < ActionController::TestCase
       
       should "allow multiple calls to has_widgets" do
         @controller.class.has_widgets do |root|
-          root << mouse_mock('kid')
+          root << widget(:mouse_cell, 'kid')
         end
         
         assert @controller.apotomo_root['mum']
@@ -48,7 +48,7 @@ class ControllerMethodsTest < ActionController::TestCase
       end
       
       should "inherit has_widgets blocks to sub-controllers" do
-        berry = mouse_mock('berry')
+        berry = widget(:mouse_cell, 'berry')
         @sub_controller = Class.new(@controller.class) do
           has_widgets { |root| root << berry }
         end.new
@@ -60,7 +60,7 @@ class ControllerMethodsTest < ActionController::TestCase
       
       should "be aliased to has_widgets" do
         @controller.class.has_widgets do |root|
-          root << mouse_mock('kid')
+          root << widget(:mouse_cell, 'kid')
         end
         
         assert @controller.apotomo_root['mum']
@@ -76,7 +76,7 @@ class ControllerMethodsTest < ActionController::TestCase
       
       should "extend the widget family and remember the block with one #use_widgets call" do
         @controller.use_widgets do |root|
-          root << mouse_mock
+          root << widget(:mouse_cell, 'mum')
         end
         
         assert_equal 1, @controller.bound_use_widgets_blocks.size
@@ -84,7 +84,7 @@ class ControllerMethodsTest < ActionController::TestCase
       end
       
       should "add blocks only once" do
-        block = Proc.new {|root| root << mouse_mock}
+        block = Proc.new {|root| root << widget(:mouse_cell, 'mum')}
         
         @controller.use_widgets &block
         @controller.use_widgets &block
@@ -99,7 +99,7 @@ class ControllerMethodsTest < ActionController::TestCase
           root << @mum
         end
         @controller.use_widgets do |root|
-          root << mouse_mock('pet')
+          root << widget(:mouse_cell, 'pet')
         end
         
         assert_equal 2, @controller.bound_use_widgets_blocks.size
