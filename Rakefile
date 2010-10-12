@@ -35,7 +35,7 @@ Jeweler::Tasks.new do |spec|
   spec.add_dependency 'cells', '~> 3.3'
   spec.add_dependency 'activesupport', '>= 2.3.0'
   spec.add_dependency 'onfire', '>= 0.1.0'
-  spec.add_dependency 'hooks', '~> 0.1'
+  spec.add_dependency 'hooks', '~> 0.1.2'
 end
 
 Jeweler::GemcutterTasks.new
