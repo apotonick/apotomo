@@ -36,36 +36,6 @@ class PersistenceTest < Test::Unit::TestCase
     end
   end
   
-  context "After #hibernate_widget (request) the widget" do
-    should "still have the same ivars" do
-      @mum = stateful('mum')
-      
-      @mum.invoke(:educate)
-      
-      assert_equal @mum.last_state, "educate"
-      assert_equal @mum.who,  "the cat"
-      assert_equal @mum.what, "run away"
-      
-      @mum = hibernate_widget(@mum)
-      
-      @mum.invoke(:recap)
-      
-      assert_equal @mum.last_state, :recap
-      assert_equal @mum.who,  "the cat"
-      assert_equal @mum.what, "run away"
-    end
-    
-    should "still have its event_table" do
-      @mum    = stateful('mum')
-      @event  = Apotomo::Event.new(:squeak, @mum)
-      @mum.respond_to_event :squeak, :with => :educate
-      
-      assert_equal 1, @mum.send(:local_event_handlers, @event).size
-      @mum = hibernate_widget(@mum)
-      assert_equal 1, @mum.send(:local_event_handlers, @event).size
-    end
-  end
-  
   context "freezing and thawing a widget family" do
     setup do
       mum_and_kid!
@@ -127,18 +97,13 @@ class PersistenceTest < Test::Unit::TestCase
       end
       
       should "save stateful branches only" do
-        #@mum.root!
-        #@jerry.root!  # disconnect stateful branches.
-        
-        assert_equal([[@mum, 'root'], [@jerry, 'berry']], @storage[:apotomo_stateful_branches])
-        assert @storage[:apotomo_stateful_branches].first.first.root?, "mum not disconnected from root"
-        assert @storage[:apotomo_stateful_branches].last.first.root?, "jerry not disconnected from berry"
+        assert_equal([[[MouseCell, 'mum', 'root'], [MouseCell, 'kid', 'mum']], [[MouseCell, 'jerry', 'berry']]], @storage[:apotomo_stateful_branches])
       end
       
       should "attach stateful branches to the tree in thaw_for" do
         @new_root = stateless('root')
           @new_root << stateless('berry')
-        assert_equal @new_root, Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+        assert_equal @new_root, Apotomo::StatefulWidget.thaw_for(@controller, @storage, @new_root)
         
         assert_equal 5, @new_root.size  # without tom.
       end
@@ -148,7 +113,7 @@ class PersistenceTest < Test::Unit::TestCase
         
         @new_root = stateless('root')
           @new_root << stateless('berry')
-        @new_root = Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+        @new_root = Apotomo::StatefulWidget.thaw_for(@controller, @storage, @new_root)
         
         assert_equal :answer_squeak,  @new_root['mum'].instance_variable_get(:@start_state)
         assert_equal :peek,           @new_root['mum']['kid'].instance_variable_get(:@start_state)
@@ -158,7 +123,7 @@ class PersistenceTest < Test::Unit::TestCase
         @new_root = stateless('dad')
         
         assert_raises RuntimeError do
-           Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+           Apotomo::StatefulWidget.thaw_for(@controller, @storage, @new_root)
         end
       end
       
@@ -166,7 +131,7 @@ class PersistenceTest < Test::Unit::TestCase
         @new_root = stateless('root')
           @new_root << stateless('berry')
         
-        Apotomo::StatefulWidget.thaw_for(@storage, @new_root)
+        Apotomo::StatefulWidget.thaw_for(@controller, @storage, @new_root)
         
         assert_nil @storage[:apotomo_stateful_branches]
         assert_nil @storage[:apotomo_widget_ivars]
@@ -196,46 +161,35 @@ class PersistenceTest < Test::Unit::TestCase
     
   end
   
-  context "dumping and loading" do
+  context "#dump_tree" do
     setup do
       @mum = stateful('mum')
       @mum << @kid = stateful('kid')
+        @kid << @pet = stateful('pet')
+      @mum << @berry = stateful('berry')
+      
     end
     
-    context "a single stateful widget" do
-      should "provide a serialized widget on #node_dump" do
-        assert_equal "mum|PersistenceTest::PersistentMouse|mum", @mum.dump_node
-        assert_equal "kid|PersistenceTest::PersistentMouse|mum", @kid.dump_node
-      end
-      
-      should "recover the widget skeleton when invoking self.node_load" do
-        @mum, parent = ::Apotomo::StatefulWidget.load_node(@mum.dump_node)
-        assert_kind_of PersistentMouse, @mum
-        assert_equal 'mum', @mum.name
-        assert_equal 1,     @mum.size
-        assert_equal 'mum', parent
-      end
+    should "return a list of widget metadata" do
+      assert_equal [[PersistentMouse, 'mum', nil], [PersistentMouse, 'kid', 'mum'], [PersistentMouse, 'pet', 'kid'], [PersistentMouse, 'berry', 'mum']], @mum.dump_tree
     end
     
-    context "a stateful widget family" do
-      should "provide the serialized tree on _dump" do
-        assert_equal "mum|PersistenceTest::PersistentMouse|mum\nkid|PersistenceTest::PersistentMouse|mum\n", @mum._dump(10)
-      end
-      
-      should "recover the widget tree on _load" do
-        @mum = ::Apotomo::StatefulWidget._load(@mum._dump(10))
-        assert_equal 2, @mum.size
-        assert_equal @mum, @mum['kid'].parent
+    should "return a tree for #load_tree" do
+      cold_widgets = @mum.dump_tree
+      assert_equal ['mum', 'kid', 'pet', 'berry'], Apotomo::StatefulWidget.send(:load_tree, @controller, cold_widgets).collect { |n| n.name }
+    end
+    
+    context "#frozen_widget_in?" do
+      should "return true if a valid widget is passed" do
+        @session = {}
+        assert_not Apotomo::StatefulWidget.frozen_widget_in?(@session)
+        Apotomo::StatefulWidget.freeze_for(@session, @berry)
+        assert Apotomo::StatefulWidget.frozen_widget_in?(@session)
       end
     end
   end
   
-  context "#frozen_widget_in?" do
-    should "return true if a valid widget is passed" do
-      assert_not Apotomo::StatefulWidget.frozen_widget_in?({})
-      assert Apotomo::StatefulWidget.frozen_widget_in?({:apotomo_stateful_branches => [[mouse_mock, 'root']]})
-    end
-  end
+  
   
   context "#symbolized_instance_variables?" do
     should "return instance_variables as symbols" do

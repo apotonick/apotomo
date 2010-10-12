@@ -42,59 +42,29 @@ module Apotomo
     end
     
     
-    # Serializes the widget node structure (not children, not content).
-    def dump_node
-      field_sep = self.class.field_sep
-      "#{@name}#{field_sep}#{self.class}#{field_sep}#{root? ? @name : parent.name}"
+    def dump_tree
+      collect  { |n|  [n.class, n.name, n.root? ? nil : n.parent.name] }
     end
     
-    # Serializes the tree structure.
-    def _dump(depth)
-      inject("") { |str, node| str << node.dump_node << self.class.node_sep }
-    end
     
     module ClassMethods
-      def field_sep;  '|';  end
-      def node_sep;   "\n"; end
-      
-      # Creates an empty widget instance from <tt>line</tt>.
-      def load_node(line)
-        name, klass, parent = line.split(field_sep)
-        [klass.constantize.new(name, nil), parent]
-      end
-      
-      def _load(str)
-        nodes = {}
-        root  = nil
-        str.split(node_sep).each do |line|
-          node, parent = load_node(line)
-          nodes[node.name] = node
-          
-          if node.name == parent # we're at the root node.
-            root = node and next
-          end
-          
-          nodes[parent].add(node)
-        end
-        root
-      end
-      
+      # Dump the shit to storage.
       def freeze_for(storage, root)
         storage[:apotomo_stateful_branches] = []
         storage[:apotomo_widget_ivars]      = {}
         
         stateful_branches_for(root).each do |branch|
           branch.freeze_data_to(storage[:apotomo_widget_ivars])  # save ivars.
-          storage[:apotomo_stateful_branches] << [branch, branch.parent.name]
-          branch.root!  # disconnect from tree.
+          storage[:apotomo_stateful_branches] << branch.dump_tree
         end
       end
       
-      def thaw_for(storage, root)
+      # Create tree from storage and add branches to root/stateless parents.
+      def thaw_for(controller, storage, root)
         branches = storage.delete(:apotomo_stateful_branches) || []
-        branches.each do |config|
-          branch = config.first
-          parent = root.find_widget(config.last) or raise "Couldn't find parent `#{config.last}` for `#{branch.name}`"
+        branches.each do |data|
+          branch = load_tree(controller, data)
+          parent = root.find_widget(data.first.last) or raise "Couldn't find parent `#{data.first.last}` for `#{branch.name}`"
           
           parent << branch
           branch.thaw_data_from(storage.delete(:apotomo_widget_ivars) || {})
@@ -102,16 +72,9 @@ module Apotomo
         
         root
       end
-  
-      def thaw_from(storage)
-        root = storage[:apotomo_root]
-        root.thaw_data_from(storage.fetch(:apotomo_widget_ivars, {}))
-        root
-      end
       
       def frozen_widget_in?(storage)
-        branches = storage[:apotomo_stateful_branches]
-        branches.present? and branches.first.first.kind_of? Apotomo::StatefulWidget
+        storage[:apotomo_stateful_branches].kind_of? Array
       end
       
       def flush_storage(storage)
@@ -134,6 +97,17 @@ module Apotomo
         stateful_roots
       end
       
+    private
+      def load_tree(parent_controller, cold_widgets)
+        root = nil
+        cold_widgets.each do |data|
+          puts data.inspect
+          node = data[0].new(parent_controller, data[1], "")
+          root = node and next unless root
+          root.find_widget(data[2]) << node
+        end
+        root
+      end
     end
   end
 end

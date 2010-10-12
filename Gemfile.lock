@@ -40,7 +40,7 @@ GEM
       abstract (>= 1.0.0)
     gemcutter (0.6.1)
     git (1.2.5)
-    hooks (0.1.1)
+    hooks (0.1.2)
     i18n (0.4.1)
     jeweler (1.4.0)
       gemcutter (>= 0.1.0)
@@ -89,7 +89,7 @@ PLATFORMS
 
 DEPENDENCIES
   cells!
-  hooks
+  hooks (~> 0.1.2)
   jeweler
   mocha
   onfire

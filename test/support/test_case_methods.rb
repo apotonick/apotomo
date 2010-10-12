@@ -50,11 +50,11 @@ module Apotomo
     end
     
     def hibernate_widget(widget, session = {})
-      widget.freeze_to(session)
+      Apotomo::StatefulWidget.freeze_for(session, widget)
       
       session = Marshal.load(Marshal.dump(session))
       
-      Apotomo::StatefulWidget.thaw_from(session)
+      Apotomo::StatefulWidget.thaw_for(@controller, session, )
     end
     
     def hibernate(widget, session = {})

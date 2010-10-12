@@ -3,6 +3,19 @@ require 'test_helper'
 class RequestProcessorTest < ActiveSupport::TestCase
   include Apotomo::TestCaseMethods::TestController
   
+  
+  def root_mum_and_kid!
+    
+        mum_and_kid!
+        
+        root = Apotomo::Widget.new(parent_controller, 'root', :display)
+        root << @mum
+        
+        
+        @session = {}
+        Apotomo::StatefulWidget.freeze_for(@session, @root)
+  end
+  
   context "#root" do
     should "allow external modification of the tree" do
       @processor = Apotomo::RequestProcessor.new(parent_controller, {})
@@ -62,13 +75,14 @@ class RequestProcessorTest < ActiveSupport::TestCase
     
     context "with session" do
       setup do
-        mum_and_kid!
+        root_mum_and_kid!
         @mum.version = 1
-        @session = {:apotomo_stateful_branches => [[@mum, 'root']]}
+        
         @processor = Apotomo::RequestProcessor.new(parent_controller, @session)
       end
       
       should "provide a widget family for #root" do
+      puts @processor.root.printTree
         assert_equal 3, @processor.root.size
         assert_equal 1, @processor.root['mum'].version
         assert_not @processor.widgets_flushed?
@@ -93,7 +107,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
       
       context "and with stateless widgets" do
         setup do
-          @session = {:apotomo_stateful_branches => [[@mum, 'grandma']]}
+          @session = {:apotomo_stateful_branches => [[[MouseCell, 'mum', 'grandma']]]}
           @processor = Apotomo::RequestProcessor.new(parent_controller, @session, {}, [Proc.new { |root| root << Apotomo::Widget.new(parent_controller, 'grandma', :eating) }])
         end
         
@@ -108,7 +122,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
   context "#process_for" do
     setup do
       mum_and_kid!
-      @processor = Apotomo::RequestProcessor.new(parent_controller, {:apotomo_stateful_branches => [[@mum, 'root']]}, :js_framework => :prototype)
+      @processor = Apotomo::RequestProcessor.new(parent_controller, {:apotomo_stateful_branches => [[[MouseCell, 'mum', 'root'], [MouseCell]]]}, :js_framework => :prototype)
       
       
       
@@ -155,11 +169,12 @@ class RequestProcessorTest < ActiveSupport::TestCase
   
   context "#render_widget_for" do
     setup do
-      @mum = mouse_mock('mum', :snuggle) do
+      ::MouseCell.class_eval do
         def snuggle; render; end
       end
       
-      @processor = Apotomo::RequestProcessor.new(parent_controller, {:apotomo_stateful_branches => [[@mum, 'root']]})
+      @processor = Apotomo::RequestProcessor.new(parent_controller, {}, {}, 
+        [Proc.new { |root| root << MouseCell.new(parent_controller, 'mum', :snuggle) }])
     end
     
     should "render the widget when passing an existing widget id" do
@@ -167,7 +182,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
     end
     
     should "render the widget when passing an existing widget instance" do
-      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for(@mum, {})
+      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for(@processor.root['mum'], {})
     end
     
     should "raise an exception when a non-existent widget id id passed" do

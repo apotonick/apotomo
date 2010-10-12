@@ -11,7 +11,7 @@ module Apotomo
       attach_stateless_blocks_for(has_widgets_blocks, @root, controller)
       
       if options[:flush_widgets].blank? and ::Apotomo::StatefulWidget.frozen_widget_in?(session)  
-        @root = ::Apotomo::StatefulWidget.thaw_for(session, @root)
+        @root = ::Apotomo::StatefulWidget.thaw_for(controller, session, @root)
       else
         #@root = flushed_root
         
