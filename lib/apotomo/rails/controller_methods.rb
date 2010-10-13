@@ -111,6 +111,11 @@ require 'apotomo/rails/view_methods'
         
         protected
         
+        def parent_controller
+          self
+        end
+        
+        
         
         # Renders the page updates through an iframe. Copied from responds_to_parent,
         # see http://github.com/markcatley/responds_to_parent .

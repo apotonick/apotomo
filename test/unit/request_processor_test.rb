@@ -12,18 +12,18 @@ class RequestProcessorTest < Test::Unit::TestCase
   
   context "#attach_stateless_blocks_for" do
     setup do
-      @processor  = Apotomo::RequestProcessor.new("controller", {})
+      @processor  = Apotomo::RequestProcessor.new(@controller, {})
       @root       = @processor.root
-      @controller = "yo"
+      #@controller = parent_controller
     end
     
     should "allow has_widgets blocks with root parameter, only" do
-      @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root| root.add mouse_mock }], @root, @controller)
+      @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root| root.add widget(:mouse_cell, 'mouse') }], @root, @controller)
       assert_equal 'mouse', @processor.root['mouse'].name
     end
     
     should "allow has_widgets blocks with both root and controller parameter" do
-      @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root,controller| root.add mouse_mock }], @root, @controller)
+      @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root,controller| root.add widget(:mouse_cell, 'mouse') }], @root, @controller)
       assert_equal 'mouse', @processor.root['mouse'].name
     end
   end

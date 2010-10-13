@@ -27,10 +27,11 @@ module Apotomo
     def attach_stateless_blocks_for(blocks, root, controller)
       blocks.each do |blk|
         if blk.arity == 1
-          blk.call(root) and next # fixes misbehaviour in ruby 1.8.
+          #blk.call(root) and next # fixes misbehaviour in ruby 1.8.
+          controller.instance_exec(root, &blk) and next
         end
-        
-        blk.call(root, controller)  
+        ### FIXME: use Widget.has_widgets func.
+        controller.instance_exec(root, controller, &blk)  
       end
     end
     
