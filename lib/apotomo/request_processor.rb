@@ -25,10 +25,10 @@ module Apotomo
       blocks.each do |blk|
         if blk.arity == 1
           #blk.call(root) and next # fixes misbehaviour in ruby 1.8.
-          root.instance_exec(root, &blk) and next
+          controller.instance_exec(root, &blk) and next
         end
         ### FIXME: use Widget.has_widgets func.
-        root.instance_exec(root, controller, &blk)  
+        controller.instance_exec(root, controller, &blk)  
       end
     end
     

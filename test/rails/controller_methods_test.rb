@@ -22,6 +22,10 @@ class ControllerMethodsTest < ActionController::TestCase
       end
     end
     
+    should "respond to parent_controller" do
+      assert_equal @controller, @controller.send(:parent_controller)
+    end
+    
     context "invoking #has_widgets" do
       setup do
         @controller.class.has_widgets do |root|
@@ -58,13 +62,16 @@ class ControllerMethodsTest < ActionController::TestCase
         assert @sub_controller.apotomo_root['berry']
       end
       
-      should "be aliased to has_widgets" do
-        @controller.class.has_widgets do |root|
-          root << widget(:mouse_cell, 'kid')
+      should "be executed in controller context" do
+        @controller.instance_eval do
+          def roomies; ['mice', 'cows']; end
         end
         
-        assert @controller.apotomo_root['mum']
-        assert @controller.apotomo_root['kid']
+        @controller.class.has_widgets do |root|
+          root << widget(:mouse_cell, 'kid', :display, :roomies => roomies)
+        end
+        
+        assert_equal ['mice', 'cows'], @controller.apotomo_root['kid'].opts[:roomies]
       end
     end
     
