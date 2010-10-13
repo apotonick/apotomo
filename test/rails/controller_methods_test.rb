@@ -128,7 +128,7 @@ class ControllerMethodsTest < ActionController::TestCase
     
     should "render the widget" do
       @controller.apotomo_root << @mum
-      assert_equal '<div id="mum"><snuggle></snuggle></div>', @controller.render_widget('mum')
+      assert_equal "<div id=\"mum\"><snuggle></snuggle></div>\n", @controller.render_widget('mum')
     end
   end
   

@@ -72,18 +72,4 @@ class ViewHelperTest < ActionView::TestCase
       end
     end
   end
-  
-  context "A widget including ViewHelper" do
-    setup do
-      barn_controller!
-      @mum = mouse_mock
-      @mum.class_eval do
-        include Apotomo::Rails::ViewHelper
-      end
-    end
-    
-    should "respond to url_for_event" do
-      @mum.url_for_event(:bla)
-    end
-  end
 end

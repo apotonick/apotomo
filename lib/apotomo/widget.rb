@@ -88,7 +88,7 @@ module Apotomo
     end
     
     def unfreezable_ivars
-      [:@childrenHash, :@children, :@parent, :@parent_controller, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts,
+      [:@childrenHash, :@children, :@parent, :@parent_controller, :@_request, :@_config, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts,
       :@suppress_javascript ### FIXME: implement with ActiveHelper and :locals.
       
       ]

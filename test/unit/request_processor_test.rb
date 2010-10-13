@@ -3,18 +3,23 @@ require 'test_helper'
 class RequestProcessorTest < ActiveSupport::TestCase
   include Apotomo::TestCaseMethods::TestController
   
-  
   def root_mum_and_kid!
     
         mum_and_kid!
         
-        root = Apotomo::Widget.new(parent_controller, 'root', :display)
-        root << @mum
+        @root = Apotomo::Widget.new(parent_controller, 'root', :display)
+        @root << @mum
         
         
         @session = {}
-        Apotomo::StatefulWidget.freeze_for(@session, @root)
+        #freeze!
   end
+  
+  # Call SW.freeze_for on @session, "freezing" stateful widgets below @root there.
+  def freeze!
+    Apotomo::StatefulWidget.freeze_for(@session, @root)
+  end
+  
   
   context "#root" do
     should "allow external modification of the tree" do
@@ -77,12 +82,12 @@ class RequestProcessorTest < ActiveSupport::TestCase
       setup do
         root_mum_and_kid!
         @mum.version = 1
+        freeze!
         
         @processor = Apotomo::RequestProcessor.new(parent_controller, @session)
       end
       
       should "provide a widget family for #root" do
-      puts @processor.root.printTree
         assert_equal 3, @processor.root.size
         assert_equal 1, @processor.root['mum'].version
         assert_not @processor.widgets_flushed?
@@ -107,7 +112,8 @@ class RequestProcessorTest < ActiveSupport::TestCase
       
       context "and with stateless widgets" do
         setup do
-          @session = {:apotomo_stateful_branches => [[[MouseCell, 'mum', 'grandma']]]}
+          root_mum_and_kid!
+          freeze!
           @processor = Apotomo::RequestProcessor.new(parent_controller, @session, {}, [Proc.new { |root| root << Apotomo::Widget.new(parent_controller, 'grandma', :eating) }])
         end
         
@@ -121,29 +127,26 @@ class RequestProcessorTest < ActiveSupport::TestCase
   
   context "#process_for" do
     setup do
-      mum_and_kid!
-      @processor = Apotomo::RequestProcessor.new(parent_controller, {:apotomo_stateful_branches => [[[MouseCell, 'mum', 'root'], [MouseCell]]]}, :js_framework => :prototype)
-      
-      
-      
-      
-      
-      @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
-          @kid.respond_to_event :doorSlam, :with => :squeak
-          @mum.respond_to_event :doorSlam, :with => :squeak
-          
-          @mum.instance_eval do
-            def squeak; render :js => 'squeak();'; end
-          end
-          @kid.instance_eval do
-            def squeak; render :text => 'squeak!', :update => :true; end
-          end
+      class KidCell < Apotomo::Widget
+        responds_to_event :doorSlam, :with => :flight
+        responds_to_event :doorSlam, :with => :squeak
+        def flight; render :text => "away from here!"; end
+        def squeak; render :text => "squeak!"; end
+      end
+  
+      procs = [Proc.new{ |root,controller| 
+        root << mum = MouseCell.new(parent_controller, 'mum', :squeak) << KidCell.new(parent_controller, 'kid', :squeak)
+      }]
+    
+      @processor = Apotomo::RequestProcessor.new(parent_controller, {}, {:js_framework => :prototype}, procs)
     end
-      
-    should "return 2 page_updates when @kid squeaks" do
-      res = @processor.process_for({:type => :squeak, :source => 'kid'})
-      
-      assert_equal ["alert!", "squeak"], res
+    
+    should "return an empty array if nothing was triggered" do
+      assert_equal [], @processor.process_for({:type => :mouseClick, :source => 'kid'})
+    end
+    
+    should "return 2 page updates when @kid squeaks" do
+      assert_equal ["away from here!", "squeak!"], @processor.process_for({:type => :doorSlam, :source => 'kid'})
     end
     
     should "raise an exception when :source is unknown" do
@@ -169,20 +172,20 @@ class RequestProcessorTest < ActiveSupport::TestCase
   
   context "#render_widget_for" do
     setup do
-      ::MouseCell.class_eval do
-        def snuggle; render; end
+      class MouseCell < Apotomo::Widget
+        def squeak; render :text => "squeak!"; end
       end
       
       @processor = Apotomo::RequestProcessor.new(parent_controller, {}, {}, 
-        [Proc.new { |root| root << MouseCell.new(parent_controller, 'mum', :snuggle) }])
+        [Proc.new { |root| root << MouseCell.new(parent_controller, 'mum', :squeak) }])
     end
     
     should "render the widget when passing an existing widget id" do
-      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for('mum', {})
+      assert_equal 'squeak!', @processor.render_widget_for('mum', {})
     end
     
     should "render the widget when passing an existing widget instance" do
-      assert_equal '<div id="mum"><snuggle></snuggle></div>', @processor.render_widget_for(@processor.root['mum'], {})
+      assert_equal 'squeak!', @processor.render_widget_for(@processor.root['mum'], {})
     end
     
     should "raise an exception when a non-existent widget id id passed" do

@@ -1,1 +1,1 @@
-<div id="<%= @name %>"><snuggle><%= rendered_children.collect{|e| e.last}.join("") %></snuggle></div>
+<div id="<%= @name %>"><snuggle><%= rendered_children.collect{|e| e.last}.join("").html_safe %></snuggle></div>

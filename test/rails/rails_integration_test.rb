@@ -11,8 +11,12 @@ class RailsIntegrationTest < ActionController::TestCase
   
   context "A Rails controller" do
     setup do
-      @mum = MouseCell.new(@controller, 'mum', :snuggle)
-      @mum.instance_eval{ def snuggle; render; end }
+      @mum = MouseCell.new(parent_controller, 'mum', :snuggle)
+      @mum.class.class_eval do
+        responds_to_event :squeak, :with => :snuggle
+        
+        def snuggle; render; end
+      end
       
       @controller.instance_variable_set(:@mum, @mum)
       @controller.instance_eval do
@@ -83,7 +87,6 @@ class RailsIntegrationTest < ActionController::TestCase
     should "render updates to the parent window for an iframe request" do
       get 'widget'
       assert_response :success
-      @controller.apotomo_root['mum'].respond_to_event :squeak, :with => :snuggle
       
       simulate_request!
       
@@ -91,7 +94,7 @@ class RailsIntegrationTest < ActionController::TestCase
       
       assert_response :success
       assert_equal 'text/html', @response.content_type
-      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<div id=\\\"mum\\\"><snuggle><\\/snuggle><\\/div>'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
+      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<div id=\\\"mum\\\"><snuggle><\\/snuggle><\\/div>\\n'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
     end
   end
 end

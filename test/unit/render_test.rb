@@ -135,13 +135,13 @@ class RenderTest < ActionView::TestCase
         end
         
         should "render the :view" do
-          assert_equal "<div id=\"mouse\"><snuggle></snuggle></div>", @mum.invoke(:squeak)
+          assert_equal "<div id=\"mouse\"><snuggle></snuggle></div>\n", @mum.invoke(:squeak)
         end
         
         should "render the children" do
           @mum << @kid
           
-          assert_equal "<div id=\"mouse\"><snuggle>squeeeeaaak</snuggle></div>", @mum.invoke(:squeak)
+          assert_equal "<div id=\"mouse\"><snuggle>squeeeeaaak</snuggle></div>\n", @mum.invoke(:squeak)
           assert @kid.rendered?
         end
       end
@@ -206,7 +206,7 @@ class RenderTest < ActionView::TestCase
     end
     
     should "per default render kid's content inside mums div with rendered_children" do
-      assert_equal '<div id="mum"><snuggle><div id="kid">burp!</div></snuggle></div>', @mum.invoke(:snuggle)
+      assert_equal "<div id=\"mum\"><snuggle><div id=\"kid\">burp!</div></snuggle></div>\n", @mum.invoke(:snuggle)
     end
     
     should "skip kids if :render_children=>false but still provide a rendered_children hash" do
@@ -214,7 +214,7 @@ class RenderTest < ActionView::TestCase
         def snuggle; render :render_children => false; end
       end
       
-      assert_equal '<div id="mum"><snuggle></snuggle></div>', @mum.invoke(:snuggle)
+      assert_equal "<div id=\"mum\"><snuggle></snuggle></div>\n", @mum.invoke(:snuggle)
     end
      
     should_eventually "provide an ordered rendered_children hash"

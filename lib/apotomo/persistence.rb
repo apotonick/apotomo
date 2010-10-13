@@ -101,7 +101,6 @@ module Apotomo
       def load_tree(parent_controller, cold_widgets)
         root = nil
         cold_widgets.each do |data|
-          puts data.inspect
           node = data[0].new(parent_controller, data[1], "")
           root = node and next unless root
           root.find_widget(data[2]) << node
