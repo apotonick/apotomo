@@ -70,6 +70,8 @@ module Apotomo
       
       @cell         = self  ### DISCUSS: needed?
       
+      @params       = parent_controller.params.dup.reverse_merge!(opts)
+      
       run_hook(:after_initialize, id, start_state, opts)
     end
     
@@ -88,7 +90,7 @@ module Apotomo
     end
     
     def unfreezable_ivars
-      [:@childrenHash, :@children, :@parent, :@parent_controller, :@_request, :@_config, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts,
+      [:@childrenHash, :@children, :@parent, :@parent_controller, :@_request, :@_config, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts, :@params,
       :@suppress_javascript ### FIXME: implement with ActiveHelper and :locals.
       
       ]
@@ -250,7 +252,7 @@ module Apotomo
     
     ### DISCUSS: use #param only for accessing request data.
     def param(name)
-      params[name]
+      @params[name]
     end
     
     

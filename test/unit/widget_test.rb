@@ -128,5 +128,14 @@ class WidgetTest < ActiveSupport::TestCase
     should "alias #widget_id to #name" do
       assert_equal @mum.name, @mum.widget_id
     end
+    
+    should "provide #param" do
+      @controller.params = HashWithIndifferentAccess.new('type' => 'shrew')
+      @mum = widget(:mouse_cell, 'mum', :display, :color => 'grey')
+      assert_equal nil,     @mum.param(:whatever)
+      assert_equal 'grey',  @mum.param(:color)
+      assert_equal 'grey',  @mum.param('color')
+      assert_equal 'shrew', @mum.param(:type)
+    end
   end
 end
