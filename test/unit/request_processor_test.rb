@@ -37,18 +37,11 @@ class RequestProcessorTest < ActiveSupport::TestCase
       assert_equal @root.size, 1
     end
     
-    should "allow has_widgets blocks with root parameter, only" do
+    should "allow has_widgets blocks with root parameter" do
       @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root|
         root.add widget('mouse_cell', 'mouse') 
       }], @root, parent_controller)
       
-      assert_equal 'mouse', @processor.root['mouse'].name
-    end
-    
-    should "allow has_widgets blocks with both root and controller parameter" do
-      @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root,controller| 
-        root.add widget('mouse_cell', 'mouse') 
-      }], @root, parent_controller)
       assert_equal 'mouse', @processor.root['mouse'].name
     end
   end
