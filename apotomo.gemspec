@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{apotomo}
-  s.version = "0.1.2"
+  s.version = "1.0.0.beta1"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-10-11}
-  s.description = %q{A generic widget framework for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
+  s.date = %q{2010-10-13}
+  s.description = %q{Web components for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
     "README",
@@ -41,7 +41,6 @@ Gem::Specification.new do |s|
      "lib/apotomo/rails/view_methods.rb",
      "lib/apotomo/request_processor.rb",
      "lib/apotomo/stateful_widget.rb",
-     "lib/apotomo/test_methods.rb",
      "lib/apotomo/transition.rb",
      "lib/apotomo/tree_node.rb",
      "lib/apotomo/version.rb",
@@ -59,7 +58,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.summary = %q{Event-driven Widgets for Rails with optional Statefulness.}
+  s.summary = %q{Web components for Rails.}
   s.test_files = [
     "test/fixtures/application_widget_tree.rb",
      "test/rails/view_methods_test.rb",
@@ -89,7 +88,6 @@ Gem::Specification.new do |s|
      "test/unit/event_handler_test.rb",
      "test/unit/widget_shortcuts_test.rb",
      "test/unit/stateful_widget_test.rb",
-     "test/unit/test_methods_test.rb",
      "test/unit/test_addressing.rb",
      "test/unit/invoke_test.rb",
      "test/unit/container_test.rb",
@@ -116,18 +114,18 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<cells>, ["~> 3.4.2"])
       s.add_runtime_dependency(%q<rails>, [">= 3.0.0"])
       s.add_runtime_dependency(%q<onfire>, [">= 0.1.0"])
-      s.add_runtime_dependency(%q<hooks>, ["~> 0.1"])
+      s.add_runtime_dependency(%q<hooks>, ["~> 0.1.2"])
     else
       s.add_dependency(%q<cells>, ["~> 3.4.2"])
       s.add_dependency(%q<rails>, [">= 3.0.0"])
       s.add_dependency(%q<onfire>, [">= 0.1.0"])
-      s.add_dependency(%q<hooks>, ["~> 0.1"])
+      s.add_dependency(%q<hooks>, ["~> 0.1.2"])
     end
   else
     s.add_dependency(%q<cells>, ["~> 3.4.2"])
     s.add_dependency(%q<rails>, [">= 3.0.0"])
     s.add_dependency(%q<onfire>, [">= 0.1.0"])
-    s.add_dependency(%q<hooks>, ["~> 0.1"])
+    s.add_dependency(%q<hooks>, ["~> 0.1.2"])
   end
 end
 

@@ -1,5 +1,5 @@
 # encoding: utf-8
 
 module Apotomo
-  VERSION = '0.1.2'
+  VERSION = '1.0.0.beta1'
 end

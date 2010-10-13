@@ -24,8 +24,8 @@ require 'apotomo/version'
 Jeweler::Tasks.new do |spec|
   spec.name         = "apotomo"
   spec.version      = ::Apotomo::VERSION
-  spec.summary      = %{Event-driven Widgets for Rails with optional Statefulness.}
-  spec.description  = "A generic widget framework for Rails. Event-driven. Clean. Fast. Free optional statefulness included."
+  spec.summary      = %{Web components for Rails.}
+  spec.description  = "Web components for Rails. Event-driven. Clean. Fast. Free optional statefulness included."
   spec.homepage     = "http://apotomo.de"
   spec.authors      = ["Nick Sutterer"]
   spec.email        = "apotonick@gmail.com"
