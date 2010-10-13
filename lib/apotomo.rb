@@ -46,12 +46,10 @@ module Apotomo
 end
 
 require 'apotomo/javascript_generator'
-Apotomo.js_framework = :prototype ### DISCUSS: move to rails.rb
+Apotomo.js_framework = :jquery ### DISCUSS: move to rails.rb
 
 require 'apotomo/widget'
 require 'apotomo/stateful_widget'
 require 'apotomo/container_widget'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'
-
-#require 'apotomo/engine' if defined?(Rails)
