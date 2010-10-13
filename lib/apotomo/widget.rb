@@ -70,7 +70,7 @@ module Apotomo
       
       @cell         = self  ### DISCUSS: needed?
       
-      @params       = parent_controller.params.dup.reverse_merge!(opts)
+      @params       = parent_controller.params.dup.merge(opts)
       
       run_hook(:after_initialize, id, start_state, opts)
     end
