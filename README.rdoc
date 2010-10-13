@@ -1,141 +1,186 @@
-how does Apotomo handle Ajax and JavaScript?
-framework abstraction with JavascriptGenerator
-
-no manual AJAX-routes for dozens of controllers, one generic route to rule them all
-
 = Apotomo
 
-Apotomo is a stateful widget component framework for Rails.
+<em>Web Components for Rails.</em>
 
-It is good for you if you
-It is perfect for building AJAXed Rich Client Applications.
-It is suitable for iGoogle-like widgets, dashboards, portals, or even full-blown interactive web apps.
-* Development Teams, where separate teams can work on separate components
+== Overview
 
-== Widgets
+Do you need an <b>interactive user interface</b> for your Rails application? A cool Rich Client Application with dashboards, portlets and AJAX, Drag&Drop and jQuery?
 
-=== Widget Trees
+Is your controller gettin' fat? And your partial-helper-AJAX pile is getting out of control?
 
+Do you want a framework to make the implementation easier? <b>You want Apotomo.</b> 
 
-== Events
+== Apotomo
 
-=== Event Handlers
+Apotomo is based on {Cells}[http://github.com/apotonick/cells], the popular View Components framework for Rails.
 
-== AJAX
+It gives you widgets and encapsulation, bubbling events, AJAX page updates, rock-solid testing and more. Check out http://apotomo.de for a bunch of tutorials and a nice web 2.0 logo.
 
-== Statefulness vs. Stateless
+== Installation
 
+Easy as hell.
 
+=== Rails 3
 
-A stateful WHAT?
+  gem install apotomo
 
-Well, you know that. In Rails, people tend to have fat controllers. One controller action renders the complete page. While many programmers try to separate their code into helpers, controller actions, RJS logic and partials, it is still the controller that has to care about when to update what, and how!
+=== Rails 2.3
 
+  gem install apotomo -v 0.1.4
 
-In Apotomo, it is the opposite. Widgets are small, autonomous components that look and feel like controllers. These tiny monsters listen to events and thus keep updating themselves on the page via AJAX. However, there's no JavaScript for you - they're pure Ruby.
+Don't forget to load the gem in your app, either in your +Gemfile+ or +environment.rb+.
 
+== Example!
 
-== Man, gimme code!
+A _shitty_ example is worse a _shitty_ framework, so let's choose wisely...
 
-Let's use the famous and tiresome counter example.
+Say you had a blog application. The page showing the post should have a comments block, with a list of comments and a form to post a new comment. Submitting should validate and send back the updated comments list, via AJAX.
 
- class CounterCell < Apotomo::StatefulWidget
-   transition :from => :display, :to => :increment
-   
-   def display
-     respond_to_event :counterClick, :with => :increment
-  	  
-     @count = 0
-     render		# renders display.html.erb
-   end
+Let's wrap that comments block in a widget.
 
-   def increment
-     @count += 1	# @count is simply there - that's stateful.
-     render :view => :display
-   end
- end
+== Generate
+
+Go and generate a widget stub.
+
+  $ rails generate apotomo:widget CommentsWidget display process --haml
+    create  app/cells/
+    create  app/cells/comments_widget
+    create  app/cells/comments_widget.rb
+    create  app/cells/comments_widget/display.html.haml
+    create  app/cells/comments_widget/process.html.haml
+    create  test/widgets/comments_widget_test.rb
+
+Nothing special.
+
+== Plug it in
+
+You now tell your controller about the new widget.
+
+  class PostsController < ApplicationController
+    has_widgets do |root|
+      root << widget('comments_widget', 'post-comments', :display, :post => post)
+    end
+
+The widget is named +post-comments+ and jumps to the +:display+ state per default. Assuming your controller has a method +#post+ we pass the current post into the widget.
+
+== Render the widget
+
+Rendering usually happens in your controller view, <tt>views/posts/show.haml</tt>, for instance.
+
+  %h1 @post.title
   
-Since this widget calls <tt>render</tt> it surely needs a view.
-
- <!-- I'm display.html.erb -->
+  %p
+    @post.body
   
- <h1><%= @count %></h1>
- 
- <%= link_to_event "Increment me!", :counterClick %>
+  %p
+    = render_widget 'post-comments'
 
+== Write the widget
 
-We now plug the widget in a page.
+A widget is like a cell which is like a mini-controller.
 
- class ExistingController < ApplicationController
-   include Apotomo::ControllerHelper
+  class CommentsWidget < Apotomo::Widget
+    responds_to_event :submit, :with => :process
+    
+    def display
+      @comments = param(:post).comments # the parameter from outside.
+      render
+    end
+    
+    def process
+      @comment = Comment.new(:post => param(:post))
+      @comment.update_attributes param(:comment)  # like params[].
+      
+      update :state => :display
+    end
+  end
 
-   def some_action
-     # do what you want...
-     
-     use_widgets do |root|
-       root << cell(:counter, :display, 'my_first_counter')
-     end
-   end
- end
+Look at line 2 - if encountering a +:submit+ event we invoke +#process+. This will do three steps:
 
-As soon as the widget is rendered it will jump to its <tt>:display</tt> state which initializes the counter and renders itself.
+* create the new comment
+* re-render the +display+ state
+* update itself on the page.
 
-Speaking of rendering: how do we place the widget in our controller?
+== Triggering events
 
-  <!-- I'm some_action.html.erb -->
-  <p>
-  	<%= render_widget 'my_first_counter' %>
+So how and where is the +:submit+ event triggered?
 
-Ok, so this renders the widget in our controller page.
-
-When clicking the link it updates automatically on the screen showing the incremented value. Wow.
-
-
-== That's cool!
-Yes, it is.
-
-== Is there more?
-Apotomo got a load of features.
-
-[Composability]     Widgets can range from small standalone components to nested widget trees like dashboards or forms. Remember that each widget can have any number of children.
+Take a look at the widget's view <tt>display.html.haml</tt>.
+  = widget_div do
+    %ul
+      - for c in @comments
+        %li c.text
+    
+    - form_for :comment, @comment, :html => {"data-event-url" => url_for_event(:submit)} do |f|
+      = f.error_messages
+      = f.text_field :text
   
-[Bubbling events]   Widgets can trigger events and watch out for them. While events bubble up from their triggering source to root they can be observed, providing a way to implement loosely coupled, distributable components.
+      = submit_tag "Don't be shy, comment!"
+
+That's a lot of familiar view code, almost looks like a _partial_.
+
+The view also contains a bit of JavaScript.
+
+  :javascript
+    var form = $("##{widget_id} form");
   
-[Deep Linking]      Apotomo deals with deep links (or url fragments) out-of-the-box while using SWFAddress. Components that register for deep linking will update as soon as the deep link changes. That makes your application back-button-safe!
-  
-[Testing]           Needless to say that it is simply easier to test small components instead of fat do-it-all controllers.
+    form.submit(function() {
+      $.ajax({url: form.attr("data-event-url"), data: form.serialize()})
+      return false;
+    });
+
+Triggering happens by sending an AJAX request to an address that the Apotomo helper +url_for_event+ generated for us.
+
+== Event processing
+
+Now what happens when the event request is sent? Apotomo - again - does three things for you, it
+
+* <b>accepts the request</b> on a special event route it adds to your app
+* <b>triggers the event</b> in your ruby widget tree, which will invoke the +#process+ state in our comment widget
+* <b>sends back</b> the page updates your widgets rendered
+
+== JavaScript Agnosticism
+
+In this example, we use jQuery for triggering. We could  also use Prototype, RightJS, YUI, or a self-baked framework, that's up to you.
+
+Also, updating the page is in your hands. Where Apotomo provides handy helpers as +#replace+, you could also <b>emit your own JavaScript</b>.
+
+Look, +replace+ basically generates
+
+  $("post-comments").replaceWith(<the rendered view>);
+
+If that's not what you want, do
+
+  def process
+    if param(:comment)[:text].explicit?
+      render :text => 'alert("Hey, you wanted to submit a pervert comment!");'
+    end
+  end
+
+Apotomo doesn't depend on _any_ JS framework - you choose!
 
 
-Give it a try- you will love the power and simplicity of real stateful components!
+== More features
+
+There's even more, too much for a simple README.
+
+[Statefulness]      Deriving your widget from +StatefulWidget+ gives you free statefulness.
+[Composability]     Widgets can range from small standalone components to nested widget trees like complex dashboards.
+[Bubbling events]   Events bubble up from their triggering source to root and thus can be observed, providing a way to implement loosely coupled, distributable components.
+[Testing]           Apotomo comes with testing assertions to build rock-solid web components.
+[Team-friendly]     Widgets encourage encapsulation and help having different developers working on different components without getting out of bounds.
+
+
+Give it a try- you will love the power and simplicity of real web components!
 
 
 == Bugs, Community
 Please visit http://apotomo.de, the official project page with <em>lots</em> of examples.
-Join the mailing list and visit us in the IRC channel. More information is
-here[http://apotomo.de/download].
+
+If you have questions, visit us in the IRC channel #cells at irc.freenode.org.
+
+If you wanna be cool, subscribe to our feed[http://feeds.feedburner.com/Apotomo]!
 
 
 == License
-Copyright (c) 2007-2010 Nick Sutterer <apotonick@gmail.com>
-
-The MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
+Copyright (c) 2007-2010 Nick Sutterer <apotonick@gmail.com> under the MIT License
