@@ -1,17 +1,30 @@
 module Apotomo
   # Shortcut methods for creating widget trees.
   module WidgetShortcuts
-    # Creates an instance of <tt>class_name</tt> with the id <tt>id</tt> and start state <tt>state</tt>.
-    # Default start state is <tt>:display</tt>.
-    # Yields self if a block is passed.
+    # Shortcut for creating an instance of +class_name+ named +id+.
+    # If +start_state+ is omited, :display is default. Yields self.
+    #
     # Example:
-    #   widget(:form, 'uploads', :build_form) do |form|
-    #     form << widget(:upload_field)
     # 
+    #   widget(:comments_widget, 'post-comments')
+    #   widget(:comments_widget, 'post-comments', :user => @current_user)
+    #
+    # Start state is <tt>:display</tt>, whereas the latter also populates @opts.
+    #
+    #   widget(:comments_widget, 'post-comments', :reload)
+    #   widget(:comments_widget, 'post-comments', :reload, :user => @current_user)
+    #
+    # Explicitely sets the start state.
+    #
     # You can also use namespaces.
     #
     #   widget('jquery/tabs', 'panel')
     def widget(class_name, id, state=:display, *args)
+      if state.kind_of?(Hash)
+        args << state
+        state = :display
+      end
+      
       object = constant_for(class_name).new(parent_controller, id, state, *args)
       yield object if block_given?
       object
