@@ -21,6 +21,15 @@ require 'apotomo/rails/view_methods'
         end
         
         module ClassMethods
+          # Yields the root widget to setup your widgets for a controller. The block is executed in 
+          # controller _instance_ context, so you may use instance methods and variables of the
+          # controller.
+          #
+          # Example:
+          #   class PostsController < ApplicationController
+          #     has_widgets do |root|
+          #       root << widget(:comments_widget, 'post-comments', :user => @current_user)
+          #     end
           def has_widgets(&block)
             has_widgets_blocks << block
           end
@@ -63,7 +72,7 @@ require 'apotomo/rails/view_methods'
         # Example:
         #   def login
         #     use_widgets do |root|
-        #       root << cell(:login, :form, 'login_box')
+        #       root << widget(:login_widget, 'login_box')
         #     end
         #
         #     @box = render_widget 'login_box'
