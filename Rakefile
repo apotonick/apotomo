@@ -30,8 +30,8 @@ Jeweler::Tasks.new do |spec|
   spec.authors      = ["Nick Sutterer"]
   spec.email        = "apotonick@gmail.com"
 
-  spec.files = FileList["[A-Z]*", File.join(*%w[{generators,lib,rails,app,config} ** *]).to_s]
-  spec.test_files   = FileList["test/**/*"] - FileList["test/dummy/tmp/**/*", "test/dummy/log/*"]
+  spec.files        = FileList["[A-Z]*", "lib/**/*", "config/*"] - ["Gemfile.lock"]
+  spec.test_files   = FileList["test/**/*"] - FileList["test/dummy/tmp", "test/dummy/tmp/**/*", "test/dummy/log/*"]
   
   spec.add_dependency 'cells', '~> 3.4.2'
   spec.add_dependency 'rails', '>= 3.0.0'
