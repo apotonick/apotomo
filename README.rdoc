@@ -87,8 +87,8 @@ A widget is like a cell which is like a mini-controller.
       render
     end
 
-The +display+ state collects which comments to show and renders its view.
- 
+The +display+ state collects comments to show and renders its view.
+
 And look at line 2 - if encountering a <tt>:submit</tt> event we invoke +process+, which is simply another state. How cool is that? 
 
     def process
@@ -105,6 +105,8 @@ The event is processes with three steps in our widget:
 * create the new comment
 * re-render the +display+ state
 * update itself on the page.
+
+Apotomo helps you focusing on your app and takes away the pain of <b>action dispatching</b> and <b>page updating</b>.
 
 == Triggering events
 
