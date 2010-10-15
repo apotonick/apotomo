@@ -61,7 +61,7 @@ You now tell your controller about the new widget.
       root << widget('comments_widget', 'post-comments', :display, :post => post)
     end
 
-The widget is named +post-comments+ and jumps to the +:display+ state per default. Assuming your controller has a method +#post+ we pass the current post into the widget.
+The widget is named <tt>post-comments</tt> and jumps to the <tt>:display</tt> state per default. Assuming your controller has a method +post+ we pass the current post into the widget.
 
 == Render the widget
 
@@ -86,7 +86,11 @@ A widget is like a cell which is like a mini-controller.
       @comments = param(:post).comments # the parameter from outside.
       render
     end
-    
+
+The +display+ state collects which comments to show and renders its view.
+ 
+And look at line 2 - if encountering a <tt>:submit</tt> event we invoke +process+, which is simply another state. How cool is that? 
+
     def process
       @comment = Comment.new(:post => param(:post))
       @comment.update_attributes param(:comment)  # like params[].
@@ -95,7 +99,8 @@ A widget is like a cell which is like a mini-controller.
     end
   end
 
-Look at line 2 - if encountering a +:submit+ event we invoke +#process+. This will do three steps:
+
+The event is processes with three steps in our widget:
 
 * create the new comment
 * re-render the +display+ state
@@ -103,7 +108,7 @@ Look at line 2 - if encountering a +:submit+ event we invoke +#process+. This wi
 
 == Triggering events
 
-So how and where is the +:submit+ event triggered?
+So how and where is the <tt>:submit</tt> event triggered?
 
 Take a look at the widget's view <tt>display.html.haml</tt>.
   = widget_div do
