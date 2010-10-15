@@ -57,6 +57,8 @@ Nothing special.
 You now tell your controller about the new widget.
 
   class PostsController < ApplicationController
+    include Apotomo::Rails::ControllerMethods
+    
     has_widgets do |root|
       root << widget('comments_widget', 'post-comments', :display, :post => post)
     end
