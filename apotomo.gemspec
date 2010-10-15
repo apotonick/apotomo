@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{apotomo}
-  s.version = "1.0.0.beta1"
+  s.version = "1.0.0.beta2"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-10-15}
+  s.date = %q{2010-10-16}
   s.description = %q{Web components for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
@@ -57,13 +57,6 @@ Gem::Specification.new do |s|
   s.summary = %q{Web components for Rails.}
   s.test_files = [
     "test/fixtures",
-     "test/fixtures/apotomo",
-     "test/fixtures/apotomo/stateful_widget",
-     "test/fixtures/apotomo/stateful_widget/check_state.html.erb",
-     "test/fixtures/apotomo/stateful_widget/widget_content.html.erb",
-     "test/fixtures/rendering_test",
-     "test/fixtures/rendering_test/call_render.html.erb",
-     "test/fixtures/rendering_test/different.html.erb",
      "test/fixtures/mouse",
      "test/fixtures/mouse/feed.html.erb",
      "test/fixtures/mouse/eating.html.erb",
