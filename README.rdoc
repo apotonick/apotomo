@@ -22,7 +22,7 @@ Easy as hell.
 
 === Rails 3
 
-  gem install apotomo
+  gem install apotomo --pre
 
 === Rails 2.3
 
@@ -42,12 +42,12 @@ Let's wrap that comments block in a widget.
 
 Go and generate a widget stub.
 
-  $ rails generate apotomo:widget CommentsWidget display process --haml
+  $ rails generate apotomo:widget CommentsWidget display write --haml
     create  app/cells/
     create  app/cells/comments_widget
     create  app/cells/comments_widget.rb
     create  app/cells/comments_widget/display.html.haml
-    create  app/cells/comments_widget/process.html.haml
+    create  app/cells/comments_widget/write.html.haml
     create  test/widgets/comments_widget_test.rb
 
 Nothing special.
@@ -60,10 +60,10 @@ You now tell your controller about the new widget.
     include Apotomo::Rails::ControllerMethods
     
     has_widgets do |root|
-      root << widget('comments_widget', 'post-comments', :display, :post => post)
+      root << widget('comments_widget', 'post-comments', :post => @post)
     end
 
-The widget is named <tt>post-comments</tt> and jumps to the <tt>:display</tt> state per default. Assuming your controller has a method +post+ we pass the current post into the widget.
+The widget is named <tt>post-comments</tt>. We pass the current post into the widget - the block is executed in controller instance context, that's were <tt>@post</tt> comes from. Handy, isn't it?
 
 == Render the widget
 
@@ -82,18 +82,18 @@ Rendering usually happens in your controller view, <tt>views/posts/show.haml</tt
 A widget is like a cell which is like a mini-controller.
 
   class CommentsWidget < Apotomo::Widget
-    responds_to_event :submit, :with => :process
+    responds_to_event :submit, :with => :write
     
     def display
       @comments = param(:post).comments # the parameter from outside.
       render
     end
 
-The +display+ state collects comments to show and renders its view.
+Having +display+ as the default state when rendering, this method collects comments to show and renders its view.
 
-And look at line 2 - if encountering a <tt>:submit</tt> event we invoke +process+, which is simply another state. How cool is that? 
+And look at line 2 - if encountering a <tt>:submit</tt> event we invoke +write+, which is simply another state. How cool is that? 
 
-    def process
+    def write
       @comment = Comment.new(:post => param(:post))
       @comment.update_attributes param(:comment)  # like params[].
       
@@ -160,7 +160,7 @@ Look, +replace+ basically generates
 
 If that's not what you want, do
 
-  def process
+  def write
     if param(:comment)[:text].explicit?
       render :text => 'alert("Hey, you wanted to submit a pervert comment!");'
     end
