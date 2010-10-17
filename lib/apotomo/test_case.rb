@@ -1,0 +1,80 @@
+require 'cell/test_case'
+
+module Apotomo
+  # Testing is fun. Test your widgets!
+  #
+  # This class helps you testing widgets where it can. It is similar as in a controller.
+  # A declarative test would look like
+  #
+  #   class BlogWidgetTest < Apotomo::TestCase
+  #     has_widgets do |root|
+  #       root << widget(:comments_widget, 'post-comments')
+  #     end
+  #     
+  #     it "should be rendered nicely" do
+  #       render_widget 'post-comments'
+  #       
+  #       assert_select "div#post-comments", "Comments for this post"
+  #     end
+  #
+  #     it "should redraw on :update" do
+  #       trigger :update
+  #       assert_response "$(\"post-comments\").update ..."
+  #     end
+  #
+  # For unit testing, you can grab an instance of your tested widget.
+  #
+  #     it "should be visible" do
+  #       assert root['post-comments'].visible?
+  #     end
+  #
+  # See also in Cell::TestCase.
+  class TestCase < Cell::TestCase
+    class << self
+      def has_widgets_blocks; @has_widgets; end
+      
+      # Setup a widget tree as you're used to it from your controller. Executed in test context.
+      def has_widgets(&block)
+        @has_widgets = block  # DISCUSS: use ControllerMethods?
+      end
+    end
+    
+    # Returns the widget tree from TestCase.has_widgets.
+    def root
+      @root ||= widget("apotomo/widget", "root").tap do |root|
+         self.instance_exec(root, &self.class.has_widgets_blocks)
+      end
+    end
+    
+    def parent_controller
+      @controller
+    end
+    
+    # Renders the widget +name+.
+    def render_widget(name, options={})
+      @last_invoke = root.find_widget(name).tap { |w| w.opts = options }.invoke # DISCUSS: use ControllerMethods?
+    end
+    
+    # Triggers and event of +type+. You have to pass <tt>:source</tt> as options.
+    #
+    # Example:
+    #
+    #   trigger :submit, :source => "post-comments"
+    def trigger(type, options)
+      root.find_widget(options.delete(:source)).fire(type)
+      root.page_updates # DISCUSS: use ControllerMethods?
+    end
+    
+    # After a #trigger this assertion compares the actually triggered page updates with the passed. 
+    #
+    # Example:
+    #
+    #   trigger :submit, :source => "post-comments"
+    #   assert_response "alert(\":submit clicked!\")", "$(\"post-comments\").update ..."
+    def assert_response(*content)
+      assert_equal content, root.page_updates
+    end
+    
+    include Apotomo::WidgetShortcuts
+  end
+end
