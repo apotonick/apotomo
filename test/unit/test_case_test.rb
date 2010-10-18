@@ -10,12 +10,12 @@ class TestCaseTest < Test::Unit::TestCase
   end
   
   context "TestCase" do
-    should "respond to .tests" do
+    should_eventually "respond to .tests" do
       Apotomo::TestCase.tests CommentsWidget
       assert_equal CommentsWidget, Apotomo::TestCase.controller_class
     end
     
-    should "infer the widget name" do
+    should_eventually "infer the widget name" do
       assert_equal CommentsWidget, CommentsWidgetTest.new(:widget).class.controller_class
     end
     
@@ -31,6 +31,15 @@ class TestCaseTest < Test::Unit::TestCase
       
       should "respond to #root" do  
         assert_equal ['root', 'mum'], @test.root.collect { |w| w.name }
+      end
+      
+      should "raise an error if no has_widgets block given" do
+        exc = assert_raises RuntimeError do
+          @test = Class.new(Apotomo::TestCase).new(:widget).tap{ |t| t.setup }
+          @test.root
+        end
+        
+        assert_equal "Please setup a widget tree using TestCase.has_widgets", exc.message
       end
       
       should "memorize root" do

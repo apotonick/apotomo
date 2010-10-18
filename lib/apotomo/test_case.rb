@@ -41,8 +41,9 @@ module Apotomo
     
     # Returns the widget tree from TestCase.has_widgets.
     def root
+      blk = self.class.has_widgets_blocks or raise "Please setup a widget tree using TestCase.has_widgets"
       @root ||= widget("apotomo/widget", "root").tap do |root|
-         self.instance_exec(root, &self.class.has_widgets_blocks)
+         self.instance_exec(root, &blk)
       end
     end
     
