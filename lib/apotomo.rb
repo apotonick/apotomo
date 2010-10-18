@@ -20,6 +20,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+require "rails/railtie"
+require 'rails/engine'
+ 
 module Apotomo
   class << self
     def js_framework=(js_framework)
@@ -43,13 +46,24 @@ module Apotomo
   
   class Engine < Rails::Engine
   end
+  
+  class Railtie < Rails::Railtie
+    rake_tasks do
+      load "tasks.rake"
+    end
+  end 
 end
 
-require 'apotomo/javascript_generator'
-Apotomo.js_framework = :jquery ### DISCUSS: move to rails.rb
 
 require 'apotomo/widget'
 require 'apotomo/stateful_widget'
 require 'apotomo/container_widget'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'
+
+
+require 'apotomo/javascript_generator'
+Apotomo.js_framework = :jquery ### DISCUSS: move to rails.rb
+
+### FIXME: only load in test env.
+require 'apotomo/test_case' #if defined?("Rails") and Rails.env == "test"
