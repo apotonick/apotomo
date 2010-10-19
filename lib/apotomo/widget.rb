@@ -95,13 +95,7 @@ module Apotomo
       
       ]
     end
-
-    # Defines the instance vars which should <em>not</em> be copied to the view.
-    # Called in Cell::Base.
-    def ivars_to_ignore
-      []
-    end
-    
+        
     ### FIXME:
     def logger; self; end
     def debug(*args); puts args; end
