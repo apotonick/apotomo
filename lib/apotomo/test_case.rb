@@ -43,7 +43,7 @@ module Apotomo
       super
       @controller.instance_eval do 
         def controller_name
-         'BarnController'
+         'barn'
         end
       end
       @controller.extend Apotomo::Rails::ControllerMethods

@@ -83,7 +83,7 @@ class TestCaseTest < Test::Unit::TestCase
       end
       
       should "respond to #controller_name" do
-        assert_equal "BarnController", @test.parent_controller.controller_name
+        assert_equal "barn", @test.parent_controller.controller_name
       end
     end
   end

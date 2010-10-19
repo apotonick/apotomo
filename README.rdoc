@@ -168,6 +168,25 @@ If that's not what you want, do
 
 Apotomo doesn't depend on _any_ JS framework - you choose!
 
+== Testing
+
+Apotomo comes with its own test case and assertions to <b>build rock-solid web components</b>.
+
+  class CommentsWidgetTest < Apotomo::TestCase
+    has_widgets do |root|
+      root << widget(:comments_widget, 'me', :post => @pervert_post)
+    end
+    
+    def test_render
+      render_widget 'me'
+      assert_select "li#me"
+      
+      trigger :submit, :comment => {:text => "Sex on the beach"}
+      assert_response 'alert("Hey, you wanted to submit a pervert comment!");'
+    end
+  end
+
+You can render your widgets, spec the markup, trigger events and assert the event responses, so far. If you need more, let us know!
 
 == More features
 
@@ -175,8 +194,7 @@ There's even more, too much for a simple README.
 
 [Statefulness]      Deriving your widget from +StatefulWidget+ gives you free statefulness.
 [Composability]     Widgets can range from small standalone components to nested widget trees like complex dashboards.
-[Bubbling events]   Events bubble up from their triggering source to root and thus can be observed, providing a way to implement loosely coupled, distributable components.
-[Testing]           Apotomo comes with testing assertions to build rock-solid web components.
+[Bubbling events]   Events bubble up from their triggering source to root and thus can be observed, providing a way to implement loosely coupled, distributable components.           
 [Team-friendly]     Widgets encourage encapsulation and help having different developers working on different components without getting out of bounds.
 
 
