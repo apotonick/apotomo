@@ -10,14 +10,6 @@ class TestCaseTest < Test::Unit::TestCase
   end
   
   context "TestCase" do
-    should_eventually "respond to .tests" do
-      Apotomo::TestCase.tests CommentsWidget
-      assert_equal CommentsWidget, Apotomo::TestCase.controller_class
-    end
-    
-    should_eventually "infer the widget name" do
-      assert_equal CommentsWidget, CommentsWidgetTest.new(:widget).class.controller_class
-    end
     
     context "responding to #root" do
       class MouseWidgetTest < Apotomo::TestCase
@@ -81,9 +73,18 @@ class TestCaseTest < Test::Unit::TestCase
       end
     end
     
-    should "respond to #parent_controller" do
-      assert_kind_of ActionController::Base, Apotomo::TestCase.new(:widget).tap{ |t| t.setup }.parent_controller
+    context "responding to parent_controller" do
+      setup do
+        @test = Apotomo::TestCase.new(:widget).tap{ |t| t.setup }
+      end
+      
+      should "provide a test controller" do
+        assert_kind_of ActionController::Base, @test.parent_controller
+      end
+      
+      should "respond to #controller_name" do
+        assert_equal "BarnController", @test.parent_controller.controller_name
+      end
     end
-    
   end
 end

@@ -65,21 +65,15 @@ class WidgetTest < ActiveSupport::TestCase
     
     context "responding to #address_for_event" do
       should "accept an event :type" do
-        assert_equal({:type => :squeak, :source => 'mum'}, @mum.address_for_event(:type => :squeak))
+        assert_equal({:source=>"mum", :type=>:squeak, :controller=>"barn"}, @mum.address_for_event(:squeak))
       end
       
       should "accept a :source" do
-        assert_equal({:type => :squeak, :source => 'kid'}, @mum.address_for_event(:type => :squeak, :source => 'kid'))
+        assert_equal({:source=>"kid", :type=>:squeak, :controller=>"barn"}, @mum.address_for_event(:squeak, :source => 'kid'))
       end
       
       should "accept arbitrary options" do
-        assert_equal({:type => :squeak, :volume => 'loud', :source => 'mum'}, @mum.address_for_event(:type => :squeak, :volume => 'loud'))
-      end
-      
-      should "complain if no type given" do
-        assert_raises RuntimeError do
-          @mum.address_for_event(:source => 'mum')
-        end
+        assert_equal({:volume=>"loud", :source=>"mum", :type=>:squeak, :controller=>"barn"}, @mum.address_for_event(:squeak, :volume => 'loud'))
       end
     end
     

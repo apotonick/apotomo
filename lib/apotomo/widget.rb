@@ -256,36 +256,19 @@ module Apotomo
     end
     
     
-    # Returns the address hash to the event controller and the targeted widget.
-    #
-    # Reserved options for <tt>way</tt>:
-    #   :source   explicitly specifies an event source.
-    #             The default is to take the current widget as source.
-    #   :type     specifies the event type.
-    #
-    # Any other option will be directly passed into the address hash and is 
-    # available via StatefulWidget#param in the widget.
-    #
-    # Can be passed to #url_for.
-    # 
-    # Example:
-    #   address_for_event :type => :squeak, :volume => 9
-    # will result in an address that triggers a <tt>:click</tt> event from the current
-    # widget and also provides the parameter <tt>:item_id</tt>.
-    def address_for_event(options)
-      raise "please specify the event :type" unless options[:type]
-      
-      options[:source] ||= self.name
-      options
-    end
-    
     # Returns the widget named <tt>widget_id</tt> as long as it is below self or self itself.
     def find_widget(widget_id)
       find {|node| node.name.to_s == widget_id.to_s}
     end
     
-    def url_for_event(*args)
-      parent_controller.url_for_event(*args)
+    def address_for_event(type, options={})
+      options.reverse_merge!  :source     => name,
+                              :type       => type,
+                              :controller => parent_controller.controller_name  # DISCUSS: dependency to parent_controller.  
+    end
+    
+    def url_for_event(type, options={})
+      apotomo_event_path address_for_event(type, options) 
     end
     
     alias_method :widget_id, :name
