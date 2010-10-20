@@ -20,6 +20,7 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "app/cells/mouse_widget/squeak.html.erb", %r(app/cells/mouse_widget/squeak\.html\.erb)
 
         assert_file "test/widgets/mouse_widget_test.rb", %r(class MouseWidgetTest < Apotomo::TestCase)
+        assert_file "test/widgets/mouse_widget_test.rb", %r(widget\(:mouse_widget, 'me'\))
       end
       
       should "create haml assets with --haml" do

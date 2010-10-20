@@ -1,15 +1,12 @@
 require 'test_helper'
 
 class MouseWidgetTest < Apotomo::TestCase
-  test "squeak" do
-    invoke :squeak
-    assert_select "p"
+  has_widgets do |root|
+    root << widget(:mouse_widget, 'me')
   end
   
-  test "snuggle" do
-    invoke :snuggle
-    assert_select "p"
+  test "display" do
+    render_widget 'me'
+    assert_select "h1"
   end
-  
-
 end

@@ -1,11 +1,12 @@
 require 'test_helper'
 
 class <%= class_name %>Test < Apotomo::TestCase
-<% for state in @states -%>
-  test "<%= state %>" do
-    invoke :<%= state %>
-    assert_select "p"
+  has_widgets do |root|
+    root << widget(:<%= file_name %>, 'me')
   end
   
-<% end %>
+  test "display" do
+    render_widget 'me'
+    assert_select "h1"
+  end
 end
