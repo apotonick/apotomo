@@ -95,10 +95,6 @@ module Apotomo
       
       ]
     end
-        
-    ### FIXME:
-    def logger; self; end
-    def debug(*args); puts args; end
     
     # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
     # This might lead us to some other state since the state method could call #jump_to_state.
