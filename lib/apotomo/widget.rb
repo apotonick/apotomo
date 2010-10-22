@@ -82,19 +82,6 @@ module Apotomo
     def visible?
       @visible
     end
-
-    # Defines the instance vars that should <em>not</em> survive between requests, 
-    # which means they're not frozen in Apotomo::StatefulWidget#freeze.
-    def ivars_to_forget
-      unfreezable_ivars
-    end
-    
-    def unfreezable_ivars
-      [:@childrenHash, :@children, :@parent, :@parent_controller, :@_request, :@_config, :@cell, :@invoke_block, :@rendered_children, :@page_updates, :@opts, :@params,
-      :@suppress_javascript ### FIXME: implement with ActiveHelper and :locals.
-      
-      ]
-    end
     
     # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
     # This might lead us to some other state since the state method could call #jump_to_state.
