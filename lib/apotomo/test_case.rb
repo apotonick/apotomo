@@ -67,13 +67,15 @@ module Apotomo
       @last_invoke = root.find_widget(name).tap { |w| w.opts = options }.invoke # DISCUSS: use ControllerMethods?
     end
     
-    # Triggers and event of +type+. You have to pass <tt>:source</tt> as options.
+    # Triggers an event of +type+. You have to pass <tt>:source</tt> as options.
     #
     # Example:
     #
     #   trigger :submit, :source => "post-comments"
     def trigger(type, options)
-      root.find_widget(options.delete(:source)).fire(type)
+      source = root.find_widget(options.delete(:source))
+      source.instance_variable_set :@params, options  # TODO: this is just a try-out (what about children?). 
+      source.fire(type)
       root.page_updates # DISCUSS: use ControllerMethods?
     end
     

@@ -66,6 +66,11 @@ class TestCaseTest < Test::Unit::TestCase
           assert_equal ["squeak!"], @test.trigger(:footsteps, :source => 'mum')
         end
         
+        should "provide options from #trigger to the widget" do
+          @test.trigger(:footsteps, :source => 'mum', :direction => :kitchen)
+          assert_equal :kitchen, @mum.param(:direction)
+        end
+        
         should "respond to #assert_response" do
           @test.trigger(:footsteps, :source => 'mum')
           assert @test.assert_response("squeak!")
