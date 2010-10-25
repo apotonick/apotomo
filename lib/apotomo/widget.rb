@@ -72,7 +72,7 @@ module Apotomo
       
       @params       = parent_controller.params.dup.merge(opts)
       
-      run_hook(:after_initialize, id, start_state, opts)
+      run_hook :after_initialize, self
     end
     
     def last_state
