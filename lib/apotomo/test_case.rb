@@ -84,9 +84,20 @@ module Apotomo
     # Example:
     #
     #   trigger :submit, :source => "post-comments"
-    #   assert_response "alert(\":submit clicked!\")", "$(\"post-comments\").update ..."
+    #   assert_response "alert(\":submit clicked!\")", /\$\("post-comments"\).update/
     def assert_response(*content)
-      assert_equal content, root.page_updates
+      updates = root.page_updates
+      
+      i = 0
+      content.each do |assertion|
+        if assertion.kind_of? Regexp
+          assert_match assertion, updates[i] 
+        else
+          assert_equal assertion, updates[i]
+        end
+        
+        i+=1
+      end
     end
     
     include Apotomo::WidgetShortcuts
