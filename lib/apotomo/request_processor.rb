@@ -17,8 +17,6 @@ module Apotomo
         
         flushed_root  ### FIXME: set internal mode to flushed 
       end
-      
-      #handle_version!(options[:version])
     end
     
     def attach_stateless_blocks_for(blocks, root, controller)
@@ -30,16 +28,7 @@ module Apotomo
       @widgets_flushed = true
       #widget('apotomo/widget', 'root')
     end
-    
-    ### DISCUSS: do we need the version feature, or should we push that into user code?
-    def handle_version!(version)
-      return if version.blank?
-      return if root.version == version
-      
-      @root = flushed_root
-      @root.version = version
-    end
-    
+        
     def widgets_flushed?;  @widgets_flushed; end
     
     # Fires the request event in the widget tree and collects the rendered page updates.
