@@ -59,10 +59,6 @@ class RequestProcessorTest < ActiveSupport::TestCase
       should "provide a single root-node for #root" do
         assert_equal 1, @processor.root.size
       end
-      
-      should "initialize version to 0" do
-        assert_equal 0, @processor.root.version
-      end
     end
     
     context "with controller" do

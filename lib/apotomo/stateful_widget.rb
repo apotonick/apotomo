@@ -5,6 +5,14 @@ module Apotomo
   class StatefulWidget < Widget
     include Persistence
     
+    attr_accessor :version
+    
+    def initialize(*)
+      super
+      @version = 0
+    end
+    
+    
     # Defines the instance vars that should <em>not</em> survive between requests, 
     # which means they're not frozen in Apotomo::StatefulWidget#freeze.
     def ivars_to_forget

@@ -30,9 +30,8 @@ module Apotomo
     
     attr_accessor :opts
     attr_writer   :visible
-    
+
     attr_writer   :controller
-    attr_accessor :version
     
     include TreeNode
     
@@ -64,8 +63,6 @@ module Apotomo
       @start_state  = start_state
 
       @visible      = true
-      @version      = 0 ### DISCUSS: neeed in stateLESS?
-      
       @cell         = self  ### DISCUSS: needed?
       
       @params       = parent_controller.params.dup.merge(opts)
