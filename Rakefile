@@ -25,7 +25,7 @@ Jeweler::Tasks.new do |spec|
   spec.name         = "apotomo"
   spec.version      = ::Apotomo::VERSION
   spec.summary      = %{Web components for Rails.}
-  spec.description  = "Web components for Rails. Event-driven. Clean. Fast. Free optional statefulness included."
+  spec.description  = "Web component framework for Rails providing page widgets that trigger events and know when and how to update themselves with AJAX."
   spec.homepage     = "http://apotomo.de"
   spec.authors      = ["Nick Sutterer"]
   spec.email        = "apotonick@gmail.com"

@@ -12,3 +12,4 @@ gem "jeweler"
 gem "shoulda"
 gem "mocha"
 gem 'sqlite3-ruby', '1.2.5', :require => 'sqlite3'	# needed in router_test, whatever.
+gem "capybara"

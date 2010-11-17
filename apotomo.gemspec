@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{apotomo}
-  s.version = "1.0.0.beta2"
+  s.version = "1.0.0"
 
-  s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Nick Sutterer"]
-  s.date = %q{2010-10-16}
-  s.description = %q{Web components for Rails. Event-driven. Clean. Fast. Free optional statefulness included.}
+  s.date = %q{2010-11-17}
+  s.description = %q{Web component framework for Rails providing page widgets that trigger events and know when and how to update themselves with AJAX.}
   s.email = %q{apotonick@gmail.com}
   s.extra_rdoc_files = [
     "README.rdoc",
@@ -23,9 +23,7 @@ Gem::Specification.new do |s|
      "TODO",
      "config/routes.rb",
      "lib/apotomo.rb",
-     "lib/apotomo/caching.rb",
      "lib/apotomo/container_widget.rb",
-     "lib/apotomo/deep_link_methods.rb",
      "lib/apotomo/event.rb",
      "lib/apotomo/event_handler.rb",
      "lib/apotomo/event_methods.rb",
@@ -38,6 +36,7 @@ Gem::Specification.new do |s|
      "lib/apotomo/rails/view_methods.rb",
      "lib/apotomo/request_processor.rb",
      "lib/apotomo/stateful_widget.rb",
+     "lib/apotomo/test_case.rb",
      "lib/apotomo/transition.rb",
      "lib/apotomo/tree_node.rb",
      "lib/apotomo/version.rb",
@@ -48,7 +47,8 @@ Gem::Specification.new do |s|
      "lib/generators/apotomo/templates/view.haml",
      "lib/generators/apotomo/templates/widget.rb",
      "lib/generators/apotomo/templates/widget_test.rb",
-     "lib/generators/apotomo/widget_generator.rb"
+     "lib/generators/apotomo/widget_generator.rb",
+     "lib/tasks.rake"
   ]
   s.homepage = %q{http://apotomo.de}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -58,91 +58,90 @@ Gem::Specification.new do |s|
   s.test_files = [
     "test/fixtures",
      "test/fixtures/mouse",
-     "test/fixtures/mouse/feed.html.erb",
-     "test/fixtures/mouse/eating.html.erb",
      "test/fixtures/mouse/make_me_squeak.html.erb",
-     "test/fixtures/mouse/posing.html.erb",
-     "test/fixtures/mouse/educate.html.erb",
-     "test/fixtures/mouse/snuggle.html.erb",
      "test/fixtures/mouse/content.html.erb",
+     "test/fixtures/mouse/educate.html.erb",
+     "test/fixtures/mouse/feed.html.erb",
+     "test/fixtures/mouse/snuggle.html.erb",
+     "test/fixtures/mouse/eating.html.erb",
+     "test/fixtures/mouse/posing.html.erb",
      "test/fixtures/application_widget_tree.rb",
+     "test/test_helper.rb",
+     "test/dummy",
+     "test/dummy/Rakefile",
+     "test/dummy/app",
+     "test/dummy/app/controllers",
+     "test/dummy/app/controllers/application_controller.rb",
+     "test/dummy/app/helpers",
+     "test/dummy/app/helpers/application_helper.rb",
+     "test/dummy/app/views",
+     "test/dummy/app/views/layouts",
+     "test/dummy/app/views/layouts/application.html.erb",
+     "test/dummy/public",
+     "test/dummy/public/404.html",
+     "test/dummy/public/stylesheets",
+     "test/dummy/public/javascripts",
+     "test/dummy/public/javascripts/prototype.js",
+     "test/dummy/public/javascripts/controls.js",
+     "test/dummy/public/javascripts/effects.js",
+     "test/dummy/public/javascripts/dragdrop.js",
+     "test/dummy/public/javascripts/application.js",
+     "test/dummy/public/javascripts/rails.js",
+     "test/dummy/public/422.html",
+     "test/dummy/public/favicon.ico",
+     "test/dummy/public/500.html",
+     "test/dummy/config.ru",
+     "test/dummy/config",
+     "test/dummy/config/environments",
+     "test/dummy/config/environments/test.rb",
+     "test/dummy/config/environments/production.rb",
+     "test/dummy/config/environments/development.rb",
+     "test/dummy/config/database.yml",
+     "test/dummy/config/boot.rb",
+     "test/dummy/config/locales",
+     "test/dummy/config/locales/en.yml",
+     "test/dummy/config/environment.rb",
+     "test/dummy/config/initializers",
+     "test/dummy/config/initializers/secret_token.rb",
+     "test/dummy/config/initializers/backtrace_silencers.rb",
+     "test/dummy/config/initializers/session_store.rb",
+     "test/dummy/config/initializers/mime_types.rb",
+     "test/dummy/config/initializers/inflections.rb",
+     "test/dummy/config/application.rb",
+     "test/dummy/config/routes.rb",
+     "test/dummy/db",
+     "test/dummy/db/test.sqlite3",
+     "test/dummy/script",
+     "test/dummy/script/rails",
+     "test/dummy/log",
+     "test/support",
+     "test/support/test_case_methods.rb",
      "test/rails",
+     "test/rails/rails_integration_test.rb",
      "test/rails/view_methods_test.rb",
      "test/rails/controller_methods_test.rb",
      "test/rails/view_helper_test.rb",
      "test/rails/widget_generator_test.rb",
-     "test/rails/rails_integration_test.rb",
-     "test/test_helper.rb",
-     "test/support",
-     "test/support/test_case_methods.rb",
-     "test/dummy",
-     "test/dummy/config",
-     "test/dummy/config/application.rb",
-     "test/dummy/config/initializers",
-     "test/dummy/config/initializers/session_store.rb",
-     "test/dummy/config/initializers/mime_types.rb",
-     "test/dummy/config/initializers/secret_token.rb",
-     "test/dummy/config/initializers/inflections.rb",
-     "test/dummy/config/initializers/backtrace_silencers.rb",
-     "test/dummy/config/locales",
-     "test/dummy/config/locales/en.yml",
-     "test/dummy/config/routes.rb",
-     "test/dummy/config/boot.rb",
-     "test/dummy/config/environment.rb",
-     "test/dummy/config/environments",
-     "test/dummy/config/environments/production.rb",
-     "test/dummy/config/environments/test.rb",
-     "test/dummy/config/environments/development.rb",
-     "test/dummy/config/database.yml",
-     "test/dummy/script",
-     "test/dummy/script/rails",
-     "test/dummy/config.ru",
-     "test/dummy/db",
-     "test/dummy/db/test.sqlite3",
-     "test/dummy/Rakefile",
-     "test/dummy/public",
-     "test/dummy/public/422.html",
-     "test/dummy/public/favicon.ico",
-     "test/dummy/public/stylesheets",
-     "test/dummy/public/500.html",
-     "test/dummy/public/404.html",
-     "test/dummy/public/javascripts",
-     "test/dummy/public/javascripts/controls.js",
-     "test/dummy/public/javascripts/application.js",
-     "test/dummy/public/javascripts/rails.js",
-     "test/dummy/public/javascripts/dragdrop.js",
-     "test/dummy/public/javascripts/prototype.js",
-     "test/dummy/public/javascripts/effects.js",
-     "test/dummy/log",
-     "test/dummy/app",
-     "test/dummy/app/controllers",
-     "test/dummy/app/controllers/application_controller.rb",
-     "test/dummy/app/views",
-     "test/dummy/app/views/layouts",
-     "test/dummy/app/views/layouts/application.html.erb",
-     "test/dummy/app/helpers",
-     "test/dummy/app/helpers/application_helper.rb",
      "test/unit",
-     "test/unit/test_widget_shortcuts.rb",
-     "test/unit/event_handler_test.rb",
-     "test/unit/widget_shortcuts_test.rb",
-     "test/unit/stateful_widget_test.rb",
-     "test/unit/test_addressing.rb",
-     "test/unit/invoke_test.rb",
-     "test/unit/container_test.rb",
-     "test/unit/test_tab_panel.rb",
-     "test/unit/test_jump_to_state.rb",
-     "test/unit/render_test.rb",
-     "test/unit/apotomo_test.rb",
-     "test/unit/request_processor_test.rb",
-     "test/unit/test_caching.rb",
-     "test/unit/javascript_generator_test.rb",
      "test/unit/onfire_integration_test.rb",
+     "test/unit/invoke_test.rb",
+     "test/unit/request_processor_test.rb",
+     "test/unit/render_test.rb",
+     "test/unit/test_case_test.rb",
+     "test/unit/apotomo_test.rb",
+     "test/unit/javascript_generator_test.rb",
+     "test/unit/stateful_widget_test.rb",
+     "test/unit/event_methods_test.rb",
      "test/unit/persistence_test.rb",
+     "test/unit/event_handler_test.rb",
      "test/unit/transition_test.rb",
      "test/unit/event_test.rb",
-     "test/unit/event_methods_test.rb",
-     "test/unit/widget_test.rb"
+     "test/unit/widget_test.rb",
+     "test/unit/widget_shortcuts_test.rb",
+     "test/unit/test_tab_panel.rb",
+     "test/unit/test_addressing.rb",
+     "test/unit/container_test.rb",
+     "test/unit/test_jump_to_state.rb"
   ]
 
   if s.respond_to? :specification_version then
@@ -153,18 +152,18 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<cells>, ["~> 3.4.2"])
       s.add_runtime_dependency(%q<rails>, [">= 3.0.0"])
       s.add_runtime_dependency(%q<onfire>, [">= 0.1.0"])
-      s.add_runtime_dependency(%q<hooks>, ["~> 0.1.2"])
+      s.add_runtime_dependency(%q<hooks>, ["~> 0.1.3"])
     else
       s.add_dependency(%q<cells>, ["~> 3.4.2"])
       s.add_dependency(%q<rails>, [">= 3.0.0"])
       s.add_dependency(%q<onfire>, [">= 0.1.0"])
-      s.add_dependency(%q<hooks>, ["~> 0.1.2"])
+      s.add_dependency(%q<hooks>, ["~> 0.1.3"])
     end
   else
     s.add_dependency(%q<cells>, ["~> 3.4.2"])
     s.add_dependency(%q<rails>, [">= 3.0.0"])
     s.add_dependency(%q<onfire>, [">= 0.1.0"])
-    s.add_dependency(%q<hooks>, ["~> 0.1.2"])
+    s.add_dependency(%q<hooks>, ["~> 0.1.3"])
   end
 end
 
