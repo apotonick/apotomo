@@ -43,6 +43,7 @@ module Apotomo
     
     helper Apotomo::Rails::ViewHelper
     
+    abstract!
     
     # Runs callbacks for +name+ hook in instance context.  
     def run_widget_hook(name, *args)
