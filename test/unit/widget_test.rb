@@ -133,17 +133,19 @@ class WidgetTest < ActiveSupport::TestCase
       assert_equal 'Logitech', @mum.param(:brand)
     end
     
+    
+    # internal_methods:
     should "not list internal methods in action_methods" do
       assert_equal [], Class.new(Apotomo::Widget).action_methods
     end
     
     should "list both local and inherited states in Widget.action_methods" do
-      assert_not Class.new(Apotomo::Widget).internal_methods.include?(:eating)
-      assert_not Class.new(MouseCell).internal_methods.include?(:eating)
-      
       assert MouseCell.action_methods.collect{ |m| m.to_s }.include?("eating")
       assert Class.new(MouseCell).action_methods.collect{ |m| m.to_s }.include?("eating")
     end
     
+    should "not list #display in internal_methods although it's defined in Object" do
+      assert_not Apotomo::Widget.internal_methods.include?(:display)
+    end
   end
 end

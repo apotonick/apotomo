@@ -44,6 +44,7 @@ module Apotomo
     helper Apotomo::Rails::ViewHelper
     
     abstract!
+    undef :display  # We don't want #display to be listed in #internal_methods.
     
     # Runs callbacks for +name+ hook in instance context.  
     def run_widget_hook(name, *args)
