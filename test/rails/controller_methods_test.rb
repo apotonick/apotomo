@@ -116,7 +116,7 @@ class ControllerMethodsTest < ActionController::TestCase
     
     context "invoking #url_for_event" do
       should "compute an url for any widget" do
-        assert_equal "/barn/render_event_response?source=mouse&volume=9&type=footsteps", @controller.url_for_event(:footsteps, :source => :mouse, :volume => 9)
+        assert_equal "/barn/render_event_response?source=mouse&type=footsteps&volume=9", @controller.url_for_event(:footsteps, :source => :mouse, :volume => 9)
       end
     end
     

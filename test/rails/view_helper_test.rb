@@ -56,7 +56,7 @@ class ViewHelperTest < ActionView::TestCase
     context "#widget_javascript" do
       
       should "usually render a javascript block" do
-        assert_equal "<script type=\"text/javascript\">\n//<![CDATA[\nalert(\"Beer!\")\n//]]>\n</script>", widget_javascript { 'alert("Beer!")' }
+        assert_equal "<script type=\"text/javascript\">\n//<![CDATA[\nalert(&quot;Beer!&quot;)\n//]]>\n</script>", widget_javascript { 'alert("Beer!")' }
       end
       
       should "be quiet if suppress_js is set" do
