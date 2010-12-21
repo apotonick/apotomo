@@ -75,25 +75,7 @@ module Apotomo
       fire(*args)
     end
     
-    # Invokes <tt>state</tt> on the widget <em>and</end> updates itself on the page. This should
-    # never be called from outside but in setters when some internal value changed and must be
-    # displayed instantly.
-    # 
-    # Implements the following pattern (TODO: remove example as soon as invoke! proofed):
-    # 
-    #   def title=(str)
-    #     @title = str
-    #     peek(:update, self.name, :display, self.name)
-    #     trigger(:update)
-    #   end
-    def invoke!(state)
-      ### TODO: encapsulate in PageUpdateQueue:
-      Apotomo::EventProcessor.instance.processed_handlers << [name, invoke(:state)]
-    end
-    
-    
-    
-    protected
+  protected
     # Get all handlers from self for the passed event (overriding Onfire#local_event_handlers).
     def local_event_handlers(event)
       event_table.all_handlers_for(event.type, event.source.name) # we key with widget_id.
