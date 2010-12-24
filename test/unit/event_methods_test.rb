@@ -39,6 +39,12 @@ class EventMethodsTest < Test::Unit::TestCase
       assert_equal ['answer squeak', 'answer squeak'], @mum.list
     end
     
+    should "also accept an event argument only" do
+      @mum.respond_to_event :answer_squeak
+      @mum.fire :answer_squeak
+      assert_equal ['answer squeak'], @mum.list
+    end
+    
     context "#responds_to_event in class context" do
       setup do
         class AdultMouseCell < MouseCell
