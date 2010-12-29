@@ -31,8 +31,6 @@ module Apotomo
     attr_accessor :opts
     attr_writer   :visible
 
-    attr_writer   :controller
-    
     include TreeNode
     
     include Onfire
