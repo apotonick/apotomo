@@ -1,0 +1,6 @@
+h2. 1.0.2
+
+h3. Changes
+  * removals from ViewHelper: #trigger_event, #form_to_event and friends as they use deprecated Rails helpers.
+  
+h3. Bugfixes
