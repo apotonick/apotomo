@@ -236,7 +236,7 @@ module Apotomo
     def address_for_event(type, options={})
       options.reverse_merge!  :source     => name,
                               :type       => type,
-                              :controller => parent_controller.controller_name  # DISCUSS: dependency to parent_controller.  
+                              :controller => parent_controller.controller_path  # DISCUSS: dependency to parent_controller.  
     end
     
     def url_for_event(type, options={})
