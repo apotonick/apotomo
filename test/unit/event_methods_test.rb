@@ -45,6 +45,19 @@ class EventMethodsTest < Test::Unit::TestCase
       assert_equal ['answer squeak'], @mum.list
     end
     
+    should "accept payload data for the event" do
+      @mum.respond_to_event :answer_squeak
+      @mum.instance_eval do
+        def answer_squeak
+          evt = @opts[:event]
+          list << evt.data
+        end
+      end
+      
+      @mum.fire :answer_squeak, :volume => 9
+      assert_equal [{:volume => 9}], @mum.list
+    end
+    
     context "#responds_to_event in class context" do
       setup do
         class AdultMouseCell < MouseCell
