@@ -4,3 +4,5 @@ h3. Changes
   * removals from ViewHelper: #trigger_event, #form_to_event and friends as they use deprecated Rails helpers.
   
 h3. Bugfixes
+  * Widget#fire now accepts payload data for the fired event.
+  * triggered states now receive the event object if they expect one argument.

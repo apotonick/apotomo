@@ -10,13 +10,7 @@ module Apotomo
     def process_event(event)
       target = event.source.root.find_by_path(widget_id) ### DISCUSS: widget_id or widget_selector?
       
-      #::Rails.logger.debug "EventHandler: invoking #{target.name}##{state}"
-      ### DISCUSS: let target access event?
-      ###   pass additional opts to #invoke?
-      ### DISCUSS: pass block here?
-      target.opts[:event] = event
-      
-      target.invoke(state)
+      target.invoke(state, event)
     end
     
     def to_s; "InvokeEventHandler:#{widget_id}##{state}"; end

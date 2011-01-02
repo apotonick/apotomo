@@ -2,7 +2,6 @@ require 'test_helper'
 require 'action_view/test_case'
 
 class ViewHelperTest < Apotomo::TestCase
-  include Apotomo::TestCaseMethods::TestController
   include ActionDispatch::Assertions::DomAssertions
   
   # TODO: move to Apotomo::TestCase, refactor, test.

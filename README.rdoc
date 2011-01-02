@@ -22,7 +22,7 @@ Easy as hell.
 
 === Rails 3
 
-  gem install apotomo --pre
+  gem install apotomo
 
 === Rails 2.3
 

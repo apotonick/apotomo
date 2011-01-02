@@ -38,6 +38,7 @@ module Apotomo
       container(*args)
     end
     
+    # TODO: deprecate.
     def cell(base_name, states, id, *args)
       widget(base_name.to_s + '_cell', states, id, *args)
     end

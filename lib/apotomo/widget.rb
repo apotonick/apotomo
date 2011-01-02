@@ -80,8 +80,7 @@ module Apotomo
     
     # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
     # This might lead us to some other state since the state method could call #jump_to_state.
-    def invoke(state=nil, &block)
-      @invoke_block = block ### DISCUSS: store block so we don't have to pass it 10 times?
+    def invoke(state=nil, event=nil)
       logger.debug "\ninvoke on #{name} with #{state.inspect}"
       
       if state.blank?
@@ -91,7 +90,12 @@ module Apotomo
       logger.debug "#{name}: transition: #{last_state} to #{state}"
       logger.debug "                                    ...#{state}"
       
-      render_state(state)
+      #render_state(state)
+      
+      return process(state, event) if method(state).arity == 1
+      
+      opts[:event] = event
+      process(state)
     end
     
     

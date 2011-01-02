@@ -43,6 +43,19 @@ class EventMethodsTest < Test::Unit::TestCase
       @mum.respond_to_event :answer_squeak
       @mum.fire :answer_squeak
       assert_equal ['answer squeak'], @mum.list
+    end 
+    
+    should "make pass the event into the triggered state" do
+      @mum.instance_eval do
+        respond_to_event :footsteps
+          
+        def footsteps(evt)
+          list << evt.type
+        end
+      end
+      
+      @mum.trigger :footsteps
+      assert_equal ["escape", :footsteps], @mum.list
     end
     
     should "accept payload data for the event" do
@@ -77,7 +90,6 @@ class EventMethodsTest < Test::Unit::TestCase
       end
     end
     
-    
     context "#trigger" do
       should "be an alias for #fire" do
         @kid.trigger :footsteps
@@ -96,7 +108,6 @@ class EventMethodsTest < Test::Unit::TestCase
         @mum.fire :footsteps
         assert_equal ["escape"], @mum.page_updates
       end
-      
     end
     
   end 

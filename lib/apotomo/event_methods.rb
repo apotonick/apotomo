@@ -68,6 +68,16 @@ module Apotomo
       on(type, :do => handler, :from => options[:from])
     end
     
+    # Fire an event of +type+ and let it bubble up. You may add arbitrary payload data to the event.
+    #
+    # Example:
+    #
+    #   trigger(:dropped, :area => 59)
+    #
+    # which can be queried in a triggered state.
+    #
+    #   def on_drop(event)
+    #     if event.data[:area] == 59 
     def trigger(*args)
       fire(*args)
     end

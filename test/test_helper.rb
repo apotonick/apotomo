@@ -51,6 +51,7 @@ class MouseCell < Apotomo::StatefulWidget
   def snuggle; end
 end
 
+### TODO: 2brm?
 class RenderingTestCell < Apotomo::StatefulWidget
   attr_reader :brain
   attr_reader :rendered_children
@@ -60,4 +61,10 @@ class RenderingTestCell < Apotomo::StatefulWidget
   def jump
     jump_to_state :check_state
   end
+end
+
+
+# Enable dynamic states so we can do Cell.class_eval { def ... } at runtime.
+Apotomo::Widget.class_eval do
+  def action_method?(*); true; end
 end

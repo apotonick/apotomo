@@ -44,8 +44,6 @@ class InvokeTest < Test::Unit::TestCase
         
         should "automatically follow the transitions if defined" do
           assert_equal 'snuggle', @mum.last_state
-          puts "invoooooooooooooogue"
-          puts @mum.last_state.inspect
           @mum.invoke
           assert_equal 'educate', @mum.last_state
         end
