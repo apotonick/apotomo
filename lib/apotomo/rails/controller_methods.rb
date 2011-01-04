@@ -138,25 +138,6 @@ with(window.parent) { setTimeout(function() { window.eval('#{escaped_script}'); 
 </script></body></html>", :content_type => 'text/html'
         end
         
-        def respond_to_event(type, options)
-          handler = ProcEventHandler.new
-          handler.proc = options[:with]
-          ### TODO: pass :from => (event source).
-          
-          # attach once, not every request:
-          apotomo_root.evt_table.add_handler_once(handler, :event_type => type)
-        end
-        
-        
-        
-        ### DISCUSS: rename? should say "this controller action wants apotomo's deep linking!"
-        ### DISCUSS: move to deep_link_methods?
-        def respond_to_url_change
-          return if apotomo_root.find_widget('deep_link')  # add only once.
-          apotomo_root << widget("apotomo/deep_link_widget", :setup, 'deep_link')
-        end
-      
-      
       class ProcHash < Array
         def id_for_proc(proc)
           proc.to_s.split('@').last
