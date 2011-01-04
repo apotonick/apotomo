@@ -5,19 +5,17 @@ require 'apotomo/rails/view_methods'
     module Rails
       module ControllerMethods
         include WidgetShortcuts
+        extend ActiveSupport::Concern
         
-        def self.included(base) #:nodoc:
-          base.class_eval do
-            extend WidgetShortcuts
-            extend ClassMethods      
-            
-            class_inheritable_array :has_widgets_blocks
-            self.has_widgets_blocks = []
-            
-            helper ::Apotomo::Rails::ViewMethods
-            
-            after_filter :apotomo_freeze
-          end
+        included do
+          extend WidgetShortcuts
+          
+          class_inheritable_array :has_widgets_blocks
+          self.has_widgets_blocks = []
+          
+          helper ::Apotomo::Rails::ViewMethods
+          
+          after_filter :apotomo_freeze
         end
         
         module ClassMethods
