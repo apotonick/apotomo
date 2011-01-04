@@ -31,8 +31,6 @@ require 'apotomo/rails/view_methods'
           def has_widgets(&block)
             has_widgets_blocks << block
           end
-          
-          alias_method :uses_widgets, :has_widgets
         end
         
         def bound_use_widgets_blocks
