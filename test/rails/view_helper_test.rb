@@ -46,6 +46,13 @@ class ViewHelperTest < Apotomo::TestCase
       end)
     end
     
+    should "respond to #url_for_event with a namespaced controller" do
+      @controller = namespaced_controller
+      assert_equal("/farm/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) do 
+        url_for_event(:footsteps)
+      end)
+    end
+    
     should "respond to #widget_div" do
       assert_equal('<div id="mum">squeak!</div>', in_view(MouseWidget) do widget_div { "squeak!" } end)
     end

@@ -90,6 +90,12 @@ module Apotomo
         @controller
       end
       
+      def namespaced_controller
+        controller = Farm::BarnController.new
+        controller.request = ActionController::TestRequest.new
+        controller
+      end
+      
     end
   end
 end

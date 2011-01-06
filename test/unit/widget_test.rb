@@ -75,6 +75,11 @@ class WidgetTest < ActiveSupport::TestCase
       should "accept arbitrary options" do
         assert_equal({:volume=>"loud", :source=>"mum", :type=>:squeak, :controller=>"barn"}, @mum.address_for_event(:squeak, :volume => 'loud'))
       end
+      
+      should "work with controller namespaces" do
+        @mum = Apotomo::Widget.new(namespaced_controller, 'mum', :squeak)
+        assert_equal({:source=>"mum", :type=>:squeak, :controller=>"farm/barn"}, @mum.address_for_event(:squeak))
+      end
     end
     
     context "implementing visibility" do

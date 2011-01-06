@@ -29,7 +29,14 @@ end
 
 class ApotomoController < ActionController::Base
   include Apotomo::Rails::ControllerMethods
+  include Rails.application.routes.url_helpers
 end
+
+module Farm
+  class BarnController < ApotomoController
+  end
+end
+
 
 class MouseCell < Apotomo::StatefulWidget
   def eating; render; end
