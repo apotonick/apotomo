@@ -3,6 +3,7 @@ require 'action_view/test_case'
 
 class ViewHelperTest < Apotomo::TestCase
   include ActionDispatch::Assertions::DomAssertions
+  include Apotomo::TestCase::TestController
   
   # TODO: move to Apotomo::TestCase, refactor, test.
   class MouseWidget < Apotomo::Widget

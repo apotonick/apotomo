@@ -71,19 +71,16 @@ module Apotomo
       # Creates a mock controller instance. Currently, each widget needs a parent controller instance due to some
       # sucky dependency in cells.
       def barn_controller!
-        @controller = Class.new(ActionController::Base) do
-          def initialize
-            extend ActionController::UrlWriter
-            self.params = {}
+        @controller = Class.new(ApotomoController) do
+          def initialize(*)
+            super
             self.request = ActionController::TestRequest.new
           end
           
           def self.name; "BarnController"; end
           
           def self.default_url_options; {:controller => :barn}; end
-          include Apotomo::Rails::ControllerMethods
         end.new
-        ### FIXME: @controller.session = {}
       end
       
       def parent_controller
