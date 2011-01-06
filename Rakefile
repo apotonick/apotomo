@@ -34,7 +34,7 @@ Jeweler::Tasks.new do |spec|
   spec.test_files   = FileList["test/**/*"] - FileList["test/dummy/tmp", "test/dummy/tmp/**/*", "test/dummy/log/*"]
   
   spec.add_dependency 'cells', '~> 3.4.2'
-  spec.add_dependency 'rails', '>= 3.0.0'
+  spec.add_dependency 'rails', '~> 3.0.0'
   spec.add_dependency 'onfire', '>= 0.1.0'
   spec.add_dependency 'hooks', '~> 0.1.3'
 end
