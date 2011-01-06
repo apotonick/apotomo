@@ -1,6 +1,8 @@
 source "http://rubygems.org"
 
-gem "rails",  "~> 3.0.3"
+gem "rails",  "~> 3.0"
+#gem "rails", :path => "/home/nick/projects/rayls"
+
 gem "cells",  "~> 3.4"
 gem "onfire", "~> 0.1.1"
 gem "hooks",  "~> 0.1.3"
