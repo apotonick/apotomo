@@ -47,7 +47,7 @@ module Apotomo
   # Piotr Sarnacki: Railtie :P
   class Railtie < Rails::Railtie
     rake_tasks do
-      load "tasks.rake"
+      load "apotomo/apotomo.rake"
     end
     
     # As we are a Railtie only, the routes won't be loaded automatically. Beside that, we want our 

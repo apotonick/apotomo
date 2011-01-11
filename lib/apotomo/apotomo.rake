@@ -1,5 +1,5 @@
 namespace "test" do
-  TestTaskWithoutDescription.new(:widgets => "test:prepare") do |t|
+  Rake::TestTask.new(:widgets) do |t|
     t.libs << "test"
     t.pattern = 'test/widgets/**/*_test.rb'
   end
