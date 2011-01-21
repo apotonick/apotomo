@@ -1,3 +1,9 @@
+h2. 1.0.3
+
+h3. Bugfixes
+  * fixed gemspec to not require useless gem dependencies.
+
+
 h2. 1.0.2
 
 h3. Changes
