@@ -1,3 +1,5 @@
+require "rake/testtask"
+
 namespace "test" do
   Rake::TestTask.new(:widgets) do |t|
     t.libs << "test"
