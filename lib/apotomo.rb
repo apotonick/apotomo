@@ -21,7 +21,6 @@
 #  THE SOFTWARE.
 
 require "rails/railtie"
-require 'rails/engine'
  
 module Apotomo
   class << self
