@@ -42,7 +42,7 @@ module Apotomo
     def setup
       super
       @controller.instance_eval do 
-        def controller_name
+        def controller_path
          'barn'
         end
       end

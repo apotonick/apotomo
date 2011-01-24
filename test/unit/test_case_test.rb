@@ -87,8 +87,8 @@ class TestCaseTest < Test::Unit::TestCase
         assert_kind_of ActionController::Base, @test.parent_controller
       end
       
-      should "respond to #controller_name" do
-        assert_equal "barn", @test.parent_controller.controller_name
+      should "respond to #controller_path" do
+        assert_equal "barn", @test.parent_controller.controller_path
       end
     end
   end
