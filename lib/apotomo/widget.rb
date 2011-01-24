@@ -94,7 +94,7 @@ module Apotomo
       
       return process(state, event) if method(state).arity == 1
       
-      opts[:event] = event
+      opts[:event] = event if event and opts[:event].blank? # TODO: remove for 3.0.4+
       process(state)
     end
     
