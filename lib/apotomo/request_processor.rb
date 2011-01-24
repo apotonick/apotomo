@@ -62,7 +62,7 @@ module Apotomo
       
       
       ### TODO: pass options in invoke.
-      widget.opts = opts unless opts.empty?
+      widget.opts.merge!(opts)
       
       widget.invoke(&block)
     end

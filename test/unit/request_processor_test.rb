@@ -166,7 +166,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
       end
       
       @processor = Apotomo::RequestProcessor.new(parent_controller, {}, {}, 
-        [Proc.new { |root| root << MouseCell.new(parent_controller, 'mum', :squeak) }])
+        [Proc.new { |root| root << MouseCell.new(parent_controller, 'mum', :squeak, :volume => 9) }])
     end
     
     should "render the widget when passing an existing widget id" do
@@ -177,10 +177,15 @@ class RequestProcessorTest < ActiveSupport::TestCase
       assert_equal 'squeak!', @processor.render_widget_for(@processor.root['mum'], {})
     end
     
-    should "raise an exception when a non-existent widget id id passed" do
+    should "raise an exception when a non-existent widget id is passed" do
       assert_raises RuntimeError do
         @processor.render_widget_for('mummy', {})
       end
+    end
+    
+    should "merge options from constructor with render_widget options" do
+      @processor.render_widget_for('mum', :pitch => :high)
+      assert_equal({:pitch => :high, :volume => 9}, @processor.root['mum'].opts)
     end
   end
   
