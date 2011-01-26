@@ -68,7 +68,7 @@ class TestCaseTest < Test::Unit::TestCase
         
         should "provide options from #trigger to the widget" do
           @test.trigger(:footsteps, :source => 'mum', :direction => :kitchen)
-          assert_equal :kitchen, @mum.param(:direction)
+          assert_equal :kitchen, @mum.options[:direction]
         end
         
         #should "merge options from #trigger and constructor" do

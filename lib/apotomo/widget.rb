@@ -64,8 +64,6 @@ module Apotomo
       @visible      = true
       @cell         = self  ### DISCUSS: needed?
       
-      @params       = parent_controller.params.dup.merge(options)
-      
       run_hook :after_initialize, self
     end
     
@@ -222,9 +220,10 @@ module Apotomo
     end
     
     
-    ### DISCUSS: use #param only for accessing request data.
     def param(name)
-      @params[name]
+      msg = "Deprecated. Use #options for widget constructor options or #params for request data."
+      ActiveSupport::Deprecation.warn(msg)
+      raise msg
     end
     
     

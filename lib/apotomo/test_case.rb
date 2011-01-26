@@ -74,7 +74,7 @@ module Apotomo
     #   trigger :submit, :source => "post-comments"
     def trigger(type, options)
       source = root.find_widget(options.delete(:source))
-      source.instance_variable_set :@params, options  # TODO: this is just a try-out (what about children?). 
+      source.options.merge!(options)  # TODO: this is just a try-out (what about children?). 
       source.fire(type)
       root.page_updates # DISCUSS: use ControllerMethods?
     end

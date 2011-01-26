@@ -128,14 +128,10 @@ class WidgetTest < ActiveSupport::TestCase
       assert_equal @mum.name, @mum.widget_id
     end
     
-    should "provide #param" do
-      @controller.params = HashWithIndifferentAccess.new('type' => 'Wireless mouse', :brand => "Logitech")
-      @mum = widget(:mouse_cell, 'mum', :display, :color => 'grey', :type => 'shrew')
-      assert_equal nil,     @mum.param(:whatever)
-      assert_equal 'grey',  @mum.param(:color)
-      assert_equal 'grey',  @mum.param('color')
-      assert_equal 'shrew', @mum.param(:type)
-      assert_equal 'Logitech', @mum.param(:brand)
+    should "mark #param as deprecated" do
+      assert_raises RuntimeError do
+        @mum.param(:volume)
+      end
     end
     
     

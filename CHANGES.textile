@@ -1,7 +1,9 @@
 h2. 1.0.4
 
 h3. Changes
-  * options passed to #render_widget are now merged with @opts.
+  * options passed to #render_widget are now merged with #options.
+  * we no longer have @opts and @params but #options and #params from Cell::Base.
+  * deprecated #param, it is simply too complex.
 
 h3. Bugfixes
   * 
