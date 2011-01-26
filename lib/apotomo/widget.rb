@@ -188,11 +188,8 @@ module Apotomo
 
     # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 
     # transition or not.
-    ### TODO: document the need for return.
     def jump_to_state(state)
-      logger.debug "STATE JUMP! to #{state}"
-      
-      render_state(state)
+      raise "Deprecated, don't use me. Use #render."
     end
     
     
