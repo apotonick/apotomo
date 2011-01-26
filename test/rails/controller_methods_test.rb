@@ -71,7 +71,7 @@ class ControllerMethodsTest < ActionController::TestCase
           root << widget(:mouse_cell, 'kid', :display, :roomies => roomies)
         end
         
-        assert_equal ['mice', 'cows'], @controller.apotomo_root['kid'].opts[:roomies]
+        assert_equal ['mice', 'cows'], @controller.apotomo_root['kid'].options[:roomies]
       end
     end
     

@@ -23,12 +23,11 @@ module Apotomo
     #     
     #     # we need @cheese in every state:
     #     def setup_cheese(*)
-    #       @cheese = Cheese.find @opts[:cheese_id]
+    #       @cheese = Cheese.find options[:cheese_id]
     define_hook :after_initialize
     define_hook :has_widgets
     define_hook :after_add
     
-    attr_accessor :opts
     attr_writer   :visible
 
     include TreeNode
@@ -56,8 +55,8 @@ module Apotomo
     
     
     # Constructor which needs a unique id for the widget and one or multiple start states.  
-    def initialize(parent_controller, id, start_state, opts={})
-      super(parent_controller, opts)  # do that as long as cells do need a parent_controller.
+    def initialize(parent_controller, id, start_state, options={})
+      super(parent_controller, options)  # do that as long as cells do need a parent_controller.
       
       @name         = id
       @start_state  = start_state
@@ -65,7 +64,7 @@ module Apotomo
       @visible      = true
       @cell         = self  ### DISCUSS: needed?
       
-      @params       = parent_controller.params.dup.merge(opts)
+      @params       = parent_controller.params.dup.merge(options)
       
       run_hook :after_initialize, self
     end
@@ -94,7 +93,7 @@ module Apotomo
       
       return process(state, event) if method(state).arity == 1
       
-      opts[:event] = event if event and opts[:event].blank? # TODO: remove for 3.0.4+
+      options[:event] = event if event and options[:event].blank? # TODO: remove for 3.0.4+
       process(state)
     end
     

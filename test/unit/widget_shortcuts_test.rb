@@ -16,12 +16,6 @@ class WidgetShortcutsTest < Test::Unit::TestCase
     end
   end
   
-  context "#cell" do
-    should "create a MouseCell instance for backward-compatibility" do
-      assert_kind_of MouseCell, cell(:mouse, :eating, 'mum')
-    end
-  end
-  
   context "#widget" do   
     context "with all arguments" do
       setup do
@@ -35,7 +29,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       end
       
       should "accept options" do
-        assert_equal({:color => "grey", :type => :hungry}, @mum.opts)
+        assert_equal({:color => "grey", :type => :hungry}, @mum.options)
       end
     end
     
@@ -45,7 +39,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
         assert_kind_of MumWidget, @mum
         assert_equal :display,  @mum.instance_variable_get(:@start_state)
         assert_equal 'mum',     @mum.name
-        assert_equal({:color => "grey", :type => :hungry}, @mum.opts)
+        assert_equal({:color => "grey", :type => :hungry}, @mum.options)
       end
     end
     
@@ -55,7 +49,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
         assert_kind_of MumWidget, @mum
         assert_equal :squeak,   @mum.instance_variable_get(:@start_state)
         assert_equal 'mum',     @mum.name
-        assert_equal({},        @mum.opts)
+        assert_equal({},        @mum.options)
       end
     end
     

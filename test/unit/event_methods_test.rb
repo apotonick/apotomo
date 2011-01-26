@@ -62,7 +62,7 @@ class EventMethodsTest < Test::Unit::TestCase
       @mum.respond_to_event :answer_squeak
       @mum.instance_eval do
         def answer_squeak
-          evt = @opts[:event]
+          evt = options[:event]
           list << evt.data
         end
       end

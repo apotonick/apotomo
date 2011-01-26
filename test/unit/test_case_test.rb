@@ -71,6 +71,12 @@ class TestCaseTest < Test::Unit::TestCase
           assert_equal :kitchen, @mum.param(:direction)
         end
         
+        #should "merge options from #trigger and constructor" do
+        #  @test.root << @test.widget("mouse_cell", 'kid', :location => :hallway)
+        #  @test.trigger(:footsteps, :source => 'kid', :direction => :kitchen)
+        #  assert_equal({:direction => :kitchen, :location => :hallway}, @mum.param(:direction))
+        #end
+        
         should "respond to #assert_response" do
           @test.trigger(:footsteps, :source => 'mum')
           assert @test.assert_response("squeak!")

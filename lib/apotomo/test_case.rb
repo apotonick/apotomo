@@ -64,7 +64,7 @@ module Apotomo
     
     # Renders the widget +name+.
     def render_widget(name, options={})
-      @last_invoke = root.find_widget(name).tap { |w| w.opts = options }.invoke # DISCUSS: use ControllerMethods?
+      @last_invoke = root.find_widget(name).tap { |w| w.options = options }.invoke # DISCUSS: use ControllerMethods?
     end
     
     # Triggers an event of +type+. You have to pass <tt>:source</tt> as options.

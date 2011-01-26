@@ -50,9 +50,9 @@ module Apotomo
       Apotomo::StatefulWidget.freeze_for(@session, root)
     end
     
-    # Renders the widget named <tt>widget_id</tt>, passing optional <tt>opts</tt> and a block to it.
+    # Renders the widget named <tt>widget_id</tt>, passing optional <tt>options</tt> and a block to it.
     # Use this in your #render_widget wrapper.
-    def render_widget_for(widget_id, opts, &block)
+    def render_widget_for(widget_id, options, &block)
       if widget_id.kind_of?(::Apotomo::Widget)
         widget = widget_id
       else
@@ -62,7 +62,7 @@ module Apotomo
       
       
       ### TODO: pass options in invoke.
-      widget.opts.merge!(opts)
+      widget.options.merge!(options)
       
       widget.invoke(&block)
     end

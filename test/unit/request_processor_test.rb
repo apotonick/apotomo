@@ -185,7 +185,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
     
     should "merge options from constructor with render_widget options" do
       @processor.render_widget_for('mum', :pitch => :high)
-      assert_equal({:pitch => :high, :volume => 9}, @processor.root['mum'].opts)
+      assert_equal({:pitch => :high, :volume => 9}, @processor.root['mum'].options)
     end
   end
   
