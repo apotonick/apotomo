@@ -9,7 +9,7 @@ module Apotomo
     #   widget(:comments_widget, 'post-comments')
     #   widget(:comments_widget, 'post-comments', :user => @current_user)
     #
-    # Start state is <tt>:display</tt>, whereas the latter also populates @opts.
+    # Start state is <tt>:display</tt>, whereas the latter also populates #options.
     #
     #   widget(:comments_widget, 'post-comments', :reload)
     #   widget(:comments_widget, 'post-comments', :reload, :user => @current_user)
@@ -40,15 +40,7 @@ module Apotomo
     
     # TODO: deprecate.
     def cell(base_name, states, id, *args)
-      widget(base_name.to_s + '_cell', states, id, *args)
-    end
-    
-    def tab_panel(id, *args)
-      widget('apotomo/tab_panel_widget', :display, id, *args)
-    end
-    
-    def tab(id, *args)
-      widget('apotomo/tab_widget', :display, id, *args)
+      raise "Deprecated."
     end
     
     private
