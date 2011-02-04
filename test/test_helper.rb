@@ -4,13 +4,13 @@ require 'bundler'
 Bundler.setup
 
 require 'shoulda'
-require 'cells'
-require 'apotomo'
 
 ENV['RAILS_ENV'] = 'test'
 require "dummy/config/environment"
 require "rails/test_help" # sets up ActionController::TestCase's @routes
 
+require 'cells'
+require 'apotomo'
 
 Cell::Base.append_view_path File.expand_path(File.dirname(__FILE__) + "/fixtures")
 
