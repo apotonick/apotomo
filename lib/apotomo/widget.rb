@@ -75,8 +75,7 @@ module Apotomo
       @visible
     end
     
-    # Returns the rendered content for the widget by running the state method for <tt>state</tt>.
-    # This might lead us to some other state since the state method could call #jump_to_state.
+    # Returns the rendered content for the widget by running the state method for +state+.
     def invoke(state=nil, event=nil)
       logger.debug "\ninvoke on #{name} with #{state.inspect}"
       
@@ -87,12 +86,10 @@ module Apotomo
       logger.debug "#{name}: transition: #{last_state} to #{state}"
       logger.debug "                                    ...#{state}"
       
-      #render_state(state)
-      
-      return process(state, event) if method(state).arity == 1
+      return render_state(state, event) if state_accepts_args?(state)
       
       options[:event] = event if event and options[:event].blank? # TODO: remove for 3.0.4+
-      process(state)
+      render_state(state)
     end
     
     
@@ -150,7 +147,7 @@ module Apotomo
       @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
       
       
-      render_view_for(options, action_name) # defined in Cell::Base.
+      render_view_for(action_name, options) # defined in Cell::Base.
     end
     
     alias_method :emit, :render
