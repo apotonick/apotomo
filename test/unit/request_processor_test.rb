@@ -170,22 +170,27 @@ class RequestProcessorTest < ActiveSupport::TestCase
     end
     
     should "render the widget when passing an existing widget id" do
-      assert_equal 'squeak!', @processor.render_widget_for('mum', {})
+      assert_equal 'squeak!', @processor.render_widget_for('mum')
     end
     
     should "render the widget when passing an existing widget instance" do
-      assert_equal 'squeak!', @processor.render_widget_for(@processor.root['mum'], {})
+      assert_equal 'squeak!', @processor.render_widget_for(@processor.root['mum'])
     end
     
     should "raise an exception when a non-existent widget id is passed" do
       assert_raises RuntimeError do
-        @processor.render_widget_for('mummy', {})
+        @processor.render_widget_for('mummy')
       end
     end
     
-    should "merge options from constructor with render_widget options" do
-      @processor.render_widget_for('mum', :pitch => :high)
-      assert_equal({:pitch => :high, :volume => 9}, @processor.root['mum'].options)
+    should "pass options as state-args" do
+      @processor.root['mum'].instance_eval do
+        def squeak(pitch)
+          @pitch = pitch
+        end
+      end
+      @processor.render_widget_for('mum', :high)
+      assert_equal(:high, @processor.root['mum'].instance_variable_get(:@pitch))
     end
   end
   

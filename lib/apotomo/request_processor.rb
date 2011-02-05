@@ -52,7 +52,7 @@ module Apotomo
     
     # Renders the widget named <tt>widget_id</tt>, passing optional <tt>options</tt> and a block to it.
     # Use this in your #render_widget wrapper.
-    def render_widget_for(widget_id, options, &block)
+    def render_widget_for(widget_id, *args, &block) # DISCUSS: allow passing a state here?
       if widget_id.kind_of?(::Apotomo::Widget)
         widget = widget_id
       else
@@ -60,11 +60,7 @@ module Apotomo
         raise "Couldn't render non-existent widget `#{widget_id}`" unless widget
       end
       
-      
-      ### TODO: pass options in invoke.
-      widget.options.merge!(options)
-      
-      widget.invoke(&block)
+      widget.invoke(nil, *args, &block)
     end
     
     # Computes the address hash for a +:source+ widget and an event +:type+.
