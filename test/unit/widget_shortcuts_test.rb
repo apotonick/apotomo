@@ -24,7 +24,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       
       should "create a MumWidget instance" do
         assert_kind_of MumWidget, @mum
-        assert_equal :eating, @mum.instance_variable_get(:@start_state)
+        assert_equal :eating, @mum.start_state
         assert_equal 'mum', @mum.name
       end
       
@@ -37,7 +37,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       should "set a default start_state" do
         @mum = widget(:mum_widget, 'mum', :color => 'grey', :type => :hungry)
         assert_kind_of MumWidget, @mum
-        assert_equal :display,  @mum.instance_variable_get(:@start_state)
+        assert_equal :display,  @mum.start_state
         assert_equal 'mum',     @mum.name
         assert_equal({:color => "grey", :type => :hungry}, @mum.options)
       end
@@ -47,7 +47,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       should "not set options" do
         @mum = widget(:mum_widget, 'mum', :squeak)
         assert_kind_of MumWidget, @mum
-        assert_equal :squeak,   @mum.instance_variable_get(:@start_state)
+        assert_equal :squeak,   @mum.start_state
         assert_equal 'mum',     @mum.name
         assert_equal({},        @mum.options)
       end
@@ -60,7 +60,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       
       should "create a MumWidget instance with :display start state" do
         assert_kind_of MumWidget, @mum
-        assert_equal :display, @mum.instance_variable_get(:@start_state)
+        assert_equal :display, @mum.start_state
         assert_equal 'mum', @mum.name
       end
     end

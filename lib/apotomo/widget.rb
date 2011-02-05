@@ -40,7 +40,8 @@ module Apotomo
     define_hook :has_widgets
     define_hook :after_add
     
-    attr_writer   :visible
+    attr_writer :visible
+    attr_reader :start_state
 
     include TreeNode
     
@@ -87,16 +88,13 @@ module Apotomo
       @visible
     end
     
-    # Returns the rendered content for the widget by running the state method for +state+.
+    # Returns the rendered content for the widget by running the method for +state+.
     def invoke(state=nil, *args)
-      logger.debug "\ninvoke on #{name} with #{state.inspect}"
+      logger.debug "#{name}.invoke(#{state.inspect})"
       
-      if state.blank?
-        state = next_state_for(last_state) || @start_state
-      end
+      state ||= (next_state_for(last_state) || start_state) # TODO: move to separate method.
       
       logger.debug "#{name}: transition: #{last_state} to #{state}"
-      logger.debug "                                    ...#{state}"
       
       return render_state(state, *args) if state_accepts_args?(state)
       
