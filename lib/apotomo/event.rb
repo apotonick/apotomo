@@ -5,5 +5,7 @@ module Apotomo
     def _dump(depth)
       raise "You're trying to serialize an instance of Apotomo::Event. Don't do that."
     end
+    
+    delegate :[], :to => :data
   end
 end

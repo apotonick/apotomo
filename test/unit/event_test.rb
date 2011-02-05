@@ -17,6 +17,11 @@ class EventTest < Test::Unit::TestCase
       assert_equal({:volume => :loud}, @event.data)
     end
     
+    should "delegate #[] to data" do
+      @event = Apotomo::Event.new(:footsteps, 'mum', {:volume => :loud})
+      assert_equal :loud, @event[:volume]
+    end
+    
     should "complain when serialized" do
       assert_raises RuntimeError do
         Marshal.dump(Apotomo::Event.new(:footsteps, 'mum'))
