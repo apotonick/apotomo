@@ -61,8 +61,7 @@ class EventMethodsTest < Test::Unit::TestCase
     should "accept payload data for the event" do
       @mum.respond_to_event :answer_squeak
       @mum.instance_eval do
-        def answer_squeak
-          evt = options[:event]
+        def answer_squeak(evt)
           list << evt.data
         end
       end
