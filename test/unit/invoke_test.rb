@@ -13,6 +13,24 @@ class InvokeTest < Test::Unit::TestCase
       @mum = LocalMouse.new(parent_controller, 'mum', :snuggle)
     end
     
+    context "#invoke_state" do
+      should "accept a state, only" do
+        @mum.invoke_state :snuggle
+        assert_equal 'snuggle', @mum.last_state
+      end
+      
+      should "pass args as state-args" do
+        @mum.instance_eval do
+          def snuggle(duration)
+            @duration = duration
+          end
+        end
+        @mum.invoke_state :snuggle, "forever"
+        assert_equal 'snuggle', @mum.last_state
+        assert_equal "forever", @mum.instance_variable_get(:@duration)
+      end
+    end
+    
     context "implicitely" do
       should "always enter the given state" do
         @mum.invoke :snuggle

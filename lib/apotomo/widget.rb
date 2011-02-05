@@ -96,10 +96,14 @@ module Apotomo
       
       logger.debug "#{name}: transition: #{last_state} to #{state}"
       
+      invoke_state(state, *args)
+    end
+    
+    def invoke_state(state, *args)
       return render_state(state, *args) if state_accepts_args?(state)
-      
       render_state(state)
     end
+    
     
     
     # Render the view for the current state. Usually called at the end of a state method.
