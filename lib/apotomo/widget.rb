@@ -54,7 +54,12 @@ module Apotomo
     helper Apotomo::Rails::ViewHelper
     
     abstract!
+    
     undef :display  # We don't want #display to be listed in #internal_methods.
+    
+    alias_method :last_state, :action_name
+    alias_method :widget_id,  :name
+    
     
     # Runs callbacks for +name+ hook in instance context.  
     def run_widget_hook(name, *args)
@@ -78,10 +83,6 @@ module Apotomo
       @cell         = self  ### DISCUSS: needed?
       
       run_hook :after_initialize, self
-    end
-    
-    def last_state
-      action_name
     end
     
     def visible?
@@ -251,7 +252,5 @@ module Apotomo
     def url_for_event(type, options={})
       apotomo_event_path address_for_event(type, options) 
     end
-    
-    alias_method :widget_id, :name
   end
 end
