@@ -84,8 +84,8 @@ require 'apotomo/rails/view_methods'
         end
         
         
-        def render_widget(widget, options={}, &block)
-          apotomo_request_processor.render_widget_for(widget, options, &block)
+        def render_widget(widget, *args, &block)
+          apotomo_request_processor.render_widget_for(widget, *args, &block)
         end
         
         def apotomo_freeze
