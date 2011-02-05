@@ -10,6 +10,18 @@ require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/view_helper'
 
 module Apotomo
+  # == Accessing Parameters
+  #
+  # 1. Configuration values are available both in render and triggered states. Pass those in #widget
+  # when creating the widget tree. Use #options for reading.
+  #
+  #   has_widgets do |root|
+  #     root << widget(:mouse_widget, 'mum', :favorites => ["Gouda", "Chedar"])
+  #
+  # and read in your widget state
+  #
+  #   def display
+  #     @cheese = options[:favorites].first
   class Widget < Cell::Base
     include Hooks
     
@@ -88,7 +100,6 @@ module Apotomo
       
       return render_state(state, event) if state_accepts_args?(state)
       
-      options[:event] = event if event and options[:event].blank? # TODO: remove for 3.0.4+
       render_state(state)
     end
     
