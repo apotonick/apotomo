@@ -3,6 +3,7 @@ h2. 1.1
 h3. Changes
   * The event is no longer added to #options at triggering time.
   * Options passed in #render_widget are no longer merged with #options. They are passed as state-args to reduce complexity.
+  * Removed #jump_to_state.
 
 h2. 1.0.4
 

@@ -193,13 +193,6 @@ module Apotomo
       content = render(options)
       Apotomo.js_generator.update(options[:selector] || self.name, content)
     end
-
-    # Force the FSM to go into <tt>state</tt>, regardless whether it's a valid 
-    # transition or not.
-    def jump_to_state(state)
-      raise "Deprecated, don't use me. Use #render."
-    end
-    
     
     def visible_children
       children.find_all { |kid| kid.visible? }
