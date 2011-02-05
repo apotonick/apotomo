@@ -97,6 +97,7 @@ module Apotomo
       logger.debug "#{name}: transition: #{last_state} to #{state}"
       
       return render_state(state, *args) if state_accepts_args?(state)
+      
       render_state(state)
     end
     
