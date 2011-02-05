@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'apotomo/proc_event_handler'
 
 class EventHandlerTest < Test::Unit::TestCase
   include Apotomo::TestCaseMethods::TestController

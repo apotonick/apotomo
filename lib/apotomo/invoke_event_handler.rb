@@ -1,3 +1,5 @@
+require 'apotomo/event_handler'
+
 module Apotomo
   class InvokeEventHandler < EventHandler
     attr_accessor :widget_id, :state

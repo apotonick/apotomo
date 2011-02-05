@@ -18,6 +18,3 @@ module Apotomo
     
   end
 end
-
-require 'apotomo/invoke_event_handler'
-require 'apotomo/proc_event_handler'
