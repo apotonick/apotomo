@@ -35,7 +35,7 @@ module Apotomo
     def process_for(request_params)
       source = self.root.find_widget(request_params[:source]) or raise "Source #{request_params[:source].inspect} non-existent."
       
-      source.fire(request_params[:type].to_sym)
+      source.fire(request_params[:type].to_sym, request_params) # set data to params for now.
       source.root.page_updates ### DISCUSS: that's another dependency.
     end
     

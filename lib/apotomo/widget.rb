@@ -12,6 +12,9 @@ require 'apotomo/rails/view_helper'
 module Apotomo
   # == Accessing Parameters
   #
+  # Apotomo tries to prevent you from having to access the global #params hash. We have the following
+  # concepts to retrieve input data.
+  #
   # 1. Configuration values are available both in render and triggered states. Pass those in #widget
   # when creating the widget tree. Use #options for reading.
   #
@@ -22,6 +25,12 @@ module Apotomo
   #
   #   def display
   #     @cheese = options[:favorites].first
+  #
+  # 2. Request data from forms etc. is available through <tt>event.data</tt> in the triggered states. 
+  # Use the <tt>#[]</tt> shortcut to access values directly.
+  #
+  #   def update(evt)
+  #     @cheese = Cheese.find evt[:cheese_id]
   class Widget < Cell::Base
     include Hooks
     

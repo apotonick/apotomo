@@ -138,6 +138,14 @@ class RequestProcessorTest < ActiveSupport::TestCase
       assert_equal ["away from here!", "squeak!"], @processor.process_for({:type => :doorSlam, :source => 'kid'})
     end
     
+    should "append the params hash to the triggered event" do
+      KidCell.class_eval do
+        def squeak(evt); render :text => evt.data.inspect; end
+      end
+      
+      assert_equal ["away from here!", "{:type=>:doorSlam, :source=>\"kid\"}"], @processor.process_for({:type => :doorSlam, :source => 'kid'})
+    end
+    
     should "raise an exception when :source is unknown" do
       assert_raises RuntimeError do
         @processor.process_for({:type => :squeak, :source => 'tom'})

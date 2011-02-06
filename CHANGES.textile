@@ -3,6 +3,7 @@ h2. 1.1
 h3. Changes
   * The event is no longer added to #options at triggering time.
   * Options passed in #render_widget are no longer merged with #options. They are passed as state-args to reduce complexity.
+  * The params hash is appended to the event in RequestProcessor#process_for. You can now live completely without accessing the global #params.
   * Removed #jump_to_state.
   * Event delegates #[] to #data.
 
