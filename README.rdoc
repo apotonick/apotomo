@@ -42,7 +42,7 @@ Let's wrap that comments block in a widget.
 
 Go and generate a widget stub.
 
-  $ rails generate apotomo:widget CommentsWidget display write --haml
+  $ rails generate apotomo:widget CommentsWidget display write -e haml
     create  app/cells/
     create  app/cells/comments_widget
     create  app/cells/comments_widget.rb
@@ -84,8 +84,8 @@ A widget is like a cell which is like a mini-controller.
   class CommentsWidget < Apotomo::Widget
     responds_to_event :submit, :with => :write
     
-    def display
-      @comments = param(:post).comments # the parameter from outside.
+    def display(args)
+      @comments = args[:post].comments # the parameter from outside.
       render
     end
 
@@ -93,9 +93,9 @@ Having +display+ as the default state when rendering, this method collects comme
 
 And look at line 2 - if encountering a <tt>:submit</tt> event we invoke +write+, which is simply another state. How cool is that? 
 
-    def write
-      @comment = Comment.new(:post => param(:post))
-      @comment.update_attributes param(:comment)  # like params[].
+    def write(evt)
+      @comment = Comment.new(:post_id => evt[:post_id])
+      @comment.update_attributes evt[:comment]  # a bit like params[].
       
       update :state => :display
     end
@@ -160,8 +160,8 @@ Look, +replace+ basically generates
 
 If that's not what you want, do
 
-  def write
-    if param(:comment)[:text].explicit?
+  def write(evt)
+    if evt[:comment][:text].explicit?
       render :text => 'alert("Hey, you wanted to submit a pervert comment!");'
     end
   end
@@ -210,4 +210,4 @@ If you wanna be cool, subscribe to our feed[http://feeds.feedburner.com/Apotomo]
 
 
 == License
-Copyright (c) 2007-2010 Nick Sutterer <apotonick@gmail.com> under the MIT License
+Copyright (c) 2007-2011 Nick Sutterer <apotonick@gmail.com> under the MIT License

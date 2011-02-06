@@ -77,7 +77,7 @@ module Apotomo
     # which can be queried in a triggered state.
     #
     #   def on_drop(event)
-    #     if event.data[:area] == 59 
+    #     if event[:area] == 59 
     def trigger(*args)
       fire(*args)
     end
