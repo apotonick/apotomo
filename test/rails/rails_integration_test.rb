@@ -10,9 +10,9 @@ class RailsIntegrationTest < ActionController::TestCase
   context "A Rails controller" do
     setup do
       @mum = mum = MouseWidget.new(parent_controller, 'mum', :snuggle)
-      @mum.class.class_eval do
-        responds_to_event :squeak, :with => :snuggle
-        
+      
+      @mum.respond_to_event :squeak, :with => :snuggle
+      @mum.instance_eval do
         def snuggle; render; end
       end
       
@@ -36,7 +36,14 @@ class RailsIntegrationTest < ActionController::TestCase
       assert_select "a", "mum"
     end
     
-
+    should "pass the event with all params data as state-args" do
+      @mum.instance_eval do
+        def snuggle(evt); render :text => evt.data; end
+      end
+      
+      get 'render_event_response', :source => 'mum', :type => :squeak, :pitch => :high
+      assert_equal "{\"source\"=>\"mum\", \"type\"=>:squeak, \"pitch\"=>:high, \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}", @response.body
+    end
     
     should "render updates to the parent window for an iframe request" do
       get 'widget'

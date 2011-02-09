@@ -49,7 +49,7 @@ module Apotomo
       end
       
       def render_event_response
-        page_updates = apotomo_request_processor.process_for({:type => params[:type], :source => params[:source]})
+        page_updates = apotomo_request_processor.process_for(params)
         
         return render_iframe_updates(page_updates) if params[:apotomo_iframe]
         
