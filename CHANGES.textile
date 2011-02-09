@@ -4,15 +4,21 @@ h3. Changes
   * The event is no longer added to #options at triggering time.
   * Options passed in #render_widget are no longer merged with #options. They are passed as state-args to reduce complexity.
   * The params hash is appended to the event in RequestProcessor#process_for. You can now live completely without accessing the global #params.
+  * we no longer have @opts and @params but #options and #params from Cell::Base.
   * Removed #jump_to_state.
   * Event delegates #[] to #data.
+  * Removed #param, it is simply too complex.
+
 
 h2. 1.0.4
 
-h3. Changes
-  * options passed to #render_widget are now merged with #options.
-  * we no longer have @opts and @params but #options and #params from Cell::Base.
-  * deprecated #param, it is simply too complex.
+h3. Bugfixes
+    * Caching states works, again. Thanks to Gudleik Rasch for spotting.
+    * We cleanly require cells-3.4.x now. Thanks to Ryan Bates who remarked that Apotomo 1.0.x tries to require cells-3.5, which was wrong.
+
+h3. Notes
+
+    * Removed the usage of state-args. If you want the event instance in your triggered state, use @opts[:event] or upgrade to apotomo-1.1.
 
 
 h2. 1.0.3
