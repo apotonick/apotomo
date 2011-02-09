@@ -92,10 +92,10 @@ module Apotomo
       
       #render_state(state)
       
-      return process(state, event) if method(state).arity == 1
+      return render_state(state, event) if method(state).arity == 1
       
       opts[:event] = event
-      process(state)
+      render_state(state)
     end
     
     
