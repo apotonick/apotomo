@@ -1,3 +1,12 @@
+h2. 1.0.4
+
+h3. Bugfixes
+  * Caching states works, again. Thanks to Gudleik Rasch for spotting.
+  * We cleanly require cells-3.4.x now. Thanks to Ryan Bates who remarked that Apotomo 1.0.x tries to require cells-3.5, which was wrong.
+  
+h3. Notes
+  * Removed the usage of state-args. If you want the event instance in your triggered state, use @opts[:event] or upgrade to apotomo-1.1.
+  
 h2. 1.0.3
 
 h3. Bugfixes
