@@ -1,4 +1,4 @@
-h2. 1.0.4
+h2. 1.0.5
 
 h3. Bugfixes
   * Caching states works, again. Thanks to Gudleik Rasch for spotting.
