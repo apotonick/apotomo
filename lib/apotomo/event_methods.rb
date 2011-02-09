@@ -87,5 +87,9 @@ module Apotomo
     def local_event_handlers(event)
       event_table.all_handlers_for(event.type, event.source.name) # we key with widget_id.
     end
+    
+    def event_for(*args)  # defined in Onfire: we want Apotomo::Event.
+      Event.new(*args)
+    end
   end
 end

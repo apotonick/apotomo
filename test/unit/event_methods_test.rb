@@ -50,12 +50,12 @@ class EventMethodsTest < Test::Unit::TestCase
         respond_to_event :footsteps
           
         def footsteps(evt)
-          list << evt.type
+          list << evt
         end
       end
       
-      @mum.trigger :footsteps
-      assert_equal ["escape", :footsteps], @mum.list
+      @mum.trigger :footsteps, "near"
+      assert_kind_of Apotomo::Event, @mum.list.last
     end
     
     should "accept payload data for the event" do

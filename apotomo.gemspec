@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.email       = ["apotonick@gmail.com"]
   s.homepage    = "http://github.com/apotonick/apotomo"
   s.summary     = %q{Web components for Rails.}
-  s.description = %q{Web component framework for Rails providing page widgets that trigger events and know when and how to update themselves with AJAX.}
+  s.description = %q{Web component framework for Rails providing widgets that trigger events and know when and how to update themselves with AJAX.}
   
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   
   s.add_dependency "rails",   "~> 3.0"
   s.add_dependency "cells",   "~> 3.5"
-  s.add_dependency "onfire",  "~> 0.1.1"
+  s.add_dependency "onfire",  "~> 0.1.2"
   s.add_dependency "hooks",   "~> 0.1.3"
 
   s.add_development_dependency "shoulda"
