@@ -12,9 +12,9 @@ class WidgetTest < ActiveSupport::TestCase
   
   context "Widget.has_widgets" do
     setup do
-      @mum = Class.new(MouseCell) do
+      @mum = Class.new(MouseWidget) do
         has_widgets do |me|
-          me << widget('mouse_cell', 'baby', :squeak)
+          me << widget(:mouse_widget, 'baby', :squeak)
         end
       end.new(@controller, 'mum', :squeak)
       
@@ -23,20 +23,20 @@ class WidgetTest < ActiveSupport::TestCase
     
     should "setup the widget family at creation time" do
       assert_equal 1, @mum.children.size
-      assert_kind_of Apotomo::StatefulWidget, @mum['baby']
+      assert_kind_of Apotomo::Widget, @mum['baby']
     end
     
     should "inherit trees for now" do
       assert_equal 1, @mum.children.size
-      assert_kind_of Apotomo::StatefulWidget, @mum['baby']
+      assert_kind_of Apotomo::Widget, @mum['baby']
     end
   end
   
   context "Widget.after_add" do
     setup do
-      @mum = Class.new(MouseCell) do
+      @mum = Class.new(MouseWidget) do
         after_add do |me, parent|
-          parent << widget('mouse_cell', 'kid', :squeak)
+          parent << widget(:mouse_widget, 'kid', :squeak)
         end
       end.new(@controller, 'mum', :squeak)
       
@@ -141,8 +141,8 @@ class WidgetTest < ActiveSupport::TestCase
     end
     
     should "list both local and inherited states in Widget.action_methods" do
-      assert MouseCell.action_methods.collect{ |m| m.to_s }.include?("eating")
-      assert Class.new(MouseCell).action_methods.collect{ |m| m.to_s }.include?("eating")
+      assert MouseWidget.action_methods.collect{ |m| m.to_s }.include?("squeak")
+      assert Class.new(MouseWidget).action_methods.collect{ |m| m.to_s }.include?("squeak")
     end
     
     should "not list #display in internal_methods although it's defined in Object" do

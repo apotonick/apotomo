@@ -38,31 +38,13 @@ module Farm
 end
 
 
-class MouseCell < Apotomo::StatefulWidget
-  def eating; render; end
-  def squeak; render; end
-  def educate; render; end
-  def snooze; render; end
-  def listen; render; end
-  def answer_squeak; render; end
-  def peek; render; end
-  def alert; end
-  def escape; end
-  def snuggle; end
-end
-
-### TODO: 2brm?
-class RenderingTestCell < Apotomo::StatefulWidget
-  attr_reader :brain
-  attr_reader :rendered_children
-  
-  
-  
-  def jump
-    jump_to_state :check_state
+class MouseWidget < Apotomo::Widget
+  def squeak
+  end
+  def eating
+    render
   end
 end
-
 
 # Enable dynamic states so we can do Cell.class_eval { def ... } at runtime.
 Apotomo::Widget.class_eval do

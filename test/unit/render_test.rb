@@ -5,11 +5,11 @@ class RenderTest < ActionView::TestCase
   
   context "Rendering a single widget" do
     setup do
-      @mum = mouse_mock
+      @mum = mouse_mock('mum', :eating)
     end
     
     should "per default display the state content framed in a div" do
-      assert_equal '<div id="mouse">burp!</div>', @mum.invoke(:eating)
+      assert_equal '<div id="mum">burp!</div>', @mum.invoke(:eating)
     end
     
     context "with :text" do
@@ -115,7 +115,7 @@ class RenderTest < ActionView::TestCase
         end
         
         should "render the view" do
-          assert_equal "<div id=\"mouse\">burp!</div>",  @mum.invoke(:eating)
+          assert_equal "<div id=\"mum\">burp!</div>",  @mum.invoke(:eating)
         end
         
         should "render the children, too" do
@@ -135,13 +135,13 @@ class RenderTest < ActionView::TestCase
         end
         
         should "render the :view" do
-          assert_equal "<div id=\"mouse\"><snuggle></snuggle></div>\n", @mum.invoke(:squeak)
+          assert_equal "<div id=\"mum\"><snuggle></snuggle></div>\n", @mum.invoke(:squeak)
         end
         
         should "render the children" do
           @mum << @kid
           
-          assert_equal "<div id=\"mouse\"><snuggle>squeeeeaaak</snuggle></div>\n", @mum.invoke(:squeak)
+          assert_equal "<div id=\"mum\"><snuggle>squeeeeaaak</snuggle></div>\n", @mum.invoke(:squeak)
           assert @kid.rendered?
         end
       end
@@ -158,7 +158,7 @@ class RenderTest < ActionView::TestCase
             update :text => "squeak!"
           end
         end
-        assert_equal "$(\"mouse\").update(\"squeak!\")", @mum.invoke(:squeak)
+        assert_equal "$(\"mum\").update(\"squeak!\")", @mum.invoke(:squeak)
       end
       
       should "accept :selector" do
@@ -182,7 +182,7 @@ class RenderTest < ActionView::TestCase
             replace :text => '<div id="mum">squeak!</div>'
           end
         end
-        assert_equal "$(\"mouse\").replace(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+        assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
       end
       
       should "accept :selector" do
@@ -202,7 +202,7 @@ class RenderTest < ActionView::TestCase
         def snuggle; render; end
       end
       
-      @mum << @kid = mouse_mock('kid')
+      @mum << @kid = mouse_mock('kid', :eating)
     end
     
     should "per default render kid's content inside mums div with rendered_children" do

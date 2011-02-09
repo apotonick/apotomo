@@ -3,7 +3,7 @@ require 'test_helper'
 class InvokeTest < Test::Unit::TestCase
   include Apotomo::TestCaseMethods::TestController
   
-  class LocalMouse < MouseCell
+  class LocalMouse < MouseWidget
     def snuggle; render; end
     def educate; render :view => :snuggle; end
   end

@@ -13,8 +13,8 @@ class ContainerTest < Test::Unit::TestCase
     end
     
     should "provide a family picture" do
-      @family << mouse_mock('mum')
-      @family << mouse_mock('kid')
+      @family << mouse_mock('mum', :eating)
+      @family << mouse_mock('kid', :eating)
       assert_equal "<div id=\"family\"><div id=\"mum\">burp!</div>\n<div id=\"kid\">burp!</div></div>", @family.invoke
     end
   end

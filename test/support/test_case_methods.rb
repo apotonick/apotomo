@@ -1,14 +1,14 @@
 module Apotomo
   module TestCaseMethods
     # Provides a ready-to-use mouse widget instance.
-    def mouse_mock(id='mouse', start_state=:eating, opts={}, &block)
-      mouse = MouseCell.new(parent_controller, id, start_state, opts)
+    def mouse_mock(id='mouse', start_state=:display, opts={}, &block)
+      mouse = MouseWidget.new(parent_controller, id, start_state, opts)
       mouse.instance_eval &block if block_given?
       mouse
     end
     
     def mouse_class_mock(&block)
-      klass = Class.new(MouseCell)
+      klass = Class.new(MouseWidget)
       klass.instance_eval &block if block_given?
       klass
     end
@@ -49,19 +49,7 @@ module Apotomo
       ### FIXME: @controller.session = {}
     end
     
-    def hibernate_widget(widget, session = {})
-      Apotomo::StatefulWidget.freeze_for(session, widget)
-      
-      session = Marshal.load(Marshal.dump(session))
-      
-      Apotomo::StatefulWidget.thaw_for(@controller, session, )
-    end
-    
-    def hibernate(widget, session = {})
-      Apotomo::StatefulWidget.freeze_for(session, widget)
-      session = Marshal.load(Marshal.dump(session))
-      Apotomo::StatefulWidget.thaw_for(session, widget('apotomo/widget', 'root'))
-    end
+
     
     module TestController
       def setup

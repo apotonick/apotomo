@@ -72,20 +72,20 @@ class EventMethodsTest < Test::Unit::TestCase
     
     context "#responds_to_event in class context" do
       setup do
-        class AdultMouseCell < MouseCell
+        class AdultMouse < MouseWidget
           responds_to_event :peep, :with => :answer_squeak
         end
-        class BabyMouseCell < AdultMouseCell
+        class BabyMouse < AdultMouse
           responds_to_event :footsteps, :with => :squeak
         end
       end
       
       should "add the handlers at creation time" do
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouseCell.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
       end
       
       should "not inherit handlers for now" do
-        assert_equal [], BabyMouseCell.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
+        assert_equal [], BabyMouse.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
       end
     end
     

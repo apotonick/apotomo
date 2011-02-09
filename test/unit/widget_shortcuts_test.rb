@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class MumWidget < MouseCell; end
+class MumWidget < MouseWidget; end
 class MouseTabs;end
 
 class WidgetShortcutsTest < Test::Unit::TestCase

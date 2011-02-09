@@ -16,7 +16,7 @@ class ControllerMethodsTest < ActionController::TestCase
     end
     
     context "responding to #apotomo_request_processor" do
-      should "initially return the processor which has a flushed root" do
+      should "initially return the processor which has an empty root" do
         assert_kind_of Apotomo::RequestProcessor, @controller.apotomo_request_processor
         assert_equal 1, @controller.apotomo_request_processor.root.size
       end
@@ -29,7 +29,7 @@ class ControllerMethodsTest < ActionController::TestCase
     context "invoking #has_widgets" do
       setup do
         @controller.class.has_widgets do |root|
-          root << widget(:mouse_cell, 'mum')
+          root << widget(:mouse_widget, 'mum')
         end
       end
       
@@ -44,7 +44,7 @@ class ControllerMethodsTest < ActionController::TestCase
       
       should "allow multiple calls to has_widgets" do
         @controller.class.has_widgets do |root|
-          root << widget(:mouse_cell, 'kid')
+          root << widget(:mouse_widget, 'kid')
         end
         
         assert @controller.apotomo_root['mum']
@@ -52,7 +52,7 @@ class ControllerMethodsTest < ActionController::TestCase
       end
       
       should "inherit has_widgets blocks to sub-controllers" do
-        berry = widget(:mouse_cell, 'berry')
+        berry = widget(:mouse_widget, 'berry')
         @sub_controller = Class.new(@controller.class) do
           has_widgets { |root| root << berry }
         end.new
@@ -68,64 +68,20 @@ class ControllerMethodsTest < ActionController::TestCase
         end
         
         @controller.class.has_widgets do |root|
-          root << widget(:mouse_cell, 'kid', :display, :roomies => roomies)
+          root << widget(:mouse_widget, 'kid', :display, :roomies => roomies)
         end
         
         assert_equal ['mice', 'cows'], @controller.apotomo_root['kid'].options[:roomies]
       end
     end
     
-    context "invoking #use_widgets" do
-      should "have an empty apotomo_root if no call happened, yet" do
-        assert_equal [],  @controller.bound_use_widgets_blocks
-        assert_equal 1,   @controller.apotomo_root.size
-      end
-      
-      should "extend the widget family and remember the block with one #use_widgets call" do
-        @controller.use_widgets do |root|
-          root << widget(:mouse_cell, 'mum')
-        end
-        
-        assert_equal 1, @controller.bound_use_widgets_blocks.size
-        assert_equal 2, @controller.apotomo_root.size
-      end
-      
-      should "add blocks only once" do
-        block = Proc.new {|root| root << widget(:mouse_cell, 'mum')}
-        
-        @controller.use_widgets &block
-        @controller.use_widgets &block
-        
-        assert_equal 1, @controller.bound_use_widgets_blocks.size
-        assert_equal 2, @controller.apotomo_root.size
-      end
-      
-      should "allow multiple calls with different blocks" do
-        mum_and_kid!
-        @controller.use_widgets do |root|
-          root << @mum
-        end
-        @controller.use_widgets do |root|
-          root << widget(:mouse_cell, 'pet')
-        end
-        
-        assert_equal 2, @controller.bound_use_widgets_blocks.size
-        assert_equal 4, @controller.apotomo_root.size
-      end
-    end
+    
     
     context "invoking #url_for_event" do
       should "compute an url for any widget" do
         assert_equal "/barn/render_event_response?source=mouse&type=footsteps&volume=9", @controller.url_for_event(:footsteps, :source => :mouse, :volume => 9)
       end
     end
-    
-    should "flush its bound_use_widgets_blocks with, guess, #flush_bound_use_widgets_blocks" do
-      @controller.bound_use_widgets_blocks << Proc.new {}
-      assert_equal 1, @controller.bound_use_widgets_blocks.size
-      @controller.flush_bound_use_widgets_blocks
-      assert_equal 0, @controller.bound_use_widgets_blocks.size
-    end 
   end
   
   context "invoking #render_widget" do
@@ -140,16 +96,6 @@ class ControllerMethodsTest < ActionController::TestCase
   end
   
   
-  
-  context "invoking #apotomo_freeze" do
-    should "freeze the widget tree to session" do
-      assert_equal 0, @controller.session.size
-      @controller.send :apotomo_freeze
-      assert @controller.session[:apotomo_widget_ivars]
-      assert @controller.session[:apotomo_stateful_branches]
-    end
-  end
-    
   context "processing an event request" do
     setup do
       @mum = mouse_mock('mum', :eating)
@@ -177,24 +123,6 @@ class ControllerMethodsTest < ActionController::TestCase
         assert_equal Mime::JS, @response.content_type
         assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
       end
-    end
-  end
-  
-  context "The ProcHash" do
-    setup do
-      @procs = Apotomo::Rails::ControllerMethods::ProcHash.new
-      @b = Proc.new{}; @d = Proc.new{}
-      @c = Proc.new{}
-      @procs << @b
-    end
-    
-    should "return true for procs it includes" do
-      assert @procs.include?(@b)
-      assert @procs.include?(@d)  ### DISCUSS: line nr is id, or do YOU got a better idea?!
-    end
-    
-    should "reject unknown procs" do
-      assert ! @procs.include?(@c)
     end
   end
   

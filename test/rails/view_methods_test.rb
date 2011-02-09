@@ -5,12 +5,13 @@ class ViewMethodsTest < ActionController::TestCase
   
   context "A Rails controller view" do
     setup do
-      @controller.instance_variable_set(:@mum, mouse_mock('mum', 'snuggle') {def snuggle; render; end})
-      @controller.instance_eval do
+      @mum = mum = mouse_mock('mum', 'snuggle') {def snuggle; render; end}
+      @controller.class.has_widgets do |root|
+        root << mum
+      end
+      
+      @controller.class_eval do
         def widget
-          use_widgets do |root|
-            root << @mum
-          end
           render :inline => "<%= render_widget 'mum' %>"
         end
       end
@@ -22,11 +23,8 @@ class ViewMethodsTest < ActionController::TestCase
     end
     
     should "respond to url_for_event" do
-      @controller.instance_eval do
+      @controller.class_eval do
         def widget
-          use_widgets do |root|
-            root << @mum
-          end
           render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
         end
       end

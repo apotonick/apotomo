@@ -59,7 +59,6 @@ end
 
 
 require 'apotomo/widget'
-require 'apotomo/stateful_widget'
 require 'apotomo/container_widget'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'
