@@ -9,6 +9,8 @@ h3. Changes
   * Event delegates #[] to #data.
   * Removed #param, it is simply too complex.
 
+h3. Bugfixes
+  * Widget.responds_to_event no longer shares its options with multiple widget instances of the same class.
 
 h2. 1.0.4
 
