@@ -1,38 +1,29 @@
 require 'test_helper'
 
-
-
 class CachingTest < ActiveSupport::TestCase
   include Apotomo::TestCaseMethods::TestController
   
   class CheeseWidget < Apotomo::Widget
     cache :holes
     
-    @@holes = 0
-    cattr_accessor :holes
-    
-    
-    #def self.reset!
-    #  @@counter = 0
-    #end
-    
-    def increment!
-      self.class.holes += 1
-    end
-    
-    def holes
-      render :text => increment!
+    def holes(count)
+      render :text => count
     end 
   end
   
   context "A caching widget" do
     setup do
+      ActionController::Base.perform_caching = true
       @cheese = CheeseWidget.new(parent_controller, 'cheese', :holes)
     end
     
+    teardown do
+      ActionController::Base.perform_caching = false
+    end
+    
     should "invoke the cached state only once" do
-      assert_equal "1", @cheese.invoke
-      assert_equal "1", @cheese.invoke
+      assert_equal "1", @cheese.invoke(:holes, 1)
+      assert_equal "1", @cheese.invoke(:holes, 2)
     end
   end
 end
