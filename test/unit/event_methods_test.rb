@@ -75,6 +75,12 @@ class EventMethodsTest < Test::Unit::TestCase
       should "not inherit handlers for now" do
         assert_equal [], BabyMouseCell.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
       end
+      
+      should "not add the same handler to each instance" do
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
+        
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'dad', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'dad', :show).event_table.all_handlers_for(:peep, 'dad')
+      end
     end
     
     context "#trigger" do
