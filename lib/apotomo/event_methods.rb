@@ -57,9 +57,9 @@ module Apotomo
     # It is important to understand the <tt>:from</tt> parameter as it filters the event source - it wouldn't make
     # sense to refill the mouse trap if the bear trap snapped, would it? 
     def respond_to_event(type, options={})
-      options.reverse_merge!( :once => true,
-                              :with => type,
-                              :on   => self.name )
+      options = options.reverse_merge(:once => true,
+                                      :with => type,
+                                      :on   => self.name)
       
       handler = InvokeEventHandler.new(:widget_id => options[:on], :state => options[:with])
       
