@@ -53,7 +53,7 @@ module Apotomo
         
         return render_iframe_updates(page_updates) if params[:apotomo_iframe]
         
-        render :text => apotomo_request_processor.render_page_updates(page_updates), :content_type => Mime::JS
+        render :text => page_updates.join("\n"), :content_type => Mime::JS
       end
       
       # Returns the url to trigger a +type+ event from +:source+, which is a non-optional parameter.
@@ -80,8 +80,7 @@ module Apotomo
       # Renders the page updates through an iframe. Copied from responds_to_parent,
       # see http://github.com/markcatley/responds_to_parent .
       def render_iframe_updates(page_updates)
-        script = apotomo_request_processor.render_page_updates(page_updates)
-        escaped_script = Apotomo::JavascriptGenerator.escape(script)
+        escaped_script = Apotomo::JavascriptGenerator.escape(page_updates.join("\n"))
         
         render :text => "<html><body><script type='text/javascript' charset='utf-8'>
 var loc = document.location;

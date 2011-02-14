@@ -20,11 +20,6 @@ module Apotomo
       source.root.page_updates ### DISCUSS: that's another dependency.
     end
     
-    ### FIXME: remove me!
-    def render_page_updates(page_updates)
-      page_updates.join("\n")
-    end
-    
     # Renders the widget named <tt>widget_id</tt>, passing optional <tt>options</tt> and a block to it.
     # Use this in your #render_widget wrapper.
     def render_widget_for(widget_id, *args, &block) # DISCUSS: allow passing a state here?
