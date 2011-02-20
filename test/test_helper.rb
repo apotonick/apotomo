@@ -12,7 +12,7 @@ require "rails/test_help" # sets up ActionController::TestCase's @routes
 require 'cells'
 require 'apotomo'
 
-Cell::Base.append_view_path File.expand_path(File.dirname(__FILE__) + "/fixtures")
+Apotomo::Widget.append_view_path(File.expand_path(File.dirname(__FILE__) + "/widgets"))
 
 # Load test support files.
 require File.join(File.dirname(__FILE__), "support/test_case_methods")
