@@ -3,6 +3,13 @@ require 'apotomo/rails/view_methods'
 
 module Apotomo
   module Rails
+    module ControllerMethodsLoader
+      def has_widgets(*args, &block)
+        include ControllerMethods
+        has_widgets(*args, &block)
+      end
+    end
+    
     module ControllerMethods
       include WidgetShortcuts
       extend ActiveSupport::Concern

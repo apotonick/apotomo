@@ -43,10 +43,8 @@ module Apotomo
       @controller = Class.new(ActionController::Base) do
         def self.default_url_options; {:controller => :barn}; end
       end.new
-      @controller.class.instance_eval { include Apotomo::Rails::ControllerMethods }
       @controller.extend ActionController::UrlWriter
       @controller.params  = {}
-      ### FIXME: @controller.session = {}
     end
     
 

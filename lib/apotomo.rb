@@ -54,6 +54,11 @@ module Apotomo
     initializer :prepend_apotomo_routes, :after => :add_routing_paths do |app|
       app.routes_reloader.paths.unshift(File.dirname(__FILE__) + "/../config/routes.rb")
     end
+    
+    # Include a lazy loader via has_widgets.
+    initializer :add_has_widgets do |app|
+      ActionController::Base.extend Apotomo::Rails::ControllerMethodsLoader
+    end
   end 
 end
 

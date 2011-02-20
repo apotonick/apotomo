@@ -59,3 +59,29 @@ class RailsIntegrationTest < ActionController::TestCase
     end
   end
 end
+
+
+class IncludingApotomoSupportTest < ActiveSupport::TestCase
+  #include Apotomo::TestCaseMethods::TestController
+  
+  context "A controller not including ControllerMethods explicitely" do
+    setup do
+      @class      = Class.new(ActionController::Base)
+      @controller = @class.new
+      @controller.request = ActionController::TestRequest.new
+    end
+    
+    should "respond to .has_widgets only" do
+      assert_respond_to @class, :has_widgets
+      assert_not_respond_to @class, :apotomo_request_processor
+    end
+    
+    should "mixin all methods after first use of .has_widgets" do
+      @class.has_widgets do |root|
+      end
+      
+      assert_respond_to @class, :has_widgets
+      assert_respond_to @controller, :apotomo_request_processor
+    end
+  end
+end
