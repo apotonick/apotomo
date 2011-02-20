@@ -87,9 +87,7 @@ module Apotomo
       
       @name         = id
       @start_state  = start_state
-
       @visible      = true
-      @cell         = self  ### DISCUSS: needed?
       
       run_hook :after_initialize, self
     end
