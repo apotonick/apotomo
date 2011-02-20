@@ -4,20 +4,10 @@ class RequestProcessorTest < ActiveSupport::TestCase
   include Apotomo::TestCaseMethods::TestController
   
   def root_mum_and_kid!
+    mum_and_kid!
     
-        mum_and_kid!
-        
-        @root = Apotomo::Widget.new(parent_controller, 'root', :display)
-        @root << @mum
-        
-        
-        @session = {}
-        #freeze!
-  end
-  
-  # Call SW.freeze_for on @session, "freezing" stateful widgets below @root there.
-  def freeze!
-    Apotomo::StatefulWidget.freeze_for(@session, @root)
+    @root = Apotomo::Widget.new(parent_controller, 'root', :display)
+    @root << @mum
   end
   
   
@@ -162,6 +152,47 @@ class RequestProcessorTest < ActiveSupport::TestCase
     should "complain if no source given" do
       assert_raises RuntimeError do
         @processor.address_for(:type => :footsteps)
+      end
+    end
+  end
+end
+
+class RequestProcessorHooksTest < ActiveSupport::TestCase
+  include Apotomo::TestCaseMethods::TestController
+  include Apotomo::TestCaseMethods
+  
+  context "Hooks in RequestProcessor" do
+    setup do
+      @class = Class.new(Apotomo::RequestProcessor)
+    end
+    
+    context ":after_initialize hook" do
+      should "be called after the has_widgets blocks invokation" do
+        @k = mouse_mock("kid")
+        @class.after_initialize do |r|
+          r.root["mum"] << @k
+        end
+        
+        @r = @class.new(parent_controller, {}, 
+          [Proc.new { |root| root << widget(:mouse_widget, 'mum') }])
+        
+        assert_equal @r.root["mum"]["kid"], @k
+      end
+    end
+    
+    context ":after_fire hook" do
+      should "be called in #process_for after fire" do
+        @k = mouse_mock("kid")
+        @class.after_fire do |r|
+          r.root["mum"] << @k = mouse_mock("kid")
+        end
+        
+        # DISCUSS: maybe add a trigger test here?
+        @r = @class.new(parent_controller, {}, 
+          [Proc.new { |root| root << widget(:mouse_widget, 'mum') }])
+        @r.process_for(:source => "root", :type => :noop) # calls ~after_fire.
+        
+        assert_equal @k, @r.root["mum"]["kid"]
       end
     end
   end
