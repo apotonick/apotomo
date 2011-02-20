@@ -8,7 +8,7 @@ module Erb
       def create_views
         for state in actions do
           @state = state
-          @path = File.join('app/cells', file_name, "#{state}.html.erb")
+          @path = File.join('app/widgets', file_name, "#{state}.html.erb")
           template "view.erb", @path
         end
       end

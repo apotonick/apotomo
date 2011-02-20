@@ -1,4 +1,4 @@
-class <%= class_name %> < Apotomo::Widget
+class <%= class_name %>Widget < Apotomo::Widget
 
 <% for action in actions -%>
   def <%= action %>

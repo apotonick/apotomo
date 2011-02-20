@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class <%= class_name %>Test < Apotomo::TestCase
+class <%= class_name %>WidgetTest < Apotomo::TestCase
   has_widgets do |root|
     root << widget(:<%= file_name %>, 'me')
   end
