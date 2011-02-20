@@ -258,5 +258,9 @@ module Apotomo
     def url_for_event(type, options={})
       apotomo_event_path address_for_event(type, options) 
     end
+    
+    def self.controller_path
+      @controller_path ||= name.sub(/Widget$/, '').underscore unless anonymous?
+    end
   end
 end

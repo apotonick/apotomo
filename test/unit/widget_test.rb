@@ -138,8 +138,12 @@ class WidgetTest < ActiveSupport::TestCase
       assert_equal ["app/widgets", "app/widgets/layouts"], Apotomo::Widget::DEFAULT_VIEW_PATHS
     end
     
-    should "respond to view_paths" do
+    should "respond to .view_paths" do
       assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]), Apotomo::Widget.view_paths
+    end
+    
+    should "respond to .controller_path" do
+      assert_equal "mouse", MouseWidget.controller_path
     end
     
     # internal_methods:
