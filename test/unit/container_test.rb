@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'apotomo/container_widget'
 
 class ContainerTest < Test::Unit::TestCase
   include Apotomo::TestCaseMethods::TestController

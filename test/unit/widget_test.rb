@@ -134,6 +134,9 @@ class WidgetTest < ActiveSupport::TestCase
       end
     end
     
+    should "respond to DEFAULT_VIEW_PATHS" do
+      assert_equal ["app/widgets", "app/widgets/layouts"], Apotomo::Widget::DEFAULT_VIEW_PATHS
+    end
     
     # internal_methods:
     should "not list internal methods in action_methods" do

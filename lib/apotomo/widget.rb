@@ -32,6 +32,12 @@ module Apotomo
   #   def update(evt)
   #     @cheese = Cheese.find evt[:cheese_id]
   class Widget < Cell::Base
+    
+    DEFAULT_VIEW_PATHS = [
+      File.join('app', 'widgets'),
+      File.join('app', 'widgets', 'layouts')
+    ]
+    
     include Hooks
     
     # Use this for setup code you're calling in every state. Almost like a +before_filter+ except that it's
