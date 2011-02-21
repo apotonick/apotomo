@@ -14,7 +14,7 @@ class WidgetTest < ActiveSupport::TestCase
     setup do
       @mum = Class.new(MouseWidget) do
         has_widgets do |me|
-          me << widget(:mouse_widget, 'baby', :squeak)
+          me << widget(:mouse, 'baby', :squeak)
         end
       end.new(@controller, 'mum', :squeak)
       
@@ -36,7 +36,7 @@ class WidgetTest < ActiveSupport::TestCase
     setup do
       @mum = Class.new(MouseWidget) do
         after_add do |me, parent|
-          parent << widget(:mouse_widget, 'kid', :squeak)
+          parent << widget(:mouse, 'kid', :squeak)
         end
       end.new(@controller, 'mum', :squeak)
       

@@ -29,7 +29,7 @@ class ControllerMethodsTest < ActionController::TestCase
     context "invoking #has_widgets" do
       setup do
         @controller.class.has_widgets do |root|
-          root << widget(:mouse_widget, 'mum')
+          root << widget(:mouse, 'mum')
         end
       end
       
@@ -44,7 +44,7 @@ class ControllerMethodsTest < ActionController::TestCase
       
       should "allow multiple calls to has_widgets" do
         @controller.class.has_widgets do |root|
-          root << widget(:mouse_widget, 'kid')
+          root << widget(:mouse, 'kid')
         end
         
         assert @controller.apotomo_root['mum']
@@ -52,7 +52,7 @@ class ControllerMethodsTest < ActionController::TestCase
       end
       
       should "inherit has_widgets blocks to sub-controllers" do
-        berry = widget(:mouse_widget, 'berry')
+        berry = widget(:mouse, 'berry')
         @sub_controller = Class.new(@controller.class) do
           has_widgets { |root| root << berry }
         end.new
@@ -68,7 +68,7 @@ class ControllerMethodsTest < ActionController::TestCase
         end
         
         @controller.class.has_widgets do |root|
-          root << widget(:mouse_widget, 'kid', :display, :roomies => roomies)
+          root << widget(:mouse, 'kid', :display, :roomies => roomies)
         end
         
         assert_equal ['mice', 'cows'], @controller.apotomo_root['kid'].options[:roomies]

@@ -29,7 +29,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
     
     should "allow has_widgets blocks with root parameter" do
       @processor.send(:attach_stateless_blocks_for, [Proc.new{ |root|
-        root << widget(:mouse_widget, 'mouse') 
+        root << widget(:mouse, 'mouse') 
       }], @root, parent_controller)
       
       assert_equal 'mouse', @processor.root['mouse'].name
@@ -65,7 +65,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
       end
   
       procs = [Proc.new{ |root,controller| 
-        root << widget(:mouse_widget, 'mum') << KidWidget.new(parent_controller, 'kid', :squeak)
+        root << widget(:mouse, 'mum') << KidWidget.new(parent_controller, 'kid', :squeak)
       }]
     
       @processor = Apotomo::RequestProcessor.new(parent_controller, {:js_framework => :prototype}, procs)
@@ -102,7 +102,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
       end
       
       @processor = Apotomo::RequestProcessor.new(parent_controller, {}, 
-        [Proc.new { |root| root << widget(:mouse_widget, 'mum', :squeak, :volume => 9) }])
+        [Proc.new { |root| root << widget(:mouse, 'mum', :squeak, :volume => 9) }])
     end
     
     should "render the widget when passing an existing widget id" do
@@ -174,7 +174,7 @@ class RequestProcessorHooksTest < ActiveSupport::TestCase
         end
         
         @r = @class.new(parent_controller, {}, 
-          [Proc.new { |root| root << widget(:mouse_widget, 'mum') }])
+          [Proc.new { |root| root << widget(:mouse, 'mum') }])
         
         assert_equal @r.root["mum"]["kid"], @k
       end
@@ -189,7 +189,7 @@ class RequestProcessorHooksTest < ActiveSupport::TestCase
         
         # DISCUSS: maybe add a trigger test here?
         @r = @class.new(parent_controller, {}, 
-          [Proc.new { |root| root << widget(:mouse_widget, 'mum') }])
+          [Proc.new { |root| root << widget(:mouse, 'mum') }])
         @r.process_for(:source => "root", :type => :noop) # calls ~after_fire.
         
         assert_equal @k, @r.root["mum"]["kid"]
