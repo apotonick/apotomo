@@ -14,7 +14,7 @@ module TreeNode
   def initialize_tree_node(*)
     root!
 
-    @childrenHash = Hash.new
+    @childrenHash = {}
     @children = []
   end
 
@@ -29,7 +29,7 @@ module TreeNode
   # children hierarchies in the tree.
   # E.g. root << child << grand_child
   def <<(child)
-      add(child)
+    add(child)
   end
 
   # Adds the specified child node to the receiver node.
@@ -54,7 +54,7 @@ module TreeNode
   def remove!(child)
     @childrenHash.delete(child.name)
     @children.delete(child)
-    child.setAsRoot! unless child == nil
+    child.root! unless child == nil
     child
   end
 
@@ -67,7 +67,7 @@ module TreeNode
   # Removes all children from the receiver node.
   def remove_all!
     for child in @children
-        child.root!
+      child.root!
     end
     @childrenHash.clear
     @children.clear
@@ -77,13 +77,13 @@ module TreeNode
   
   # Private method which sets this node as a root node.
   def root!
-      @parent = nil
+    @parent = nil
   end
   
   # Indicates whether this node is a root node. Note that
   # orphaned children will also be reported as root nodes.
   def root?
-      @parent == nil
+    @parent == nil
   end
   
   # Returns an array of all the immediate children.
