@@ -91,9 +91,5 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       end
       assert_equal 2, @container.size
     end
-    
-    should "be aliased to #section for backward-compatibility" do
-      assert_kind_of ::Apotomo::ContainerWidget, section('family')
-    end
   end
 end

@@ -34,15 +34,6 @@ module Apotomo
       widget('apotomo/container_widget', id, *args, &block)
     end
     
-    def section(*args)
-      container(*args)
-    end
-    
-    # TODO: deprecate.
-    def cell(base_name, states, id, *args)
-      raise "Deprecated."
-    end
-    
     private
       def constant_for(class_name)
         class_name.to_s.camelize.constantize

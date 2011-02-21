@@ -12,6 +12,7 @@ h3. Removals
   * Removed #param, it is simply too complex.
   * Removed #jump_to_state.
   * Removed `@cell`, now longer available in state views.
+  * Removed #cell and #section widget shortcuts.
   
 h3. Bugfixes
   * Widget.responds_to_event no longer shares its options with multiple widget instances of the same class.
