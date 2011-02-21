@@ -4,15 +4,15 @@
 module TreeNode
   include Enumerable
 
-  attr_reader :content, :name, :parent
-  attr_writer :content, :parent
+  attr_reader :name, :childrenHash
+  attr_accessor :parent
   
   def self.included(base)
     base.after_initialize :initialize_tree_node
   end
   
   def initialize_tree_node(*)
-    self.setAsRoot!
+    root!
 
     @childrenHash = Hash.new
     @children = []
@@ -20,11 +20,8 @@ module TreeNode
 
   # Print the string representation of this node.
   def to_s
-          s = size()
-          "Node ID: #{@name} Content: #{@content} Parent: " +
-                  (root?()  ? "ROOT" : "#{@parent.name}") +
-                  " Children: #{@children.length}" +
-                  " Total Nodes: #{s}"
+    "Node ID: #{widget_id} Parent: " + (root?  ? "ROOT" : "#{parent.name}") +
+      " Children: #{children.length}" + " Total Nodes: #{size}"
   end
 
   # Convenience synonym for Tree#add method. 
@@ -40,13 +37,13 @@ module TreeNode
   # The child is added as the last child in the current
   # list of children for the receiver node.
   def add(child)
-      raise "Child already added" if @childrenHash.has_key?(child.name)
+    raise "Child already added" if @childrenHash.has_key?(child.name)
 
-      @childrenHash[child.name]  = child
-      @children << child
-      child.parent = self
-      
-      child.run_widget_hook(:after_add, child, self)
+    @childrenHash[child.name]  = child
+    @children << child
+    child.parent = self
+    
+    child.run_widget_hook(:after_add, child, self)
     child
   end
 
@@ -55,38 +52,34 @@ module TreeNode
   # if an alternate reference exists.
   # Returns the child node.
   def remove!(child)
-      @childrenHash.delete(child.name)
-      @children.delete(child)
-      child.setAsRoot! unless child == nil
-      return child
+    @childrenHash.delete(child.name)
+    @children.delete(child)
+    child.setAsRoot! unless child == nil
+    child
   end
 
   # Removes this node from its parent. If this is the root node,
   # then does nothing.
-  def removeFromParent!
-      @parent.remove!(self) unless root?
+  def remove_from_parent!
+    @parent.remove!(self) unless root?
   end
 
   # Removes all children from the receiver node.
   def remove_all!
-      for child in @children
-          child.setAsRoot!
-      end
-      @childrenHash.clear
-      @children.clear
-      self
+    for child in @children
+        child.root!
+    end
+    @childrenHash.clear
+    @children.clear
+    self
   end
   
   
   # Private method which sets this node as a root node.
-  def setAsRoot!
+  def root!
       @parent = nil
   end
   
-  def root!
-    setAsRoot!
-  end
-
   # Indicates whether this node is a root node. Note that
   # orphaned children will also be reported as root nodes.
   def root?
@@ -96,18 +89,18 @@ module TreeNode
   # Returns an array of all the immediate children.
   # If a block is given, yields each child node to the block.
   def children
-      if block_given?
-          @children.each {|child| yield child}
-      else
-          @children
-      end
+    if block_given?
+      @children.each { |child| yield child }
+    else
+      @children
+    end
   end
 
   # Returns every node (including the receiver node) from the
   # tree to the specified block.
-  def each &block
-      yield self
-      children { |child| child.each(&block) }
+  def each(&block)
+    yield self
+    children { |child| child.each(&block) }
   end
 
   # Returns the requested node from the set of immediate
@@ -117,44 +110,42 @@ module TreeNode
   # children is accessed (see Tree#children).
   # If the key is not _numeric_, then it is assumed to be
   # the *name* of the child node to be returned.
-  def [](key)
-      raise "Key needs to be provided" if key == nil
-
-      if key.kind_of?(Integer)
-          @children[key]
-      else
-          @childrenHash[key]
-      end
+  def [](name)
+    if name.kind_of?(Integer)
+      children[name]
+    else
+      childrenHash[name]
+    end
   end
 
   # Returns the total number of nodes in this tree, rooted
   # at the receiver node.
   def size
-      @children.inject(1) {|sum, node| sum + node.size}
+    children.inject(1) {|sum, node| sum + node.size}
   end
 
   # Pretty prints the tree starting with the receiver node.
   def printTree(tab = 0)
-      puts((' ' * tab) + self.to_s)
-      children {|child| child.printTree(tab + 4)}
+    puts((' ' * tab) + self.to_s)
+    children {|child| child.printTree(tab + 4)}
   end
 
   # Returns the root for this node.
   def root
-      root = self
-      root = root.parent while !root.root?
-      root
+    root = self
+    root = root.parent while !root.root?
+    root
   end
 
   # Provides a comparision operation for the nodes. Comparision
   # is based on the natural character-set ordering for the
   # node names.
   def <=>(other)
-      return +1 if other == nil
-      self.name <=> other.name
+    return +1 if other == nil
+    self.name <=> other.name
   end
   
-  protected :parent=, :setAsRoot!
+  protected :parent=, :root!
   
   def find_by_path(selector)
     next_node = self
@@ -165,7 +156,7 @@ module TreeNode
       }
     end
     
-    return next_node
+    next_node
   end
   
   
