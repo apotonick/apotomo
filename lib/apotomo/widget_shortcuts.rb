@@ -1,18 +1,18 @@
 module Apotomo
   # Shortcut methods for creating widget trees.
   module WidgetShortcuts
-    # Shortcut for creating an instance of +class_name+ named +id+.
+    # Shortcut for creating an instance of <tt>class_name+"_widget"</tt> named +id+.
     # If +start_state+ is omited, :display is default. Yields self.
     #
     # Example:
     # 
-    #   widget(:comments_widget, 'post-comments')
-    #   widget(:comments_widget, 'post-comments', :user => @current_user)
+    #   widget(:comments, 'post-comments')
+    #   widget(:comments, 'post-comments', :user => @current_user)
     #
     # Start state is <tt>:display</tt>, whereas the latter also populates #options.
     #
-    #   widget(:comments_widget, 'post-comments', :reload)
-    #   widget(:comments_widget, 'post-comments', :reload, :user => @current_user)
+    #   widget(:comments, 'post-comments', :reload)
+    #   widget(:comments, 'post-comments', :reload, :user => @current_user)
     #
     # Explicitely sets the start state.
     #
@@ -31,12 +31,12 @@ module Apotomo
     end
     
     def container(id, *args, &block)
-      widget('apotomo/container_widget', id, *args, &block)
+      widget('apotomo/container', id, *args, &block)
     end
     
     private
-      def constant_for(class_name)
-        class_name.to_s.camelize.constantize
+      def constant_for(class_name)  # TODO: use Cell.class_from_cell_name. 
+        "#{class_name}_widget".classify.constantize
       end
   end
 end
