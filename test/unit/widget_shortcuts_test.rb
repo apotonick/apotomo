@@ -53,7 +53,7 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       end
     end
     
-    context "with id only" do
+    context "with class and id" do
       setup do
         @mum = widget(:mum, 'mum')
       end
@@ -64,6 +64,19 @@ class WidgetShortcutsTest < Test::Unit::TestCase
         assert_equal 'mum', @mum.name
       end
     end
+    
+    context "with class, only" do
+      setup do
+        @mum = widget(:mum)
+      end
+      
+      should "create a MumWidget instance with :display start state and named :mum" do
+        assert_kind_of MumWidget, @mum
+        assert_equal :display, @mum.start_state
+        assert_equal :mum, @mum.name
+      end
+    end
+    
     
     should "yield itself" do
       @mum = widget(:mum, :snuggle, 'mum') do |mum|

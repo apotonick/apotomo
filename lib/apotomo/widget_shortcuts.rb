@@ -6,28 +6,33 @@ module Apotomo
     #
     # Example:
     # 
-    #   widget(:comments, 'post-comments')
-    #   widget(:comments, 'post-comments', :user => @current_user)
+    #   widget(:comments)
+    # 
+    # will create a +CommentsWidget+ with id :comments.
     #
-    # Start state is <tt>:display</tt>, whereas the latter also populates #options.
+    #   widget(:comments, 'post-comments', :user => current_user)
+    #
+    # sets the start state to <tt>:display</tt>, id to 'posts_comments' and #options to the hash.
     #
     #   widget(:comments, 'post-comments', :reload)
+    #
+    # start state will be <tt>:reload</tt>.
+    #
     #   widget(:comments, 'post-comments', :reload, :user => @current_user)
     #
-    # Explicitely sets the start state.
+    # The verbose way.
     #
     # You can also use namespaces.
     #
     #   widget('jquery/tabs', 'panel')
-    def widget(class_name, id, state=:display, *args)
-      if state.kind_of?(Hash)
-        args << state
-        state = :display
-      end
+    def widget(prefix, *args)
+      options = args.extract_options!
+      id      = args.shift || prefix
+      state   = args.shift || :display
       
-      object = constant_for(class_name).new(parent_controller, id, state, *args)
-      yield object if block_given?
-      object
+      constant_for(prefix).new(parent_controller, id, state, options).tap do |object|
+        yield object if block_given?  
+      end
     end
     
     def container(id, *args, &block)
