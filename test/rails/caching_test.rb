@@ -1,5 +1,7 @@
 require 'test_helper'
 
+# TODO: assert that same-named cells and widgets don't overwrite their caches.
+
 class CachingTest < ActiveSupport::TestCase
   include Apotomo::TestCaseMethods::TestController
   
