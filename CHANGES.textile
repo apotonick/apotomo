@@ -1,6 +1,9 @@
 h2. 1.1
 
 h3. Changes
+  * Widgets now reside in @app/widgets/@ and have the @Widget@ appendix per convention, identical to cells and controllers. This introduces the following changes, illustrated with an imaginary @CommentsWidget@:
+  ** @widget(:comments, ...)@ will search and instantiate @CommentsWidget@ (note the missing "Widget").
+  ** The @CommentsWidget@ views are searched in @app/widgets/comments/@ (note the missing "_widget").
   * Including Apotomo::Rails::ControllerMethods by hand is optional. The first call to Controller.has_widgets will include the real module.
   * The event is no longer added to #options at triggering time.
   * Options passed in #render_widget are no longer merged with #options. They are passed as state-args to reduce complexity.
