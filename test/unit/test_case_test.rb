@@ -18,7 +18,7 @@ class TestCaseTest < Test::Unit::TestCase
       setup do
         @klass = MouseWidgetTest
         @test = @klass.new(:widget).tap{ |t| t.setup }
-        @klass.has_widgets { |r| r << widget(:mouse_widget, 'mum', :eating) }
+        @klass.has_widgets { |r| r << widget(:mouse, 'mum', :eating) }
       end
       
       should "respond to #root" do  
