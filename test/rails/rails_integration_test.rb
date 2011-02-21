@@ -9,12 +9,12 @@ class RailsIntegrationTest < ActionController::TestCase
   
   context "A Rails controller" do
     setup do
-      @mum = mum = MouseWidget.new(parent_controller, 'mum', :snuggle)
-      
-      @mum.respond_to_event :squeak, :with => :snuggle
+      @mum = mum = MouseWidget.new(parent_controller, 'mum', :eating)
       @mum.instance_eval do
-        def snuggle; render; end
+        def eating; render; end
       end
+      
+      @mum.respond_to_event :squeak
       
       @controller.class.has_widgets do |root|
         root << mum
@@ -29,7 +29,7 @@ class RailsIntegrationTest < ActionController::TestCase
     
     should "provide the rails view helpers in state views" do
       @mum.instance_eval do
-        def snuggle; render :view => :make_me_squeak; end
+        def eating; render :view => :make_me_squeak; end
       end
       
       get 'widget'
@@ -38,7 +38,7 @@ class RailsIntegrationTest < ActionController::TestCase
     
     should "pass the event with all params data as state-args" do
       @mum.instance_eval do
-        def snuggle(evt); render :text => evt.data; end
+        def squeak(evt); render :text => evt.data; end
       end
       
       get 'render_event_response', :source => 'mum', :type => :squeak, :pitch => :high
@@ -46,6 +46,10 @@ class RailsIntegrationTest < ActionController::TestCase
     end
     
     should "render updates to the parent window for an iframe request" do
+      @mum.instance_eval do
+        def squeak(evt); render :text => "<b>SQUEAK!</b>"; end
+      end
+      
       get 'widget'
       assert_response :success
       
@@ -55,7 +59,7 @@ class RailsIntegrationTest < ActionController::TestCase
       
       assert_response :success
       assert_equal 'text/html', @response.content_type
-      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<div id=\\\"mum\\\"><snuggle><\\/snuggle><\\/div>\\n'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
+      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<b>SQUEAK!<\\/b>'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
     end
   end
 end

@@ -86,12 +86,12 @@ class ControllerMethodsTest < ActionController::TestCase
   
   context "invoking #render_widget" do
     setup do
-      @mum = mouse_mock('mum', 'snuggle') {def snuggle; render; end}
+      @mum = mouse_mock('mum', 'eating')
     end
     
     should "render the widget" do
       @controller.apotomo_root << @mum
-      assert_equal "<div id=\"mum\"><snuggle></snuggle></div>\n", @controller.render_widget('mum')
+      assert_equal "<div id=\"mum\">burp!</div>", @controller.render_widget('mum')
     end
   end
   
