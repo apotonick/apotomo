@@ -226,7 +226,7 @@ module Apotomo
           rendered_children[kid.name] = render_child(kid, child_state)
         end
       end
-    end
+    end   
 
     def render_child(cell, state)
      cell.invoke(state)
@@ -259,8 +259,25 @@ module Apotomo
       apotomo_event_path address_for_event(type, options) 
     end
     
+    
     def self.controller_path
       @controller_path ||= name.sub(/Widget$/, '').underscore unless anonymous?
     end
+  
+  
+    module Helper
+      # Renders the +widget+ (instance or id).
+      def render_widget(widget_id, *args)
+        if widget_id.kind_of?(Widget)
+          widget = widget_id
+        else
+          widget = controller[widget_id] or raise "Couldn't render non-existent widget `#{widget_id}`"
+        end
+        
+        widget.invoke(*args)
+      end
+    end
+    helper Helper
+    
   end
 end

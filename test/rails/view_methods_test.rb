@@ -5,7 +5,7 @@ class ViewMethodsTest < ActionController::TestCase
   
   context "A Rails controller view" do
     setup do
-      @mum = mum = mouse_mock('mum', 'snuggle') {def snuggle; render; end}
+      @mum = mum = mouse_mock('mum', :eating)
       @controller.class.has_widgets do |root|
         root << mum
       end
@@ -19,7 +19,7 @@ class ViewMethodsTest < ActionController::TestCase
     
     should "respond to render_widget" do
       get :widget
-      assert_select "#mum>snuggle"
+      assert_select "#mum", "burp!"
     end
     
     should "respond to url_for_event" do

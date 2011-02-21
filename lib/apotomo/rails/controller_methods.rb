@@ -21,7 +21,7 @@ module Apotomo
         class_inheritable_array :has_widgets_blocks
         self.has_widgets_blocks = []
         
-        helper ::Apotomo::Rails::ViewMethods
+        helper ::Apotomo::Rails::ViewMethods  # FIXME: use helper_methods and remove the module.
       end
       
       module ClassMethods

@@ -43,10 +43,15 @@ end
 
 class MouseWidget < Apotomo::Widget
   def squeak
+    render :text => "squeak!"
   end
   def eating
     render
   end
+  def eat
+    render
+  end
+  
 end
 
 # Enable dynamic states so we can do Cell.class_eval { def ... } at runtime.

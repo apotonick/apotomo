@@ -32,15 +32,15 @@ class RenderTest < ActionView::TestCase
       end
       
       should "per default be false" do
-        @mum.invoke :snuggle
+        @mum.invoke :eating
         assert !@mum.suppress_js
       end
       
       should "be true when set" do
         @mum.instance_eval do
-          def snuggle; render :suppress_js => true; end
+          def eating; render :suppress_js => true; end
         end
-        @mum.invoke :snuggle
+        @mum.invoke :eating
         assert @mum.suppress_js
       end
     end
@@ -57,21 +57,6 @@ class RenderTest < ActionView::TestCase
     end
     
     context "with #emit" do
-      setup do
-        @kid = mouse_mock('kid', :squeak)
-        @kid.instance_eval do
-          def squeak
-            render :text => "squeeeeaaak"
-          end
-          
-          def render(*)
-            @rendered = true
-            super
-          end
-          def rendered?; @rendered; end
-        end
-      end
-      
       context "and :text" do
         setup do
           @mum.instance_eval do
@@ -83,25 +68,6 @@ class RenderTest < ActionView::TestCase
         
         should "just return the plain :text" do
           assert_equal 'squeak();', @mum.invoke(:squeak)
-        end
-        
-        should "not render children" do
-          @mum << @kid
-          @mum.invoke(:squeak)
-          
-          assert_not @kid.rendered?
-        end
-        
-        should "allow rendering children" do
-          @mum.instance_eval do
-            def squeak
-              emit :text => "squeak();", :render_children => true
-            end
-          end
-          @mum << @kid
-          @mum.invoke(:squeak)
-          
-          assert @kid.rendered?
         end
       end
       
@@ -117,32 +83,19 @@ class RenderTest < ActionView::TestCase
         should "render the view" do
           assert_equal "<div id=\"mum\">burp!</div>",  @mum.invoke(:eating)
         end
-        
-        should "render the children, too" do
-          @mum << @kid
-          @mum.invoke(:eating)
-          assert @kid.rendered?
-        end
       end
       
       context "and :view" do
         setup do
           @mum.instance_eval do
             def squeak
-              emit :view => :snuggle
+              emit :view => :eating
             end
           end
         end
         
         should "render the :view" do
-          assert_equal "<div id=\"mum\"><snuggle></snuggle></div>\n", @mum.invoke(:squeak)
-        end
-        
-        should "render the children" do
-          @mum << @kid
-          
-          assert_equal "<div id=\"mum\"><snuggle>squeeeeaaak</snuggle></div>\n", @mum.invoke(:squeak)
-          assert @kid.rendered?
+          assert_equal "<div id=\"mum\">burp!</div>", @mum.invoke(:squeak)
         end
       end
     end
@@ -196,28 +149,45 @@ class RenderTest < ActionView::TestCase
     end
   end
   
-  context "rendering a widget family" do
+  context "#render_widget in a state view" do
     setup do
-      @mum = mouse_mock('mum', :snuggle) do
-        def snuggle; render; end
-      end
+      @mum = mouse_mock('mum')
       
-      @mum << @kid = mouse_mock('kid', :eating)
+      @mum << @kid = mouse_mock('kid', :eat)
     end
     
-    should "per default render kid's content inside mums div with rendered_children" do
-      assert_equal "<div id=\"mum\"><snuggle><div id=\"kid\">burp!</div></snuggle></div>\n", @mum.invoke(:snuggle)
-    end
-    
-    should "skip kids if :render_children=>false but still provide a rendered_children hash" do
+    should "render the child" do
       @mum.instance_eval do
-        def snuggle; render :render_children => false; end
+        def quirk
+          render :inline => "<%= render_widget 'kid' %>"
+        end
       end
       
-      assert_equal "<div id=\"mum\"><snuggle></snuggle></div>\n", @mum.invoke(:snuggle)
+      assert_equal "<div id=\"kid\">burp!</div>\n", @mum.invoke(:quirk)
     end
-     
-    should_eventually "provide an ordered rendered_children hash"
+    
+    should "render the child with the given state" do
+      @mum.instance_eval do
+        def quirk
+          render :inline => "<%= render_widget 'kid', :squeak %>"
+        end
+      end
+      
+      assert_equal "squeak!", @mum.invoke(:quirk)
+    end
+    
+    should "raise an exception when a non-existent widget id is passed" do
+      @mum.instance_eval do
+        def quirk
+          render :inline => "<%= render_widget :bobiyo %>"
+        end
+      end
+      
+      e = assert_raises ActionView::Template::Error do
+        @mum.invoke(:quirk)
+      end
+      assert_equal "Couldn't render non-existent widget `bobiyo`", e.message
+    end
   end
   
 end

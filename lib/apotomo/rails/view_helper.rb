@@ -1,7 +1,7 @@
 module Apotomo
   module Rails
     module ViewHelper
-      # needs :@controller
+      # needs :controller
       
       # Returns the app JavaScript generator.
       def js_generator

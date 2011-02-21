@@ -5,6 +5,7 @@ h3. Changes
   ** @widget(:comments, ...)@ will search and instantiate @CommentsWidget@ (note the missing "Widget").
   ** The @CommentsWidget@ views are searched in @app/widgets/comments/@ (note the missing "_widget").
   * Including Apotomo::Rails::ControllerMethods by hand is optional. The first call to Controller.has_widgets will include the real module.
+  * @#widget@ now accepts the widget prefix only, like @widget(:comments)@. Sets id to @:comments@.
   * The event is no longer added to #options at triggering time.
   * Options passed in #render_widget are no longer merged with #options. They are passed as state-args to reduce complexity.
   * We no longer have @opts and @params but #options and #params from Cell::Base.
