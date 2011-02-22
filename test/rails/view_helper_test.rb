@@ -5,12 +5,10 @@ class ViewHelperTest < Apotomo::TestCase
   include ActionDispatch::Assertions::DomAssertions
   include Apotomo::TestCase::TestController
   
-  # TODO: move to Apotomo::TestCase, refactor, test.
-  class MouseWidget < Apotomo::Widget
-  end
+  # TODO: use Cell::TestCase#in_view here.
   def in_view(subject, &block)
     if subject.kind_of?(Apotomo::Widget)
-      subject.opts[:block] = block
+      subject.options[:block] = block
     else
       subject = subject.new(@controller, 'mum', :display, :block => block)
     end
@@ -65,6 +63,11 @@ class ViewHelperTest < Apotomo::TestCase
     
     should "respond to #widget_id" do
       assert_equal('mum', in_view(MouseWidget){ widget_id })
+    end
+    
+    should "respond to #render_widget" do
+      mum = mouse_mock << mouse_mock('kid')
+      assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum){ render_widget 'kid', :eat })
     end
     
     context "#widget_javascript" do
