@@ -128,28 +128,16 @@ module Apotomo
     # * <tt>:view</tt> - Specifies the name of the view file to render. Defaults to the current state name.
     # * <tt>:template_format</tt> - Allows using a format different to <tt>:html</tt>.
     # * <tt>:layout</tt> - If set to a valid filename inside your cell's view_paths, the current state view will be rendered inside the layout (as known from controller actions). Layouts should reside in <tt>app/cells/layouts</tt>.
-    # * <tt>:render_children</tt> - If false, automatic rendering of child widgets is turned off. Defaults to true.
-    # * <tt>:invoke</tt> - Explicitly define the state to be invoked on a child when rendering.
     # * see Cell::Base#render for additional options
     #
-    # Note that <tt>:text => ...</tt> and <tt>:update => true</tt> will turn off <tt>:frame</tt>.
-    #
     # Example:
-    #  class MouseCell < Apotomo::StatefulWidget
-    #    def eating
+    #  class MouseWidget < Apotomo::StatefulWidget
+    #    def eat
     #      # ... do something
     #      render 
     #    end
     #
-    # will just render the view <tt>eating.html</tt>.
-    # 
-    #    def eating
-    #      # ... do something
-    #      render :view => :bored, :layout => "metal"
-    #    end
-    #
-    # will use the view <tt>bored.html</tt> as template and even put it in the layout
-    # <tt>metal</tt> that's located at <tt>$RAILS_ROOT/app/cells/layouts/metal.html.erb</tt>.
+    # will just render the view <tt>eat.haml</tt>.
     #
     #  render :js => "alert('SQUEAK!');"
     #
@@ -159,22 +147,8 @@ module Apotomo
         return "" 
       end
       
-      if options[:text]
-        options.reverse_merge!(:render_children => false)
-      end
-      
-      options.reverse_merge!  :render_children  => true,
-                              :locals           => {},
-                              :invoke           => {},
-                              :suppress_js      => false
-                              
-      
-      rendered_children = render_children_for(options)
-      
-      options[:locals].reverse_merge!(:rendered_children => rendered_children)
-      
+      options.reverse_merge! :suppress_js      => false
       @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
-      
       
       render_view_for(action_name, options) # defined in Cell::Base.
     end
