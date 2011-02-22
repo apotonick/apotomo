@@ -7,7 +7,7 @@ class RailsIntegrationTest < ActionController::TestCase
     @controller.instance_eval { @apotomo_request_processor = nil }
   end
   
-  context "A Rails controller" do
+  context "ActionController" do
     setup do
       @mum = mum = MouseWidget.new(parent_controller, 'mum', :eating)
       @mum.instance_eval do
@@ -61,13 +61,38 @@ class RailsIntegrationTest < ActionController::TestCase
       assert_equal 'text/html', @response.content_type
       assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<b>SQUEAK!<\\/b>'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
     end
+    
+    
+    context "ActionView" do  
+      setup do
+        @controller.instance_eval do
+          def widget
+            render :inline => "<%= render_widget 'mum' %>"
+          end
+        end
+      end
+      
+      should "respond to #render_widget" do
+        get :widget
+        assert_select "#mum", "burp!"
+      end
+      
+      should "respond to #url_for_event" do
+        @controller.class_eval do
+          def widget
+            render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
+          end
+        end
+        
+        get :widget
+        assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", @response.body
+      end
+    end
   end
 end
 
 
 class IncludingApotomoSupportTest < ActiveSupport::TestCase
-  #include Apotomo::TestCaseMethods::TestController
-  
   context "A controller not including ControllerMethods explicitely" do
     setup do
       @class      = Class.new(ActionController::Base)
@@ -89,40 +114,3 @@ class IncludingApotomoSupportTest < ActiveSupport::TestCase
     end
   end
 end
-
-
-class ViewMethodsTest < ActionController::TestCase
-  include Apotomo::TestCaseMethods::TestController
-  
-  context "A Rails controller view" do
-    setup do
-      @mum = mum = mouse_mock('mum', :eating)
-      @controller.class.has_widgets do |root|
-        root << mum
-      end
-      
-      @controller.class_eval do
-        def widget
-          render :inline => "<%= render_widget 'mum' %>"
-        end
-      end
-    end
-    
-    should "respond to render_widget" do
-      get :widget
-      assert_select "#mum", "burp!"
-    end
-    
-    should "respond to url_for_event" do
-      @controller.class_eval do
-        def widget
-          render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
-        end
-      end
-      
-      get :widget
-      assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", @response.body
-    end
-  end
-end
-
