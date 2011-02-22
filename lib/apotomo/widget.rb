@@ -5,7 +5,6 @@ require 'hooks'
 require 'apotomo/tree_node'
 require 'apotomo/event'
 require 'apotomo/event_methods'
-require 'apotomo/transition'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/view_helper'
 require 'apotomo/rails/controller_methods'  # FIXME.
