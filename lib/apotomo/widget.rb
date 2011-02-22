@@ -150,7 +150,7 @@ module Apotomo
       options.reverse_merge! :suppress_js      => false
       @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
       
-      render_view_for(action_name, options) # defined in Cell::Base.
+      super
     end
     
     alias_method :emit, :render
@@ -182,36 +182,6 @@ module Apotomo
       content = render(options)
       Apotomo.js_generator.update(options[:selector] || self.name, content)
     end
-    
-    def visible_children
-      children.find_all { |kid| kid.visible? }
-    end
-
-    def render_children_for(options)
-      return {} unless options[:render_children]
-      
-      render_children(options[:invoke])
-    end
-    
-    def render_children(invoke_options={})
-      ActiveSupport::OrderedHash.new.tap do |rendered_children|
-        visible_children.each do |kid|
-          child_state = decide_state_for(kid, invoke_options)
-          logger.debug "    #{kid.name} -> #{child_state}"
-          
-          rendered_children[kid.name] = render_child(kid, child_state)
-        end
-      end
-    end   
-
-    def render_child(cell, state)
-     cell.invoke(state)
-    end
-
-    def decide_state_for(child, invoke_options)
-      invoke_options.stringify_keys[child.name.to_s]
-    end
-    
     
     def param(name)
       msg = "Deprecated. Use #options for widget constructor options or #params for request data."
