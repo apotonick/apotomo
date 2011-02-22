@@ -8,6 +8,7 @@ require 'apotomo/event_methods'
 require 'apotomo/transition'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/view_helper'
+require 'apotomo/rails/controller_methods'  # FIXME.
 
 module Apotomo
   # == Accessing Parameters
@@ -67,6 +68,7 @@ module Apotomo
     include WidgetShortcuts
     
     helper Apotomo::Rails::ViewHelper
+    helper Apotomo::Rails::ActionViewMethods
     
     abstract!
     
@@ -263,21 +265,17 @@ module Apotomo
     def self.controller_path
       @controller_path ||= name.sub(/Widget$/, '').underscore unless anonymous?
     end
-  
-  
-    module Helper
-      # Renders the +widget+ (instance or id).
-      def render_widget(widget_id, *args)
-        if widget_id.kind_of?(Widget)
-          widget = widget_id
-        else
-          widget = controller[widget_id] or raise "Couldn't render non-existent widget `#{widget_id}`"
-        end
-        
-        widget.invoke(*args)
-      end
-    end
-    helper Helper
     
+    # Renders the +widget+ (instance or id).
+    def render_widget(widget_id, state=:display, *args)
+      if widget_id.kind_of?(Widget)
+        widget = widget_id
+      else
+        widget = find_widget(widget_id) or raise "Couldn't render non-existent widget `#{widget_id}`"
+      end
+      
+      widget.invoke_state(state, *args)
+    end
   end
 end
+ 
