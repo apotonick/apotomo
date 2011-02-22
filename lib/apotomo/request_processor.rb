@@ -31,17 +31,9 @@ module Apotomo
       source.root.page_updates ### DISCUSS: that's another dependency.
     end
     
-    # Renders the widget named <tt>widget_id</tt>, passing optional <tt>options</tt> and a block to it.
-    # Use this in your #render_widget wrapper.
-    def render_widget_for(widget_id, *args, &block) # DISCUSS: allow passing a state here?
-      if widget_id.kind_of?(Widget)
-        widget = widget_id
-      else
-        widget = root.find_widget(widget_id)
-        raise "Couldn't render non-existent widget `#{widget_id}`" unless widget
-      end
-      
-      widget.invoke(nil, *args, &block)
+    # Renders the widget named +widget_id+. Any additional args is passed through to Widget#invoke.
+    def render_widget_for(*args)
+      root.render_widget(*args)
     end
     
     # Computes the address hash for a +:source+ widget and an event +:type+.

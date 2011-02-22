@@ -11,12 +11,20 @@ class RequestProcessorTest < ActiveSupport::TestCase
   end
   
   
-  context "#root" do
-    should "allow external modification of the tree" do
+  context "RequestProcessor" do
+    setup do
       @processor = Apotomo::RequestProcessor.new(parent_controller)
       root = @processor.root
       root << mouse_mock
+    end
+    
+    should "allow external modification of the tree" do
+      root = @processor.root
       assert_equal 2, @processor.root.size
+    end
+    
+    should "delegate #render_widget_for to #root" do
+      assert_equal 'squeak!', @processor.render_widget_for('mouse', :squeak)
     end
   end
   
@@ -95,40 +103,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
   end
   
   
-  context "#render_widget_for" do
-    setup do
-      MouseWidget.class_eval do
-        def squeak; render :text => "squeak!"; end
-      end
-      
-      @processor = Apotomo::RequestProcessor.new(parent_controller, {}, 
-        [Proc.new { |root| root << widget(:mouse, 'mum', :squeak, :volume => 9) }])
-    end
     
-    should "render the widget when passing an existing widget id" do
-      assert_equal 'squeak!', @processor.render_widget_for('mum')
-    end
-    
-    should "render the widget when passing an existing widget instance" do
-      assert_equal 'squeak!', @processor.render_widget_for(@processor.root['mum'])
-    end
-    
-    should "raise an exception when a non-existent widget id is passed" do
-      assert_raises RuntimeError do
-        @processor.render_widget_for('mummy')
-      end
-    end
-    
-    should "pass options as state-args" do
-      @processor.root['mum'].instance_eval do
-        def squeak(pitch)
-          @pitch = pitch
-        end
-      end
-      @processor.render_widget_for('mum', :high)
-      assert_equal(:high, @processor.root['mum'].instance_variable_get(:@pitch))
-    end
-  end
   
   context "invoking #address_for" do
     setup do
