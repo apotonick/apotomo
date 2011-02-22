@@ -22,14 +22,14 @@ class RailsIntegrationTest < ActionController::TestCase
       
       @controller.instance_eval do
         def widget
-          render :text => render_widget('mum')
+          render :text => render_widget('mum', :eat)
         end
       end
     end
     
     should "provide the rails view helpers in state views" do
       @mum.instance_eval do
-        def eating; render :view => :make_me_squeak; end
+        def eat; render :view => :make_me_squeak; end
       end
       
       get 'widget'
@@ -67,7 +67,7 @@ class RailsIntegrationTest < ActionController::TestCase
       setup do
         @controller.instance_eval do
           def widget
-            render :inline => "<%= render_widget 'mum' %>"
+            render :inline => "<%= render_widget 'mum', :eat %>"
           end
         end
       end
@@ -78,7 +78,7 @@ class RailsIntegrationTest < ActionController::TestCase
       end
       
       should "respond to #url_for_event" do
-        @controller.class_eval do
+        @controller.instance_eval do
           def widget
             render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
           end
