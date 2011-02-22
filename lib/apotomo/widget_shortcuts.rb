@@ -35,10 +35,6 @@ module Apotomo
       end
     end
     
-    def container(id, *args, &block)
-      widget('apotomo/container', id, *args, &block)
-    end
-    
     private
       def constant_for(class_name)  # TODO: use Cell.class_from_cell_name. 
         "#{class_name}_widget".classify.constantize
