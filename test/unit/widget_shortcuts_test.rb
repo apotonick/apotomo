@@ -87,22 +87,4 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       assert_kind_of MumWidget, @mum['kid']
     end
   end
-  
-  context "#container" do
-    setup do
-      @family = container('family')
-    end
-    
-    should "create a ContainerWidget instance" do
-      assert_kind_of ::Apotomo::ContainerWidget, @family
-      assert_equal 'family', @family.name
-    end
-    
-    should "yield itself" do
-      @container = container(:family) do |family|
-        family << widget(:mum, 'mum')
-      end
-      assert_equal 2, @container.size
-    end
-  end
 end
