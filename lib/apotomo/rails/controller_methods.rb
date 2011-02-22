@@ -1,5 +1,4 @@
 require 'apotomo/request_processor'
-require 'apotomo/rails/view_methods'
 
 module Apotomo
   module Rails
@@ -9,6 +8,10 @@ module Apotomo
         include ControllerMethods
         has_widgets(*args, &block)
       end
+    end
+    
+    module ViewMethods
+      delegate :render_widget, :url_for_event, :to => :controller
     end
     
     module ControllerMethods
@@ -52,8 +55,8 @@ module Apotomo
         apotomo_request_processor.root
       end
       
-      def render_widget(widget, *args, &block)
-        apotomo_request_processor.render_widget_for(widget, *args, &block)
+      def render_widget(*args, &block)
+        apotomo_request_processor.render_widget_for(*args, &block)
       end
       
       def render_event_response
@@ -78,7 +81,7 @@ module Apotomo
         apotomo_event_path(apotomo_request_processor.address_for(options))
       end
       
-      protected
+    protected
       
       def parent_controller
         self
