@@ -40,12 +40,12 @@ class TestCaseTest < Test::Unit::TestCase
       end
       
       should "respond to #render_widget" do
-        assert_equal "<div id=\"mum\">burp!</div>", @test.render_widget('mum')
-        assert_equal "<div id=\"mum\">burp!</div>", @test.last_invoke
+        assert_equal "<div id=\"mum\">burp!</div>\n", @test.render_widget('mum', :eat)
+        assert_equal "<div id=\"mum\">burp!</div>\n", @test.last_invoke
       end
       
       should "respond to #assert_select" do
-        @test.render_widget('mum')
+        @test.render_widget('mum', :eat)
         
         assert_nothing_raised { @test.assert_select("div#mum", "burp!") } 
         

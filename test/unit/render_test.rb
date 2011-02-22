@@ -18,7 +18,7 @@ class RenderTest < ActionView::TestCase
       end
       
       should "render the :text" do
-        assert_equal "burp!!!", @mum.invoke
+        assert_equal "burp!!!", @mum.invoke(:eating)
       end
     end
     
