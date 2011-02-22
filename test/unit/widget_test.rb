@@ -9,7 +9,7 @@ class WidgetTest < ActiveSupport::TestCase
       @mum = Apotomo::Widget.new(@controller, 'mum', :squeak)
     end
   end
-  
+
   context "Widget.has_widgets" do
     setup do
       @mum = Class.new(MouseWidget) do
@@ -57,7 +57,7 @@ class WidgetTest < ActiveSupport::TestCase
       assert_equal ['berry', 'kid'], @root.children.collect { |w| w.name }
     end
   end
-  
+
   context "A stateless widget" do
     setup do
       @mum = Apotomo::Widget.new(@controller, 'mum', :squeak)
@@ -159,5 +159,55 @@ class WidgetTest < ActiveSupport::TestCase
     should "not list #display in internal_methods although it's defined in Object" do
       assert_not Apotomo::Widget.internal_methods.include?(:display)
     end
+  end
+end
+  
+
+class RenderWidgetTest < ActiveSupport::TestCase
+  include Apotomo::TestCaseMethods::TestController
+
+  context "#render_widget" do
+    should "allow passing widget id" do
+      assert_equal "squeak!", mouse_mock.render_widget('mouse', :squeak)
+    end
+    
+    should "allow passing widget instance" do
+      assert_equal 'squeak!', mouse_mock.render_widget(mouse_mock('mum'), :squeak)
+    end
+    
+    should "use :display as standard state" do
+      mum = mouse_mock('Mum') do
+        def display
+          render :text => "#{widget_id}, that's me!"
+        end
+      end
+      
+      assert_equal "Mum, that's me!", mouse_mock.render_widget(mum)
+    end
+    
+    should "raise an exception when a non-existent widget id is passed" do
+      e = assert_raises RuntimeError do
+        mouse_mock.render_widget('mummy')
+      end
+      
+      assert_equal "Couldn't render non-existent widget `mummy`", e.message
+    end
+    
+    should "pass options as state-args" do
+      mum = mouse_mock do
+        def display(color="grey")
+          render :text => "I'm #{color}"
+        end
+      end
+      
+      assert_equal("I'm grey", mouse_mock.render_widget(mum), "default value in state-arg didn't work")
+      assert_equal("I'm black", mouse_mock.render_widget(mum, :display, "black"))
+    end
+    
+    should "use #find_widget from self to find the passed widget id" do
+      mum = mouse_mock('mum') << mouse_mock(:kid)
+      
+      assert_equal "<div id=\"kid\">burp!</div>\n", mum.render_widget(:kid, :eat)
+    end 
   end
 end

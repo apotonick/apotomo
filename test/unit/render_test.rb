@@ -147,47 +147,5 @@ class RenderTest < ActionView::TestCase
         assert_equal "$(\"div#mouse\").replace(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
       end
     end
-  end
-  
-  context "#render_widget in a state view" do
-    setup do
-      @mum = mouse_mock('mum')
-      
-      @mum << @kid = mouse_mock('kid', :eat)
-    end
-    
-    should "render the child" do
-      @mum.instance_eval do
-        def quirk
-          render :inline => "<%= render_widget 'kid' %>"
-        end
-      end
-      
-      assert_equal "<div id=\"kid\">burp!</div>\n", @mum.invoke(:quirk)
-    end
-    
-    should "render the child with the given state" do
-      @mum.instance_eval do
-        def quirk
-          render :inline => "<%= render_widget 'kid', :squeak %>"
-        end
-      end
-      
-      assert_equal "squeak!", @mum.invoke(:quirk)
-    end
-    
-    should "raise an exception when a non-existent widget id is passed" do
-      @mum.instance_eval do
-        def quirk
-          render :inline => "<%= render_widget :bobiyo %>"
-        end
-      end
-      
-      e = assert_raises ActionView::Template::Error do
-        @mum.invoke(:quirk)
-      end
-      assert_equal "Couldn't render non-existent widget `bobiyo`", e.message
-    end
-  end
-  
+  end  
 end
