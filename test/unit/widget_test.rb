@@ -91,23 +91,6 @@ class WidgetTest < ActiveSupport::TestCase
         @mum.visible = false
         assert_not @mum.visible?
       end
-      
-      context "in a widget family" do
-        setup do
-          @mum << @jerry = mouse_mock('jerry')
-          @mum << @berry = mouse_mock('berry')
-        end
-        
-        should "per default return all #visible_children" do
-          assert_equal [@jerry, @berry], @mum.visible_children
-          assert_equal [], @jerry.visible_children
-        end
-        
-        should "hide berry in #visible_children if he's invisible" do
-          @berry.visible = false
-          assert_equal [@jerry], @mum.visible_children
-        end
-      end
     end
     
     should "respond to #find_widget" do
