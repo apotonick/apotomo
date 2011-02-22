@@ -1,8 +1,8 @@
 module Apotomo
   module TestCaseMethods
     # Provides a ready-to-use mouse widget instance.
-    def mouse_mock(id='mouse', start_state=:display, opts={}, &block)
-      mouse = MouseWidget.new(parent_controller, id, start_state, opts)
+    def mouse_mock(id='mouse', opts={}, &block)
+      mouse = MouseWidget.new(parent_controller, id, opts)
       mouse.instance_eval &block if block_given?
       mouse
     end
@@ -14,8 +14,8 @@ module Apotomo
     end
     
     def mum_and_kid!
-      @mum = mouse_mock('mum', :answer_squeak)
-        @mum << @kid = mouse_mock('kid', :peek)
+      @mum = mouse_mock('mum')
+        @mum << @kid = mouse_mock('kid')
       
       @mum.respond_to_event :squeak, :with => :answer_squeak
       @mum.respond_to_event :squeak, :from => 'kid', :with => :alert

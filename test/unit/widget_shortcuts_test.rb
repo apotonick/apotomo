@@ -24,7 +24,6 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       
       should "create a MumWidget instance" do
         assert_kind_of MumWidget, @mum
-        assert_equal :eating, @mum.start_state
         assert_equal 'mum', @mum.name
       end
       
@@ -33,21 +32,10 @@ class WidgetShortcutsTest < Test::Unit::TestCase
       end
     end
     
-    context "with 3 arguments and no start_state" do
-      should "set a default start_state" do
-        @mum = widget(:mum, 'mum', :color => 'grey', :type => :hungry)
-        assert_kind_of MumWidget, @mum
-        assert_equal :display,  @mum.start_state
-        assert_equal 'mum',     @mum.name
-        assert_equal({:color => "grey", :type => :hungry}, @mum.options)
-      end
-    end
-    
     context "with 3 arguments and no options" do
       should "not set options" do
         @mum = widget(:mum, 'mum', :squeak)
         assert_kind_of MumWidget, @mum
-        assert_equal :squeak,   @mum.start_state
         assert_equal 'mum',     @mum.name
         assert_equal({},        @mum.options)
       end
@@ -55,13 +43,12 @@ class WidgetShortcutsTest < Test::Unit::TestCase
     
     context "with class and id" do
       setup do
-        @mum = widget(:mum, 'mum')
+        @mum = widget(:mum, 'mummy')
       end
       
-      should "create a MumWidget instance with :display start state" do
+      should "create a MumWidget instance" do
         assert_kind_of MumWidget, @mum
-        assert_equal :display, @mum.start_state
-        assert_equal 'mum', @mum.name
+        assert_equal 'mummy', @mum.name
       end
     end
     
@@ -70,18 +57,17 @@ class WidgetShortcutsTest < Test::Unit::TestCase
         @mum = widget(:mum)
       end
       
-      should "create a MumWidget instance with :display start state and named :mum" do
+      should "create a MumWidget instance named :mum" do
         assert_kind_of MumWidget, @mum
-        assert_equal :display, @mum.start_state
         assert_equal :mum, @mum.name
       end
     end
     
     
     should "yield itself" do
-      @mum = widget(:mum, :snuggle, 'mum') do |mum|
+      @mum = widget(:mum, 'mum') do |mum|
         assert_kind_of MumWidget, mum
-        mum << widget(:mum, 'kid', :sleep)
+        mum << widget(:mum, 'kid')
       end
       assert_equal 2, @mum.size
       assert_kind_of MumWidget, @mum['kid']

@@ -57,14 +57,12 @@ module Apotomo
     define_hook :after_add
     
     attr_writer :visible
-    attr_reader :start_state
-
+    
     include TreeNode
     
     include Onfire
-    include EventMethods
     
-    include Transition
+    include EventMethods
     include WidgetShortcuts
     
     helper Apotomo::Rails::ViewHelper
@@ -74,7 +72,6 @@ module Apotomo
     
     undef :display  # We don't want #display to be listed in #internal_methods.
     
-    alias_method :last_state, :action_name
     alias_method :widget_id,  :name
     
     
@@ -89,12 +86,10 @@ module Apotomo
     after_initialize :add_has_widgets_blocks
     
     
-    # Constructor which needs a unique id for the widget and one or multiple start states.  
-    def initialize(parent_controller, id, start_state, options={})
+    def initialize(parent_controller, id, options={})
       super(parent_controller, options)  # do that as long as cells do need a parent_controller.
       
       @name         = id
-      @start_state  = start_state
       @visible      = true
       
       run_hook :after_initialize, self
@@ -109,8 +104,6 @@ module Apotomo
       return render_state(state, *args) if state_accepts_args?(state)
       render_state(state)
     end
-    
-    
     
     # Render the view for the current state. Usually called at the end of a state method.
     #
