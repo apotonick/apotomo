@@ -10,7 +10,8 @@ module Apotomo
       end
     end
     
-    module ViewMethods
+    
+    module ActionViewMethods
       delegate :render_widget, :url_for_event, :to => :controller
     end
     
@@ -24,7 +25,7 @@ module Apotomo
         class_inheritable_array :has_widgets_blocks
         self.has_widgets_blocks = []
         
-        helper ::Apotomo::Rails::ViewMethods  # FIXME: use helper_methods and remove the module.
+        helper ActionViewMethods
       end
       
       module ClassMethods
