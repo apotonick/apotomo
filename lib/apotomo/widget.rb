@@ -104,18 +104,8 @@ module Apotomo
       @visible
     end
     
-    # Returns the rendered content for the widget by running the method for +state+.
-    def invoke(state=nil, *args)
-      logger.debug "#{name}.invoke(#{state.inspect})"
-      
-      state ||= (next_state_for(last_state) || start_state) # TODO: move to separate method.
-      
-      logger.debug "#{name}: transition: #{last_state} to #{state}"
-      
-      invoke_state(state, *args)
-    end
-    
-    def invoke_state(state, *args)
+    # Invokes +state+ and hopefully returns the rendered content.
+    def invoke(state, *args)
       return render_state(state, *args) if state_accepts_args?(state)
       render_state(state)
     end
@@ -218,7 +208,7 @@ module Apotomo
         widget = find_widget(widget_id) or raise "Couldn't render non-existent widget `#{widget_id}`"
       end
       
-      widget.invoke_state(state, *args)
+      widget.invoke(state, *args)
     end
   end
 end
