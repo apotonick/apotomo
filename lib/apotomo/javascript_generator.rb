@@ -33,7 +33,6 @@ module Apotomo
     module Prototype
       def prototype;            end
       def element(id);          "$(\"#{id}\")"; end
-      def xhr(url);             "new Ajax.Request(\"#{url}\")"; end
       def update(id, markup);   element(id) + '.update("'+escape(markup)+'")'; end
       def replace(id, markup);  element(id) + '.replace("'+escape(markup)+'")'; end
     end
@@ -41,15 +40,13 @@ module Apotomo
     module Right
       def right;                end
       def element(id);          "$(\"#{id}\")"; end
-      def xhr(url);             "new Xhr(\"#{url}\", {evalScripts:true}).send()"; end
       def update(id, markup);   element(id) + '.update("'+escape(markup)+'")'; end
       def replace(id, markup);  element(id) + '.replace("'+escape(markup)+'")'; end
     end
     
     module Jquery
       def jquery;               end
-      def element(id);          "$(\"##{id}\")"; end
-      def xhr(url);             "$.ajax({url: \"#{url}\"})"; end
+      def element(id);          "$(\"#{id}\")"; end
       def update(id, markup);   element(id) + '.html("'+escape(markup)+'")'; end
       def replace(id, markup);  element(id) + '.replaceWith("'+escape(markup)+'")'; end
     end
