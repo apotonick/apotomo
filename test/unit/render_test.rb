@@ -3,7 +3,7 @@ require 'test_helper'
 class RenderTest < ActionView::TestCase
   include Apotomo::TestCaseMethods::TestController
   
-  context "Rendering a single widget" do
+  context "#render" do
     setup do
       @mum = mouse_mock('mum', :eating)
     end
@@ -22,27 +22,10 @@ class RenderTest < ActionView::TestCase
       end
     end
     
-    
-    context "with :suppress_js" do
-      setup do
-        @mum.instance_eval do
-          def snuggle; render; end
-          self.class.send :attr_reader, :suppress_js
-        end
-      end
+    should "accept :state and options" do
+      @mum.instance_eval { def eat(what); render :text => "#{what} today?"; end }
       
-      should "per default be false" do
-        @mum.invoke :eating
-        assert !@mum.suppress_js
-      end
-      
-      should "be true when set" do
-        @mum.instance_eval do
-          def eating; render :suppress_js => true; end
-        end
-        @mum.invoke :eating
-        assert @mum.suppress_js
-      end
+      assert_equal "Rice today?", @mum.render({:state => :eat}, "Rice")
     end
     
     should "expose its instance variables in the rendered view" do

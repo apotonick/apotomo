@@ -124,14 +124,7 @@ module Apotomo
     #  render :js => "alert('SQUEAK!');"
     #
     # issues a squeaking alert dialog on the page.
-    def render(options={}, &block)
-      if options[:nothing]
-        return "" 
-      end
-      
-      options.reverse_merge! :suppress_js      => false
-      @suppress_js = options[:suppress_js]    ### FIXME: implement with ActiveHelper and :locals.
-      
+    def render(*args, &block)
       super
     end
     
