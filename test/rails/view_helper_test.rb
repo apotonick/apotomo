@@ -66,31 +66,17 @@ class ViewHelperTest < Apotomo::TestCase
     end
     
     should "respond to #render_widget" do
-      mum = mouse_mock << mouse_mock('kid')
+      mum = mouse_mock 
+      mum << mouse_mock('kid')
       assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum){ render_widget 'kid', :eat })
     end
     
-    context "#widget_javascript" do
-      
-      should "usually render a javascript block" do
-        assert_equal("<script type=\"text/javascript\">\n//<![CDATA[\nalert(&quot;Beer!&quot;)\n//]]>\n</script>", in_view(MouseWidget) do
-          widget_javascript { 'alert("Beer!")' }
-        end)
-      end
-      
-      # FIXME: get the test running?
-      should_eventually "be quiet if suppress_js is set" do
-        @suppress_js = true ### TODO: use a local, not an instance variable.
-        mum = mouse_mock do
-          def in_view
-            render :suppress_js => true
-          end
-        end
-
-        assert_equal(nil, in_view(mum) do
-          widget_javascript { 'alert("Beer!")' }
-        end)
-      end
+    should "respond to #children" do
+      mum = mouse_mock 
+      mum << mouse_mock('kid')
+      assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum) do
+        children.inject("") { |html, child| html += render_widget(child, :eat) }.html_safe
+      end)
     end
   end
 end
