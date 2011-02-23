@@ -77,9 +77,9 @@ class EventMethodsTest < Test::Unit::TestCase
       end
       
       should "not add the same handler to each instance" do
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouseCell.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
         
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'dad', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'dad', :show).event_table.all_handlers_for(:peep, 'dad')
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'dad', :state => :answer_squeak)], AdultMouseCell.new(parent_controller, 'dad', :show).event_table.all_handlers_for(:peep, 'dad')
       end
     end
     
