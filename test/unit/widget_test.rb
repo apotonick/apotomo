@@ -129,6 +129,11 @@ class WidgetTest < ActiveSupport::TestCase
       assert_equal "mouse", MouseWidget.controller_path
     end
     
+    should "respond to extract_options" do
+      assert_equal({}, mouse_mock.send(:extract_options, []))
+      assert_equal({:mouse => :logitech}, mouse_mock.send(:extract_options, [{:mouse => :logitech}, 1,2]))
+    end
+    
     # internal_methods:
     should "not list internal methods in action_methods" do
       assert_equal [], Class.new(Apotomo::Widget).action_methods

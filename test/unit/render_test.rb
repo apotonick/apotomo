@@ -26,6 +26,8 @@ class RenderTest < ActionView::TestCase
       @mum.instance_eval { def eat(what); render :text => "#{what} today?"; end }
       
       assert_equal "Rice today?", @mum.render({:state => :eat}, "Rice")
+      assert_match "Rice today?", @mum.update({:state => :eat}, "Rice")
+      assert_match "Rice today?", @mum.replace({:state => :eat}, "Rice")
     end
     
     should "expose its instance variables in the rendered view" do

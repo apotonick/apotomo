@@ -142,9 +142,11 @@ module Apotomo
     #
     #   replace :view => :squeak, :selector => "div#mouse"
     #   #=> "$(\"div#mouse\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\")"
-    def replace(options={})
-      content = render(options)
-      Apotomo.js_generator.replace(options[:selector] || self.name, content)
+    def replace(*args)
+      content = render(*args)
+      options = extract_options(args)
+      
+      Apotomo.js_generator.replace(options[:selector] || name, content)
     end
     
     # Same as replace except that the content is wrapped in an update statement.
@@ -153,9 +155,11 @@ module Apotomo
     #
     #   update :view => :squeak
     #   #=> "$(\"mum\").html(\"<div id=\\\"mum\\\">squeak!<\\/div>\")"
-    def update(options={})
-      content = render(options)
-      Apotomo.js_generator.update(options[:selector] || self.name, content)
+    def update(*args)
+      content = render(*args)
+      options = extract_options(args)
+      
+      Apotomo.js_generator.update(options[:selector] || name, content)
     end
     
     def param(name)
@@ -194,6 +198,11 @@ module Apotomo
       end
       
       widget.invoke(state, *args)
+    end
+  
+  private
+    def extract_options(args) # from Cell::Rails.
+      args.first.is_a?(::Hash) ? args.shift : {}
     end
   end
 end
