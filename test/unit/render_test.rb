@@ -86,17 +86,13 @@ class RenderTest < ActionView::TestCase
     end
     
     context "with #update" do
-      setup do
-        Apotomo.js_framework = :prototype
-      end
-      
       should "wrap the :text in an update statement" do
         @mum.instance_eval do
           def squeak
             update :text => "squeak!"
           end
         end
-        assert_equal "$(\"mum\").update(\"squeak!\")", @mum.invoke(:squeak)
+        assert_equal "$(\"#mum\").html(\"squeak!\")", @mum.invoke(:squeak)
       end
       
       should "accept :selector" do
@@ -105,22 +101,18 @@ class RenderTest < ActionView::TestCase
             update :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
           end
         end
-        assert_equal "$(\"div#mouse\").update(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+        assert_equal "$(\"div#mouse\").html(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
       end
     end
     
     context "with #replace" do
-      setup do
-        Apotomo.js_framework = :prototype
-      end
-      
       should "wrap the :text in a replace statement" do
         @mum.instance_eval do
           def squeak
             replace :text => '<div id="mum">squeak!</div>'
           end
         end
-        assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+        assert_equal "$(\"#mum\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
       end
       
       should "accept :selector" do
@@ -129,7 +121,7 @@ class RenderTest < ActionView::TestCase
             replace :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
           end
         end
-        assert_equal "$(\"div#mouse\").replace(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+        assert_equal "$(\"div#mouse\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
       end
     end
   end  
