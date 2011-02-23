@@ -75,7 +75,7 @@ module Apotomo
     
     undef :display  # We don't want #display to be listed in #internal_methods.
     
-    alias_method :widget_id,  :name
+    alias_method :widget_id, :name
     
     
     # Runs callbacks for +name+ hook in instance context.  

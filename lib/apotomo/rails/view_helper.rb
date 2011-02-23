@@ -12,8 +12,8 @@ module Apotomo
     #
     # == #children
     #
-    #   = children
-    #   #=> [<first kid>, <second kid>]
+    #   - children.each do |kid|
+    #     = render_widget kid
     module ViewHelper
       delegate :children, :url_for_event, :widget_id, :to => :controller
       
