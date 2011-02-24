@@ -85,7 +85,7 @@ class RenderTest < ActionView::TestCase
       end
     end
     
-    context "with #update" do
+    context "#update" do
       should "wrap the :text in an update statement" do
         @mum.instance_eval do
           def squeak
@@ -95,17 +95,17 @@ class RenderTest < ActionView::TestCase
         assert_equal "$(\"#mum\").html(\"squeak!\");", @mum.invoke(:squeak)
       end
       
-      should "accept :selector" do
+      should "accept a selector" do
         @mum.instance_eval do
           def squeak
-            update :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
+            update "div#mouse", :text => '<div id="mum">squeak!</div>'
           end
         end
         assert_equal "$(\"div#mouse\").html(\"<div id=\\\"mum\\\">squeak!<\\/div>\");", @mum.invoke(:squeak)
       end
     end
     
-    context "with #replace" do
+    context "#replace" do
       should "wrap the :text in a replace statement" do
         @mum.instance_eval do
           def squeak
@@ -115,10 +115,10 @@ class RenderTest < ActionView::TestCase
         assert_equal "$(\"#mum\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\");", @mum.invoke(:squeak)
       end
       
-      should "accept :selector" do
+      should "accept a selector" do
         @mum.instance_eval do
           def squeak
-            replace :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
+            replace "div#mouse", :text => '<div id="mum">squeak!</div>'
           end
         end
         assert_equal "$(\"div#mouse\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\");", @mum.invoke(:squeak)

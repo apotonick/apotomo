@@ -28,12 +28,12 @@ module Apotomo
     
   private
     def wrap_in_javascript_for(mode, *args)
-      content = render(*args)
-      options = args.first.is_a?(::Hash) ? args.shift : {}
+      selector  = args.first.is_a?(String) ? args.shift : false
+      content   = render(*args)
       
-      options[:selector] ? 
-        Apotomo.js_generator.send(mode, options[:selector], content) :  # replace(:twitter)
-        Apotomo.js_generator.send("#{mode}_id", name, content)          # replace_id(:twitter)
+      selector ? 
+        Apotomo.js_generator.send(mode, selector, content) :    # replace(:twitter)
+        Apotomo.js_generator.send("#{mode}_id", name, content)  # replace_id(:twitter)
     end
   end
 end
