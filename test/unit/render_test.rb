@@ -92,7 +92,7 @@ class RenderTest < ActionView::TestCase
             update :text => "squeak!"
           end
         end
-        assert_equal "$(\"#mum\").html(\"squeak!\")", @mum.invoke(:squeak)
+        assert_equal "$(\"#mum\").html(\"squeak!\");", @mum.invoke(:squeak)
       end
       
       should "accept :selector" do
@@ -101,7 +101,7 @@ class RenderTest < ActionView::TestCase
             update :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
           end
         end
-        assert_equal "$(\"div#mouse\").html(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+        assert_equal "$(\"div#mouse\").html(\"<div id=\\\"mum\\\">squeak!<\\/div>\");", @mum.invoke(:squeak)
       end
     end
     
@@ -112,7 +112,7 @@ class RenderTest < ActionView::TestCase
             replace :text => '<div id="mum">squeak!</div>'
           end
         end
-        assert_equal "$(\"#mum\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+        assert_equal "$(\"#mum\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\");", @mum.invoke(:squeak)
       end
       
       should "accept :selector" do
@@ -121,7 +121,7 @@ class RenderTest < ActionView::TestCase
             replace :text => '<div id="mum">squeak!</div>', :selector => "div#mouse"
           end
         end
-        assert_equal "$(\"div#mouse\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\")", @mum.invoke(:squeak)
+        assert_equal "$(\"div#mouse\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\");", @mum.invoke(:squeak)
       end
     end
   end  

@@ -33,8 +33,8 @@ module Apotomo
     module Prototype
       def prototype;              end
       def element(id);            "$(\"#{id}\")"; end
-      def update(id, markup);     element(id) + '.update("'+escape(markup)+'")'; end
-      def replace(id, markup);    element(id) + '.replace("'+escape(markup)+'")'; end
+      def update(id, markup);     element(id) + '.update("'+escape(markup)+'");'; end
+      def replace(id, markup);    element(id) + '.replace("'+escape(markup)+'");'; end
       def update_id(id, markup);  update(id, markup); end
       def replace_id(id, markup); replace(id, markup); end
     end
@@ -42,8 +42,8 @@ module Apotomo
     module Right
       def right;                  end
       def element(id);            "$(\"#{id}\")"; end
-      def update(id, markup);     element(id) + '.update("'+escape(markup)+'")'; end
-      def replace(id, markup);    element(id) + '.replace("'+escape(markup)+'")'; end
+      def update(id, markup);     element(id) + '.update("'+escape(markup)+'");'; end
+      def replace(id, markup);    element(id) + '.replace("'+escape(markup)+'");'; end
       def update_id(id, markup);  update(id, markup); end
       def replace_id(id, markup); replace(id, markup); end
     end
@@ -51,8 +51,8 @@ module Apotomo
     module Jquery
       def jquery;                 end
       def element(id);            "$(\"#{id}\")"; end
-      def update(id, markup);     element(id) + '.html("'+escape(markup)+'")'; end
-      def replace(id, markup);    element(id) + '.replaceWith("'+escape(markup)+'")'; end
+      def update(id, markup);     element(id) + '.html("'+escape(markup)+'");'; end
+      def replace(id, markup);    element(id) + '.replaceWith("'+escape(markup)+'");'; end
       def update_id(id, markup);  update("##{id}", markup); end
       def replace_id(id, markup); replace("##{id}", markup); end
     end
