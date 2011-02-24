@@ -6,17 +6,19 @@ h3. Changes
   ** The @CommentsWidget@ views are searched in @app/widgets/comments/@ (note the missing "_widget").
   * Including Apotomo::Rails::ControllerMethods by hand is optional. The first call to Controller.has_widgets will include the real module.
   * You can now @#render_widget@ in your widget views to render children.
-  * @#widget@ now accepts one arg only (the widget prefix). @widget(:comments)@ sets id to @:comments@.
-  * #invoke now requires a state name.
+  * @#widget@ now accepts one arg only (the widget prefix). @widget(:comments)@ sets id to @:comments@. We also removed the start state argument.
+  * Start states are no longer accepted, you have to explicitely pass the state to #render_widget. That's why #invoke now requires an explicit state as well.
   * The event is no longer added to #options at triggering time.
   * Options passed in #render_widget are no longer merged with #options. They are passed as state-args to reduce complexity.
   * We no longer have @opts and @params but #options and #params from Cell::Base.
   * The params hash is appended to the event in RequestProcessor#process_for. You can now live completely without accessing the global #params.
+  * #respond/#update with :selector does not longer prefix the selector with #. It's up to you.
   * Event delegates #[] to #data.
 
 h3. Removals
   * Removed #param, it is simply too complex.
   * Removed render :render_children and :invoke options. Use #render_widget in your state/view.
+  * Removed render :suppress_js as it was ugly and kills children.
   * Removed #jump_to_state and #last_state.
   * Removed `@cell`, now longer available in state views.
   * Removed #cell, #container and #section widget shortcuts.
