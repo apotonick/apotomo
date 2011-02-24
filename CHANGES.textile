@@ -8,6 +8,7 @@ h3. Changes
   * You can now @#render_widget@ in your widget views to render children.
   * @#widget@ now accepts one arg only (the widget prefix). @widget(:comments)@ sets id to @:comments@. We also removed the start state argument.
   * Start states are no longer accepted, you have to explicitely pass the state to #render_widget. That's why #invoke now requires an explicit state as well.
+  * #replace/#update now append a @;@ to the JavaScript expression. You may pass an arbitrary selector string as first argument (optional).
   * The event is no longer added to #options at triggering time.
   * Options passed in #render_widget are no longer merged with #options. They are passed as state-args to reduce complexity.
   * We no longer have @opts and @params but #options and #params from Cell::Base.
