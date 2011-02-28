@@ -1,5 +1,10 @@
 module Apotomo
   module JavascriptMethods
+    # Returns the escaped script.
+    def escape_js(script)
+      Apotomo.js_generator.escape(script)
+    end
+    
     # Wraps the rendered content in a replace statement targeted at your +Apotomo.js_framework+ setting.
     # Use +:selector+ to change the selector.
     #

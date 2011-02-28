@@ -124,5 +124,11 @@ class RenderTest < ActionView::TestCase
         assert_equal "$(\"div#mouse\").replaceWith(\"<div id=\\\"mum\\\">squeak!<\\/div>\");", @mum.invoke(:squeak)
       end
     end
+    
+    context "#escape_js" do
+      should "escape the string" do
+        assert_equal "<div id=\\\"mum\\\">squeak!<\\/div>", @mum.escape_js('<div id="mum">squeak!</div>')
+      end
+    end
   end  
 end
