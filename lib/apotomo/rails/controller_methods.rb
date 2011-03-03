@@ -36,7 +36,7 @@ module Apotomo
         # Example:
         #   class PostsController < ApplicationController
         #     has_widgets do |root|
-        #       root << widget(:comments_widget, 'post-comments', :user => @current_user)
+        #       root << widget(:comments, :user => current_user)
         #     end
         def has_widgets(&block)
           has_widgets_blocks << block
