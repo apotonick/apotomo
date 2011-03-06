@@ -111,19 +111,17 @@ module Apotomo
     # Render the view for the current state. Usually called at the end of a state method.
     #
     # ==== Options
-    # * <tt>:view</tt> - Specifies the name of the view file to render. Defaults to the current state name.
-    # * <tt>:template_format</tt> - Allows using a format different to <tt>:html</tt>.
-    # * <tt>:layout</tt> - If set to a valid filename inside your cell's view_paths, the current state view will be rendered inside the layout (as known from controller actions). Layouts should reside in <tt>app/cells/layouts</tt>.
-    # * see Cell::Base#render for additional options
+    # * <tt>:view</tt> - Renders +view+. Defaults to the current state name.
+    # * <tt>:state</tt> - Invokes the +state+ method and returns whatever the state returns.
+    # * See http://rdoc.info/gems/cells/3.5.4/Cell/Rails#render-instance_method
     #
     # Example:
-    #  class MouseWidget < Apotomo::StatefulWidget
+    #  class MouseWidget < Apotomo::Widget
     #    def eat
-    #      # ... do something
     #      render 
     #    end
     #
-    # will just render the view <tt>eat.haml</tt>.
+    # render the view <tt>eat.haml</tt>.
     #
     #  render :js => "alert('SQUEAK!');"
     #
