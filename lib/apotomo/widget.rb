@@ -108,7 +108,8 @@ module Apotomo
       render_state(state)
     end
     
-    # Render the view for the current state. Usually called at the end of a state method.
+    # Renders and returns a view for the current state. That's why it is usually called at the end of 
+    # a state method.
     #
     # ==== Options
     # * <tt>:view</tt> - Renders +view+. Defaults to the current state name.
