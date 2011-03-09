@@ -2,13 +2,14 @@ require 'cells'
 require 'onfire'
 require 'hooks'
 
-require 'apotomo/tree_node'
+
 require 'apotomo/event'
-require 'apotomo/event_methods'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/view_helper'
 require 'apotomo/rails/controller_methods'  # FIXME.
 
+require 'apotomo/widget/tree_node'
+require 'apotomo/widget/event_methods'
 require 'apotomo/widget/javascript_methods'
 
 
@@ -140,7 +141,7 @@ module Apotomo
     end
     
     
-    # Returns the widget named <tt>widget_id</tt> as long as it is below self or self itself.
+    # Returns the widget named +widget_id+ if it's a descendent or self.
     def find_widget(widget_id)
       find {|node| node.name.to_s == widget_id.to_s}
     end

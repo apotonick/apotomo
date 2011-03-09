@@ -93,10 +93,26 @@ class WidgetTest < ActiveSupport::TestCase
       end
     end
     
-    should "respond to #find_widget" do
-      mum_and_kid!
-      assert_not @mum.find_widget('pet')
-      assert_equal @kid, @mum.find_widget('kid')
+    context "#find_widget" do
+      setup do
+        mum_and_kid!
+      end
+      
+      should "find itself" do
+        assert_equal @mum, @mum.find_widget('mum')
+      end
+      
+      should "return nil for not-existant widgets" do
+        assert_nil @mum.find_widget('pet')
+      end
+      
+      should "find children" do
+        assert_equal @kid, @mum.find_widget('kid')
+      end
+      
+      should "find treat 'id' and :id the same" do
+        assert_equal @mum.find_widget(:kid), @mum.find_widget('kid')
+      end
     end
     
     should "respond to the WidgetShortcuts methods, like #widget" do
