@@ -20,13 +20,29 @@ module Apotomo
     end
     
     module ClassMethods
+      # :passing
       def responds_to_event(*options)
+        return set_global_event_handler(*options) if options.dup.extract_options![:passing]
+        
         responds_to_event_options << options
       end
       alias_method :respond_to_event, :responds_to_event
-      
+    
       def responds_to_event_options
         @responds_to_event_options ||= []
+      end
+      
+    private
+      # Adds an event handler to a non-local widget. Called in #responds_to_event when the 
+      # :passing option is set.
+      #
+      # This usually leads to something like 
+      #   root.respond_to_event :click, :on => 'jerry'
+      def set_global_event_handler(type, options)
+        after_add do
+          options.reverse_merge!(:on => self.widget_id)
+          root.find_widget(options.delete(:passing)).respond_to_event(type, options)
+        end
       end
     end
     # Instructs the widget to look out for <tt>type</tt> Events that are passing by while bubbling.

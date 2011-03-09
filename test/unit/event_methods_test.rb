@@ -84,6 +84,15 @@ class EventMethodsTest < Test::Unit::TestCase
         assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
       end
       
+      should "add handlers to root when called with :passing" do
+        root  = mouse_mock(:root) 
+          root << mouse_class_mock do
+            responds_to_event :squeak, :passing => :root
+          end.new(parent_controller, 'jerry')
+        
+        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'jerry', :state => :squeak)], root.event_table.all_handlers_for(:squeak, 'jerry')
+      end
+      
       should "not inherit handlers for now" do
         assert_equal [], BabyMouse.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
       end
