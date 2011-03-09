@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   
   s.add_dependency "rails",   "~> 3.0"
-  s.add_dependency "cells",   "~> 3.5.4"
+  s.add_dependency "cells",   "~> 3.5.5"
   s.add_dependency "onfire",  "~> 0.1.2"
   s.add_dependency "hooks",   "~> 0.1.3"
 
