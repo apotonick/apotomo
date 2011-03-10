@@ -40,7 +40,7 @@ module Apotomo
       #   root.respond_to_event :click, :on => 'jerry'
       def set_global_event_handler(type, options)
         after_add do
-          options.reverse_merge!(:on => self.widget_id)
+          options = options.reverse_merge(:on => self.widget_id)
           root.find_widget(options.delete(:passing)).respond_to_event(type, options)
         end
       end
@@ -81,7 +81,7 @@ module Apotomo
       
       return if options[:once] and event_table.all_handlers_for(type, options[:from]).include?(handler)
       
-      on(type, :do => handler, :from => options[:from])
+      on(type, :call => handler, :from => options[:from])
     end
     
     # Fire an event of +type+ and let it bubble up. You may add arbitrary payload data to the event.
@@ -98,12 +98,12 @@ module Apotomo
       fire(*args)
     end
     
-  protected
     # Get all handlers from self for the passed event (overriding Onfire#local_event_handlers).
-    def local_event_handlers(event)
+    def handlers_for_event(event)
       event_table.all_handlers_for(event.type, event.source.name) # we key with widget_id.
     end
     
+  protected
     def event_for(*args)  # defined in Onfire: we want Apotomo::Event.
       Event.new(*args)
     end
