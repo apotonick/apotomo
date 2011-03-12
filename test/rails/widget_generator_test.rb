@@ -34,6 +34,18 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "app/widgets/gerbil/squeak.html.haml", %r(app/widgets/gerbil/squeak\.html\.haml)
         assert_file "test/widgets/gerbil_widget_test.rb"
       end
+
+      should "create slim assets with -e slim" do
+        run_generator %w(Gerbil squeak snuggle -e slim -t test_unit)
+        
+        assert_file "app/widgets/gerbil_widget.rb", /class GerbilWidget < Apotomo::Widget/
+        assert_file "app/widgets/gerbil_widget.rb", /def snuggle/
+        assert_file "app/widgets/gerbil_widget.rb", /def squeak/
+        assert_file "app/widgets/gerbil/snuggle.html.slim", %r(app/widgets/gerbil/snuggle\.html\.slim)
+        assert_file "app/widgets/gerbil/snuggle.html.slim", %r(p)
+        assert_file "app/widgets/gerbil/squeak.html.slim", %r(app/widgets/gerbil/squeak\.html\.slim)
+        assert_file "test/widgets/gerbil_widget_test.rb"
+      end
     end
   end
 end

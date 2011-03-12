@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_dependency "hooks",   "~> 0.1.3"
 
   s.add_development_dependency "shoulda"
+  s.add_development_dependency "slim"
 end
