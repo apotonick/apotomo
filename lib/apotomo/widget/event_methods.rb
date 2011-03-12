@@ -1,7 +1,7 @@
 require 'apotomo/invoke_event_handler'
 
 module Apotomo
-  # Introduces event-processing functions into the StatefulWidget.
+  # Event-related methods and onfire bridge for Widget.
   module EventMethods
     extend ActiveSupport::Concern
     
