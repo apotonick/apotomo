@@ -168,6 +168,11 @@ module Apotomo
       else
         widget = find_widget(widget_id) or raise "Couldn't render non-existent widget `#{widget_id}`"
       end
+
+      target_class = self.class.build_class_for(parent_controller, widget.class, args.first)
+      if widget.class != target_class
+        widget = target_class.new(parent_controller, widget_id, args.first)
+      end
       
       widget.invoke(state, *args)
     end
