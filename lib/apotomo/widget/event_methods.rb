@@ -7,7 +7,11 @@ module Apotomo
     
     included do
       after_initialize :add_class_event_handlers
+      
+      inheritable_attr :responds_to_event_options
+      self.responds_to_event_options = []
     end
+    
     
     attr_writer :page_updates
     
@@ -15,9 +19,6 @@ module Apotomo
       @page_updates ||= []
     end
     
-    def add_class_event_handlers(*)
-      self.class.responds_to_event_options.each { |options| respond_to_event(*options) }
-    end
     
     module ClassMethods
       # :passing
@@ -25,11 +26,6 @@ module Apotomo
         return set_global_event_handler(*options) if options.dup.extract_options![:passing]
         
         responds_to_event_options << options
-      end
-      alias_method :respond_to_event, :responds_to_event
-    
-      def responds_to_event_options
-        @responds_to_event_options ||= []
       end
       
     private
@@ -45,6 +41,7 @@ module Apotomo
         end
       end
     end
+    
     # Instructs the widget to look out for <tt>type</tt> Events that are passing by while bubbling.
     # If an appropriate event is encountered the widget will send the targeted widget (or itself) to another
     # state, which implies an update of the invoked widget.
@@ -106,6 +103,11 @@ module Apotomo
   protected
     def event_for(*args)  # defined in Onfire: we want Apotomo::Event.
       Event.new(*args)
+    end
+    
+    # Actually executes the #responds_to_event calls from the class on the instance.
+    def add_class_event_handlers(*)
+      self.class.responds_to_event_options.each { |options| respond_to_event(*options) }
     end
   end
 end

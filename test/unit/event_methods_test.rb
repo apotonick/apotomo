@@ -3,6 +3,11 @@ require 'test_helper'
 class EventMethodsTest < Test::Unit::TestCase
   include Apotomo::TestCaseMethods::TestController
   
+  def handler(id, state)
+    Apotomo::InvokeEventHandler.new(:widget_id => id, :state => state)
+  end
+  
+  
   context "#respond_to_event and #fire" do
     setup do
       mum_and_kid!
@@ -76,12 +81,15 @@ class EventMethodsTest < Test::Unit::TestCase
           responds_to_event :peep, :with => :answer_squeak
         end
         class BabyMouse < AdultMouse
+          responds_to_event :peep
           responds_to_event :footsteps, :with => :squeak
         end
+        
+        @mum = AdultMouse.new(parent_controller, 'mum')
       end
       
       should "add the handlers at creation time" do
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
+        assert_equal [handler('mum', :answer_squeak)], @mum.event_table.all_handlers_for(:peep, 'mum')
       end
       
       should "add handlers to root when called with :passing" do
@@ -90,17 +98,18 @@ class EventMethodsTest < Test::Unit::TestCase
             responds_to_event :squeak, :passing => :root
           end.new(parent_controller, 'jerry')
         
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'jerry', :state => :squeak)], root.event_table.all_handlers_for(:squeak, 'jerry')
+        assert_equal [handler('jerry', :squeak)], root.event_table.all_handlers_for(:squeak, 'jerry')
       end
       
-      should "not inherit handlers for now" do
-        assert_equal [], BabyMouse.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
+      should "inherit handlers" do
+        @peep_handlers = BabyMouse.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
+        assert_equal [handler('kid', :answer_squeak), handler('kid', :peep)], @peep_handlers
       end
       
-      should "not add the same handler to each instance" do
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'mum', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'mum', :show).event_table.all_handlers_for(:peep, 'mum')
+      should "not share responds_to_event options between different instances" do
+        assert_equal [handler('mum', :answer_squeak)], @mum.event_table.all_handlers_for(:peep, 'mum')
         
-        assert_equal [Apotomo::InvokeEventHandler.new(:widget_id => 'dad', :state => :answer_squeak)], AdultMouse.new(parent_controller, 'dad', :show).event_table.all_handlers_for(:peep, 'dad')
+        assert_equal [handler('dad', :answer_squeak)], AdultMouse.new(parent_controller, 'dad', :show).event_table.all_handlers_for(:peep, 'dad')
       end
     end
     
