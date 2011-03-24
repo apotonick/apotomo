@@ -22,6 +22,7 @@ module Apotomo
     
     module ClassMethods
       # :passing
+      # inheritable
       def responds_to_event(*options)
         return set_global_event_handler(*options) if options.dup.extract_options![:passing]
         
@@ -36,8 +37,8 @@ module Apotomo
       #   root.respond_to_event :click, :on => 'jerry'
       def set_global_event_handler(type, options)
         after_add do
-          options = options.reverse_merge(:on => self.widget_id)
-          root.find_widget(options.delete(:passing)).respond_to_event(type, options)
+          opts = options.reverse_merge(:on => self.widget_id)
+          root.find_widget(opts.delete(:passing)).respond_to_event(type, opts)
         end
       end
     end

@@ -75,6 +75,30 @@ class EventMethodsTest < Test::Unit::TestCase
       assert_equal [{:volume => 9}], @mum.list
     end
     
+    
+    context "#responds_to_event with :passing" do
+      setup do
+        class AdolescentMouse < MouseWidget
+          responds_to_event :squeak, :passing => :root
+        end
+        
+        @root = mouse_mock(:root)
+      end
+      
+      should "add handlers to root when called with :passing" do
+        @root << AdolescentMouse.new(parent_controller, 'jerry')
+        
+        assert_equal [handler('jerry', :squeak)], @root.event_table.all_handlers_for(:squeak, 'jerry')
+      end
+      
+      should "inherit :passing handlers" do
+        @root << Class.new(AdolescentMouse).new(parent_controller, 'jerry')
+        
+        assert_equal [handler('jerry', :squeak)], @root.event_table.all_handlers_for(:squeak, 'jerry')
+      end
+      
+    end
+    
     context "#responds_to_event in class context" do
       setup do
         class AdultMouse < MouseWidget
@@ -90,15 +114,6 @@ class EventMethodsTest < Test::Unit::TestCase
       
       should "add the handlers at creation time" do
         assert_equal [handler('mum', :answer_squeak)], @mum.event_table.all_handlers_for(:peep, 'mum')
-      end
-      
-      should "add handlers to root when called with :passing" do
-        root  = mouse_mock(:root) 
-          root << mouse_class_mock do
-            responds_to_event :squeak, :passing => :root
-          end.new(parent_controller, 'jerry')
-        
-        assert_equal [handler('jerry', :squeak)], root.event_table.all_handlers_for(:squeak, 'jerry')
       end
       
       should "inherit handlers" do

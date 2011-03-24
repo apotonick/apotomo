@@ -50,7 +50,7 @@ class WidgetTest < ActiveSupport::TestCase
       assert_equal ['mum', 'kid'], @root.children.collect { |w| w.name }
     end
     
-    should "inherit callbacks for now" do
+    should "inherit callbacks" do
       @berry = Class.new(@mum.class).new(@controller, 'berry', :squeak)
       @root << @berry
       
