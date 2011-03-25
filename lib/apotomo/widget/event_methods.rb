@@ -34,7 +34,6 @@ module Apotomo
       # Calls #squeak when a <tt>:squeak</tt> event is encountered.
       # 
       # == Options
-      #
       # Any option except the event +type+ is optional.
       #
       # [<tt>:with => state</tt>] 
@@ -53,6 +52,10 @@ module Apotomo
       #   attaches the observer to another widget. Useful if you want to catch bubbling events in +root+.
       #     responds_to_event :squeak, :passing => :root
       #   will invoke the state on the current widget if the event passes +:root+ (which is highly probable).
+      #
+      # == Inheritance
+      # Note that the observers are inherited. This allows deriving a widget class without having to redefine the
+      # responds_to_event blocks.
       def responds_to_event(*options)
         # DISCUSS: this is a Hooks.declarative_attr candidate, too.
         return set_global_event_handler(*options) if options.dup.extract_options![:passing]
