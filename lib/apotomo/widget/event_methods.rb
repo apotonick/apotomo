@@ -21,9 +21,40 @@ module Apotomo
     
     
     module ClassMethods
-      # :passing
-      # inheritable
+      # Instructs the widget to look out for +type+ events. If an appropriate event starts from or passes the widget, 
+      # the defined trigger state is executed.
+      #
+      #   class MouseWidget < Apotomo::Widget
+      #     responds_to_event :squeak
+      #
+      #     def squeak(evt)
+      #       update
+      #     end
+      #
+      # Calls #squeak when a <tt>:squeak</tt> event is encountered.
+      # 
+      # == Options
+      #
+      # Any option except the event +type+ is optional.
+      #
+      # [<tt>:with => state</tt>] 
+      #   executes +state+, defaults to +type+.
+      #     responds_to_event :squeak, :with => :chirp
+      #   will invoke the +#chirp+ state method.
+      # [<tt>:on => id</tt>] 
+      #   execute the trigger state on another widget.
+      #     responds_to_event :squeak, :on => :cat
+      #   will invoke the +#squeak+ state on the +:cat+ widget.
+      # [<tt>:from => id</tt>] 
+      #   executes the state <em>only</em> if the event origins from +id+.
+      #     responds_to_event :squeak, :from => :kid
+      #   will invoke the +#squeak+ state if +:kid+ triggered <em>and</em> if +:kid+ is a decendent of the current widget.
+      # [<tt>:passing => id</tt>] 
+      #   attaches the observer to another widget. Useful if you want to catch bubbling events in +root+.
+      #     responds_to_event :squeak, :passing => :root
+      #   will invoke the state on the current widget if the event passes +:root+ (which is highly probable).
       def responds_to_event(*options)
+        # DISCUSS: this is a Hooks.declarative_attr candidate, too.
         return set_global_event_handler(*options) if options.dup.extract_options![:passing]
         
         responds_to_event_options << options
@@ -37,39 +68,13 @@ module Apotomo
       #   root.respond_to_event :click, :on => 'jerry'
       def set_global_event_handler(type, options)
         after_add do
-          opts = options.reverse_merge(:on => self.widget_id)
+          opts = options.reverse_merge(:on => widget_id)
           root.find_widget(opts.delete(:passing)).respond_to_event(type, opts)
         end
       end
     end
     
-    # Instructs the widget to look out for <tt>type</tt> Events that are passing by while bubbling.
-    # If an appropriate event is encountered the widget will send the targeted widget (or itself) to another
-    # state, which implies an update of the invoked widget.
-    #
-    # You may configure the event handler with the following <tt>options</tt>:
-    #  :with  => (optional) the state to invoke on the target widget, defaults to +type+.
-    #  :on    => (optional) the targeted widget's id, defaults to <tt>self.name</tt>
-    #  :from  => (optional) the source id of the widget that triggered the event, defaults to any widget
-    #
-    # Example:
-    #   
-    #   trap = widget(:trap, :charged, 'mouse_trap')
-    #   trap.respond_to_event :mouseOver, :with => :catch_mouse
-    #
-    # This would instruct +trap+ to catch a <tt>:mouseOver</tt> event from any widget (including itself) and
-    # to invoke the state <tt>:catch_mouse</tt> on itself as trigger.
-    #
-    #   
-    #   hunter = widget(:form, :hunt_for_mice, 'my_form')
-    #     hunter << widget(:input_field, :smell_like_cheese,  'mouse_trap')
-    #     hunter << widget(:text_area,   :stick_like_honey,   'bear_trap')
-    #   hunter.respond_to_event :captured, :from => 'mouse_trap', :with => :refill_cheese, :on => 'mouse_trap'
-    #
-    # As both the bear- and the mouse trap can trigger a <tt>:captured</tt> event the later <tt>respond_to_event</tt>
-    # would invoke <tt>:refill_cheese</tt> on the <tt>mouse_trap</tt> widget as soon as this and only this widget fired.
-    # It is important to understand the <tt>:from</tt> parameter as it filters the event source - it wouldn't make
-    # sense to refill the mouse trap if the bear trap snapped, would it? 
+    # Same as #responds_to_event but executed on the widget instance, only.
     def respond_to_event(type, options={})
       options = options.reverse_merge(:once => true,
                                       :with => type,
