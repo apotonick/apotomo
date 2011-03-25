@@ -19,11 +19,11 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
   
-  s.add_dependency "rails",   "~> 3.0"
   s.add_dependency "cells",   "~> 3.5.6"
   s.add_dependency "onfire",  "~> 0.2.0"
   s.add_dependency "hooks",   "~> 0.1.3"
 
   s.add_development_dependency "shoulda"
   s.add_development_dependency "slim"
+  s.add_development_dependency "haml"
 end
