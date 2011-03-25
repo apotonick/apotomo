@@ -1,8 +1,15 @@
 h2. 1.1.1
 
+h3. Additions
+  * You can now attach event handlers to other widgets simply by using the @:passing@ option: @responds_to_event :click, :passing => :root@.
+  * If you want to debug events, just include the (WIP) @apotomo/debugging@ file and watch your server output on the console.
+  
 h3. Changes
+  * @Widget.responds_to_event@ is inheritable now.
   * The generator now places namespaced widgets into the correct sub-directories.
 
+h3. Removals
+  * Removed the alias @Widget.respond_to_event@, please use @Widget.responds_to_event@.
 
 h2. 1.1
 
