@@ -1,3 +1,5 @@
+require 'action_view/helpers/javascript_helper'
+
 module Apotomo
   class JavascriptGenerator
     def initialize(framework)
@@ -9,21 +11,11 @@ module Apotomo
       "#{javascript}"
     end
     
-    # Copied from ActionView::Helpers::JavascriptHelper.
-    JS_ESCAPE_MAP = {
-      '\\'    => '\\\\',
-      '</'    => '<\/',
-      "\r\n"  => '\n',
-      "\n"    => '\n',
-      "\r"    => '\n',
-      '"'     => '\\"',
-      "'"     => "\\'" }
+    JS_ESCAPER = Object.new.extend(::ActionView::Helpers::JavaScriptHelper)
 
     # Escape carrier returns and single and double quotes for JavaScript segments.
     def self.escape(javascript)
-      return javascript.gsub(/(\\|<\/|\r\n|[\n\r"'])/) { JS_ESCAPE_MAP[$1] } if javascript
-      
-      ''
+      JS_ESCAPER.escape_javascript(javascript)
     end
     
     def escape(javascript)
