@@ -1,7 +1,7 @@
 module Apotomo
   class RequestProcessor
 
-    class InvalidSourceWidget < SecurityError; end
+    class InvalidSourceWidget < RuntimeError; end
 
     include Hooks
     
