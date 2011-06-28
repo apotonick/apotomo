@@ -1,5 +1,8 @@
 module Apotomo
   class RequestProcessor
+
+    class InvalidSourceWidget < RuntimeError; end
+
     include Hooks
     
     define_hook :after_initialize
@@ -23,7 +26,7 @@ module Apotomo
     # Called when the browser wants an url_for_event address. This fires the request event in 
     # the widget tree and collects the rendered page updates.
     def process_for(request_params)
-      source = self.root.find_widget(request_params[:source]) or raise "Source #{request_params[:source].inspect} non-existent."
+      source = self.root.find_widget(request_params[:source]) or raise InvalidSourceWidget, "Source #{request_params[:source].inspect} non-existent."
       
       source.fire(request_params[:type].to_sym, request_params) # set data to params for now.
       
