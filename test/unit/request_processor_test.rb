@@ -96,7 +96,7 @@ class RequestProcessorTest < ActiveSupport::TestCase
     end
     
     should "raise an exception when :source is unknown" do
-      assert_raises RuntimeError do
+      assert_raises Apotomo::RequestProcessor::InvalidSourceWidget do
         @processor.process_for({:type => :squeak, :source => 'tom'})
       end
     end
