@@ -46,6 +46,15 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "app/widgets/gerbil/squeak.html.slim", %r(app/widgets/gerbil/squeak\.html\.slim)
         assert_file "test/widgets/gerbil_widget_test.rb"
       end
+      
+      should "work with namespaces" do
+        run_generator %w(Gerbil::Mouse squeak)
+
+        assert_file "app/widgets/gerbil/mouse_widget.rb", /class Gerbil::MouseWidget < Apotomo::Widget/
+        assert_file "app/widgets/gerbil/mouse_widget.rb", /def squeak/
+        assert_file "app/widgets/gerbil/mouse/squeak.html.erb", %r(app/widgets/gerbil/mouse/squeak\.html\.erb)
+      end
+    
     end
   end
 end
