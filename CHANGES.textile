@@ -1,3 +1,9 @@
+h2. 1.2
+
+h3. Changes
+  * New signature: @TestCase#trigger(type, source, options)@. This method no longer messes around with the widget's options hash but simply passes any additional options to @evt#data@. Also, the event @source@ is now the required second argument.
+  
+
 h2. 1.1.1
 
 h3. Additions

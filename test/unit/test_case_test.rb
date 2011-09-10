@@ -58,28 +58,23 @@ class TestCaseTest < Test::Unit::TestCase
           @mum = @test.root['mum']
           @mum.respond_to_event :footsteps, :with => :squeak
           @mum.instance_eval do
-            def squeak; render :text => "squeak!"; end
+            def squeak(evt)
+              render :text => evt.data  # this usually leads to "{}".
+            end
           end
         end
         
         should "respond to #trigger" do
-          assert_equal ["squeak!"], @test.trigger(:footsteps, :source => 'mum')
+          assert_equal ["{}"], @test.trigger(:footsteps, 'mum')
         end
         
-        should "provide options from #trigger to the widget" do
-          @test.trigger(:footsteps, :source => 'mum', :direction => :kitchen)
-          assert_equal :kitchen, @mum.options[:direction]
+        should "pass options from #trigger to the evt" do
+          assert_equal(["{:direction=>:kitchen}"] , @test.trigger(:footsteps, 'mum', :direction => :kitchen))
         end
-        
-        #should "merge options from #trigger and constructor" do
-        #  @test.root << @test.widget("mouse_cell", 'kid', :location => :hallway)
-        #  @test.trigger(:footsteps, :source => 'kid', :direction => :kitchen)
-        #  assert_equal({:direction => :kitchen, :location => :hallway}, @mum.param(:direction))
-        #end
         
         should "respond to #assert_response" do
-          @test.trigger(:footsteps, :source => 'mum')
-          assert @test.assert_response("squeak!")
+          @test.trigger(:footsteps, 'mum')
+          assert @test.assert_response("{}")
         end
       end
     end
