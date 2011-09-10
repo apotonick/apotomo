@@ -48,11 +48,12 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
       end
       
       should "work with namespaces" do
-        run_generator %w(Gerbil::Mouse squeak)
+        run_generator %w(Gerbil::Mouse squeak -t test_unit)
 
         assert_file "app/widgets/gerbil/mouse_widget.rb", /class Gerbil::MouseWidget < Apotomo::Widget/
         assert_file "app/widgets/gerbil/mouse_widget.rb", /def squeak/
         assert_file "app/widgets/gerbil/mouse/squeak.html.erb", %r(app/widgets/gerbil/mouse/squeak\.html\.erb)
+        assert_file "test/widgets/gerbil/mouse_widget_test.rb"
       end
     
     end
