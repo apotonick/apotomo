@@ -12,7 +12,7 @@ module Apotomo
     
     
     def initialize(controller, options={}, has_widgets_blocks=[])
-      @root = Widget.new(controller, 'root', :display)
+      @root = Widget.new(controller, 'root')
       
       attach_stateless_blocks_for(has_widgets_blocks, @root, controller)
       
