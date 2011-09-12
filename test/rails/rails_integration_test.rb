@@ -21,7 +21,7 @@ class RailsIntegrationTest < ActionController::TestCase
       end
       
       @controller.instance_eval do
-        def widget
+        def mum
           render :text => render_widget('mum', :eat)
         end
       end
@@ -32,7 +32,7 @@ class RailsIntegrationTest < ActionController::TestCase
         def eat; render :view => :make_me_squeak; end
       end
       
-      get 'widget'
+      get 'mum'
       assert_select "a", "mum"
     end
     
@@ -50,7 +50,7 @@ class RailsIntegrationTest < ActionController::TestCase
         def squeak(evt); render :text => "<b>SQUEAK!</b>"; end
       end
       
-      get 'widget'
+      get 'mum'
       assert_response :success
       
       simulate_request!
@@ -66,25 +66,25 @@ class RailsIntegrationTest < ActionController::TestCase
     context "ActionView" do  
       setup do
         @controller.instance_eval do
-          def widget
+          def mum
             render :inline => "<%= render_widget 'mum', :eat %>"
           end
         end
       end
       
       should "respond to #render_widget" do
-        get :widget
+        get :mum
         assert_select "#mum", "burp!"
       end
       
       should "respond to #url_for_event" do
         @controller.instance_eval do
-          def widget
+          def mum
             render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
           end
         end
         
-        get :widget
+        get :mum
         assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", @response.body
       end
     end

@@ -15,7 +15,7 @@ require 'apotomo'
 Apotomo::Widget.append_view_path(File.expand_path(File.dirname(__FILE__) + "/widgets"))
 
 # Load test support files.
-require File.join(File.dirname(__FILE__), "support/test_case_methods")
+require "test_case_methods"
 
 
 Test::Unit::TestCase.class_eval do
@@ -30,6 +30,9 @@ end
 class ApotomoController < ActionController::Base
   include Apotomo::Rails::ControllerMethods
   include Rails.application.routes.url_helpers
+  
+  def mum
+  end
 end
 
 module Farm
