@@ -20,9 +20,10 @@ module Apotomo
       extend ActiveSupport::Concern
       
       included do
+        extend Hooks::InheritableAttribute
         extend WidgetShortcuts
         
-        class_inheritable_array :has_widgets_blocks
+        inheritable_attr :has_widgets_blocks
         self.has_widgets_blocks = []
         
         helper ActionViewMethods
