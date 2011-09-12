@@ -82,7 +82,7 @@ Rendering usually happens in your controller view, <tt>views/posts/show.haml</tt
 A widget is like a cell which is like a mini-controller.
 
   class CommentsWidget < Apotomo::Widget
-    responds_to_event :submit, :with => :write
+    responds_to_event :post
     
     def display(args)
       @comments = args[:post].comments # the parameter from outside.
@@ -91,9 +91,9 @@ A widget is like a cell which is like a mini-controller.
 
 Having +display+ as the default state when rendering, this method collects comments to show and renders its view.
 
-And look at line 2 - if encountering a <tt>:submit</tt> event we invoke +write+, which is simply another state. How cool is that? 
+And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, which is simply another state. How cool is that? 
 
-    def write(evt)
+    def post(evt)
       @comment = Comment.new(:post_id => evt[:post_id])
       @comment.update_attributes evt[:comment]  # a bit like params[].
       
@@ -112,7 +112,7 @@ Apotomo helps you focusing on your app and takes away the pain of <b>action disp
 
 == Triggering events
 
-So how and where is the <tt>:submit</tt> event triggered?
+So how and where is the <tt>:post</tt> event triggered?
 
 Take a look at the widget's view <tt>display.html.haml</tt>.
   = widget_div do
@@ -120,7 +120,7 @@ Take a look at the widget's view <tt>display.html.haml</tt>.
       - for c in @comments
         %li c.text
     
-    - form_for :comment, @comment, :html => {"data-event-url" => url_for_event(:submit)} do |f|
+    - form_for :comment, @comment, :url => url_for_event(:post), :remote => true do |f|
       = f.error_messages
       = f.text_field :text
   
@@ -128,24 +128,14 @@ Take a look at the widget's view <tt>display.html.haml</tt>.
 
 That's a lot of familiar view code, almost looks like a _partial_.
 
-The view also contains a bit of JavaScript.
-
-  :javascript
-    var form = $("##{widget_id} form");
-  
-    form.submit(function() {
-      $.ajax({url: form.attr("data-event-url"), data: form.serialize()})
-      return false;
-    });
-
-Triggering happens by sending an AJAX request to an address that the Apotomo helper +url_for_event+ generated for us.
+As soon as the form is submitted, the form gets serialized and sent using the standard Rails mechanisms. The interesting part here is the endpoint URL returned by #url_for_event as it will trigger an Apotomo event.
 
 == Event processing
 
 Now what happens when the event request is sent? Apotomo - again - does three things for you, it
 
 * <b>accepts the request</b> on a special event route it adds to your app
-* <b>triggers the event</b> in your ruby widget tree, which will invoke the +#process+ state in our comment widget
+* <b>triggers the event</b> in your ruby widget tree, which will invoke the +#post+ state in our comment widget
 * <b>sends back</b> the page updates your widgets rendered
 
 == JavaScript Agnosticism
@@ -160,7 +150,7 @@ Look, +replace+ basically generates
 
 If that's not what you want, do
 
-  def write(evt)
+  def post(evt)
     if evt[:comment][:text].explicit?
       render :text => 'alert("Hey, you wanted to submit a pervert comment!");'
     end
@@ -181,7 +171,7 @@ Apotomo comes with its own test case and assertions to <b>build rock-solid web c
       render_widget 'me'
       assert_select "li#me"
       
-      trigger :submit, :comment => {:text => "Sex on the beach"}
+      trigger :post, :comment => {:text => "Sex on the beach"}
       assert_response 'alert("Hey, you wanted to submit a pervert comment!");'
     end
   end
