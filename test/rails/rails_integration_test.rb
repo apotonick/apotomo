@@ -42,7 +42,7 @@ class RailsIntegrationTest < ActionController::TestCase
       end
       
       get 'render_event_response', :source => 'mum', :type => :squeak, :pitch => :high
-      assert_equal "{\"source\"=>\"mum\", \"type\"=>:squeak, \"pitch\"=>:high, \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}", @response.body
+      assert_equal "{\"source\"=>\"mum\", \"type\"=>\"squeak\", \"pitch\"=>\"high\", \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}", @response.body
     end
     
     should "render updates to the parent window for an iframe request" do
