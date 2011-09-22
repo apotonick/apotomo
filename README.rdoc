@@ -32,7 +32,7 @@ Don't forget to load the gem in your app, either in your +Gemfile+ or +environme
 
 == Example!
 
-A _shitty_ example is worse a _shitty_ framework, so let's choose wisely...
+A _shitty_ example is worse than a _shitty_ framework, so let's choose wisely...
 
 Say you had a blog application. The page showing the post should have a comments block, with a list of comments and a form to post a new comment. Submitting should validate and send back the updated comments list, via AJAX.
 
@@ -67,7 +67,7 @@ The widget is named <tt>post-comments</tt>. We pass the current post into the wi
 
 == Render the widget
 
-Rendering usually happens in your controller view, <tt>views/posts/show.haml</tt>, for instance.
+Rendering usually happens in your controller view, <tt>views/posts/show.html.haml</tt>, for instance.
 
   %h1 @post.title
   
@@ -102,11 +102,11 @@ And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, w
   end
 
 
-The event is processes with three steps in our widget:
+The event is processed with three steps in our widget:
 
 * create the new comment
 * re-render the +display+ state
-* update itself on the page.
+* update itself on the page
 
 Apotomo helps you focusing on your app and takes away the pain of <b>action dispatching</b> and <b>page updating</b>.
 
