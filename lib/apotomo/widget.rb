@@ -125,7 +125,7 @@ module Apotomo
     #
     # render the view <tt>eat.haml</tt>.
     #
-    #  render :js => "alert('SQUEAK!');"
+    #  render :text => "alert('SQUEAK!');"
     #
     # issues a squeaking alert dialog on the page.
     def render(*args, &block)
