@@ -30,14 +30,48 @@ module Apotomo
   #
   # See also in Cell::TestCase.
   class TestCase < Cell::TestCase
-    class << self
-      def has_widgets_blocks; @has_widgets; end
+    # Generic test methods to be used in Test::Unit, RSpec, etc.
+    module TestMethods
+      extend ActiveSupport::Concern
       
-      # Setup a widget tree as you're used to it from your controller. Executed in test context.
-      def has_widgets(&block)
-        @has_widgets = block  # DISCUSS: use ControllerMethods?
+      module InstanceMethods
+        # Renders the widget +name+.
+        def render_widget(*args)
+          @last_invoke = root.render_widget(*args)
+        end
+        
+        # Triggers an event of +type+. You have to pass the +source+ as second options.
+        #
+        # Example:
+        #
+        #   trigger :submit, :comments
+        def trigger(type, source, options={})
+          source = root.find_widget(source)
+          source.fire(type, options)
+          root.page_updates
+        end
+        
+        # Returns the widget tree from TestCase.has_widgets.
+        def root
+          blk = self.class.has_widgets_blocks or raise "Please setup a widget tree using has_widgets()"
+          @root ||= Apotomo::Widget.new(parent_controller, "root").tap do |root|
+             self.instance_exec(root, &blk)
+          end
+        end
+      end
+      
+      module ClassMethods
+        def has_widgets_blocks
+          @has_widgets
+        end
+      
+        # Setup a widget tree as you're used to it from your controller. Executed in test context.
+        def has_widgets(&block)
+          @has_widgets = block
+        end
       end
     end
+    
     
     def setup
       super
@@ -49,33 +83,8 @@ module Apotomo
       @controller.extend Apotomo::Rails::ControllerMethods
     end
     
-    
-    # Returns the widget tree from TestCase.has_widgets.
-    def root
-      blk = self.class.has_widgets_blocks or raise "Please setup a widget tree using TestCase.has_widgets"
-      @root ||= Apotomo::Widget.new(parent_controller, "root").tap do |root|
-         self.instance_exec(root, &blk)
-      end
-    end
-    
     def parent_controller
       @controller
-    end
-    
-    # Renders the widget +name+.
-    def render_widget(*args)
-      @last_invoke = root.render_widget(*args)
-    end
-    
-    # Triggers an event of +type+. You have to pass <tt>:source</tt> as options.
-    #
-    # Example:
-    #
-    #   trigger :submit, :source => "post-comments"
-    def trigger(type, source, options={})
-      source = root.find_widget(source)
-      source.fire(type, options)
-      root.page_updates # DISCUSS: use ControllerMethods?
     end
     
     # After a #trigger this assertion compares the actually triggered page updates with the passed. 
@@ -100,5 +109,6 @@ module Apotomo
     end
     
     include Apotomo::WidgetShortcuts
+    include TestMethods
   end
 end

@@ -31,7 +31,7 @@ class TestCaseTest < Test::Unit::TestCase
           @test.root
         end
         
-        assert_equal "Please setup a widget tree using TestCase.has_widgets", exc.message
+        assert_equal "Please setup a widget tree using has_widgets()", exc.message
       end
       
       should "memorize root" do
