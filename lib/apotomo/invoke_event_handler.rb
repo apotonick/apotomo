@@ -5,8 +5,8 @@ module Apotomo
     attr_accessor :widget_id, :state
     
     def initialize(options={})
-      @widget_id  = options.delete(:widget_id)
-      @state      = options.delete(:state)
+      @widget_id  = options[:widget_id]
+      @state      = options[:state]
     end
     
     def process_event(event)
