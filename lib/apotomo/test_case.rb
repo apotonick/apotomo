@@ -10,10 +10,10 @@ module Apotomo
   #     has_widgets do |root|
   #       root << widget(:comments_widget, 'post-comments')
   #     end
-  #     
+  #
   #     it "should be rendered nicely" do
   #       render_widget 'post-comments'
-  #       
+  #
   #       assert_select "div#post-comments", "Comments for this post"
   #     end
   #
@@ -33,13 +33,15 @@ module Apotomo
     # Generic test methods to be used in Test::Unit, RSpec, etc.
     module TestMethods
       extend ActiveSupport::Concern
-      
+
+      include Cell::TestCase::TestMethods
+
       module InstanceMethods
         # Renders the widget +name+.
         def render_widget(*args)
           @last_invoke = root.render_widget(*args)
         end
-        
+
         # Triggers an event of +type+. You have to pass the +source+ as second options.
         #
         # Example:
@@ -50,7 +52,7 @@ module Apotomo
           source.fire(type, options)
           root.page_updates
         end
-        
+
         # Returns the widget tree from TestCase.has_widgets.
         def root
           blk = self.class.has_widgets_blocks or raise "Please setup a widget tree using has_widgets()"
@@ -58,36 +60,38 @@ module Apotomo
              self.instance_exec(root, &blk)
           end
         end
+
+        def parent_controller
+          @controller
+        end
       end
-      
+
       module ClassMethods
         def has_widgets_blocks
           @has_widgets
         end
-      
+
         # Setup a widget tree as you're used to it from your controller. Executed in test context.
         def has_widgets(&block)
           @has_widgets = block
         end
       end
-    end
-    
-    
-    def setup
-      super
-      @controller.instance_eval do 
-        def controller_path
-         'barn'
+
+      included do
+        alias :setup_cells :setup
+        def setup
+          setup_cells
+          @controller.instance_eval do
+            def controller_path
+              'barn'
+            end
+          end
+          @controller.extend Apotomo::Rails::ControllerMethods
         end
       end
-      @controller.extend Apotomo::Rails::ControllerMethods
     end
-    
-    def parent_controller
-      @controller
-    end
-    
-    # After a #trigger this assertion compares the actually triggered page updates with the passed. 
+
+    # After a #trigger this assertion compares the actually triggered page updates with the passed.
     #
     # Example:
     #
@@ -95,19 +99,19 @@ module Apotomo
     #   assert_response "alert(\":submit clicked!\")", /\$\("post-comments"\).update/
     def assert_response(*content)
       updates = root.page_updates
-      
+
       i = 0
       content.each do |assertion|
         if assertion.kind_of? Regexp
-          assert_match assertion, updates[i] 
+          assert_match assertion, updates[i]
         else
           assert_equal assertion, updates[i]
         end
-        
+
         i+=1
       end
     end
-    
+
     include Apotomo::WidgetShortcuts
     include TestMethods
   end
