@@ -20,7 +20,7 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "app/widgets/gerbil/squeak.html.erb", %r(app/widgets/gerbil/squeak\.html\.erb)
 
         assert_file "test/widgets/gerbil_widget_test.rb", %r(class GerbilWidgetTest < Apotomo::TestCase)
-        assert_file "test/widgets/gerbil_widget_test.rb", %r(widget\(:gerbil, 'me'\))
+        assert_file "test/widgets/gerbil_widget_test.rb", %r(widget\(:gerbil\))
       end
       
       should "create haml assets with -e haml" do
