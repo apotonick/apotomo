@@ -1,0 +1,4 @@
+rvm: 1.9.2
+script: "bundle exec rspec -f documentation"
+notifications:
+  irc: "irc.freenode.org#cells"
