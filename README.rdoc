@@ -2,6 +2,8 @@
 
 <em>Web Components for Rails.</em>
 
+{<img src="https://secure.travis-ci.org/apotonick/apotomo.png" />}[http://travis-ci.org/apotonick/apotomo]
+
 == Overview
 
 Do you need an <b>interactive user interface</b> for your Rails application? A cool Rich Client Application with dashboards, portlets and AJAX, Drag&Drop and jQuery?
