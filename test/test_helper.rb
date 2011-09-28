@@ -55,6 +55,8 @@ class MouseWidget < Apotomo::Widget
     render
   end
   
+  def display
+  end
 end
 
 # Enable dynamic states so we can do Cell.class_eval { def ... } at runtime.

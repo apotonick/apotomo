@@ -77,6 +77,24 @@ class TestCaseTest < Test::Unit::TestCase
           assert @test.assert_response("{}")
         end
       end
+      
+      context "#view_assigns" do
+        should "be emtpy when nothing was set" do
+          @test.render_widget('mum')
+          assert_equal({}, @test.view_assigns)
+        end
+        
+        should "return the instance variables from the last #render_widget" do
+          @mum = @test.root['mum']
+          @mum.instance_eval do
+            def sleep
+              @duration = "8h"
+            end
+          end
+          @test.render_widget('mum', :sleep)
+          assert_equal({:duration => "8h"}, @test.view_assigns)
+        end
+      end
     end
     
     context "responding to parent_controller" do

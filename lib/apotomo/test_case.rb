@@ -29,17 +29,34 @@ module Apotomo
   #     end
   #
   # See also in Cell::TestCase.
-  class TestCase < Cell::TestCase
+  class TestCase < Cell::TestCase # TODO: re-arrange modules in Cell::TestCase and include instead of inheritance.
     # Generic test methods to be used in Test::Unit, RSpec, etc.
     module TestMethods
       extend ActiveSupport::Concern
 
-      include Cell::TestCase::TestMethods
-
       module InstanceMethods
+        include Cell::TestCase::CommonTestMethods
+        
+        attr_reader :view_assigns
+        
+        def setup
+          super # defined in Cell::TestCase::CommonTestMethods.
+          
+          @controller.instance_eval do
+            def controller_path
+              'barn'
+            end
+          end
+          @controller.extend Apotomo::Rails::ControllerMethods
+        end
+        
         # Renders the widget +name+.
         def render_widget(*args)
-          @last_invoke = root.render_widget(*args)
+          @view_assigns = extract_state_ivars_for(root[args.first]) do
+            @last_invoke = root.render_widget(*args)
+          end
+          
+          @last_invoke
         end
 
         # Triggers an event of +type+. You have to pass the +source+ as second options.
@@ -60,7 +77,7 @@ module Apotomo
              self.instance_exec(root, &blk)
           end
         end
-
+        
         def parent_controller
           @controller
         end
@@ -74,19 +91,6 @@ module Apotomo
         # Setup a widget tree as you're used to it from your controller. Executed in test context.
         def has_widgets(&block)
           @has_widgets = block
-        end
-      end
-
-      included do
-        alias :setup_cells :setup
-        def setup
-          setup_cells
-          @controller.instance_eval do
-            def controller_path
-              'barn'
-            end
-          end
-          @controller.extend Apotomo::Rails::ControllerMethods
         end
       end
     end
