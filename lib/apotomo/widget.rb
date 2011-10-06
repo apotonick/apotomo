@@ -39,7 +39,6 @@ module Apotomo
     
     DEFAULT_VIEW_PATHS = [
       File.join('app', 'widgets'),
-      File.join('app', 'widgets', 'layouts')
     ]
     
     include Hooks
@@ -79,19 +78,19 @@ module Apotomo
     alias_method :widget_id, :name
     
     
-    # Runs callbacks for +name+ hook in instance context.  
+    # Runs callbacks for +name+ hook in instance context.
+    # TODO: remove this and ~after_add.  
     def run_widget_hook(name, *args)
       self.class.callbacks_for_hook(name).each { |blk| instance_exec(*args, &blk) }
     end
     
-    def add_has_widgets_blocks(*)
-      run_widget_hook(:has_widgets, self)
+    after_initialize do
+      run_hook :has_widgets, self
     end
-    after_initialize :add_has_widgets_blocks
     
     
     def initialize(parent_controller, id, options={})
-      super(parent_controller, options)  # do that as long as cells do need a parent_controller.
+      super(parent_controller, options)  # TODO: do that as long as cells do need a parent_controller. remember to remove options for cells 3.7.
       
       @name         = id
       @visible      = true

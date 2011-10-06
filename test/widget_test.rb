@@ -18,7 +18,7 @@ class WidgetTest < ActiveSupport::TestCase
         end
       end.new(@controller, 'mum')
       
-      @kid = Class.new(@mum.class).new(@controller, 'mum', :squeak)
+      @kid = Class.new(@mum.class).new(@controller, 'mum')
     end
     
     should "setup the widget family at creation time" do
@@ -134,7 +134,7 @@ class WidgetTest < ActiveSupport::TestCase
     end
     
     should "respond to DEFAULT_VIEW_PATHS" do
-      assert_equal ["app/widgets", "app/widgets/layouts"], Apotomo::Widget::DEFAULT_VIEW_PATHS
+      assert_equal ["app/widgets"], Apotomo::Widget::DEFAULT_VIEW_PATHS
     end
     
     should "respond to .view_paths" do
