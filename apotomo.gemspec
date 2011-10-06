@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   
   s.add_dependency "cells",   ">= 3.6.7"
   s.add_dependency "onfire",  "~> 0.2.0"
-  s.add_dependency "hooks",   "~> 0.1.3"
+  s.add_dependency "hooks",   "~> 0.2.0"
 
   s.add_development_dependency "shoulda"
   s.add_development_dependency "rake"

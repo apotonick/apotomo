@@ -138,36 +138,40 @@ class RequestProcessorHooksTest < ActiveSupport::TestCase
   
   context "Hooks in RequestProcessor" do
     setup do
+      @kid = mouse_mock(:kid)
       @class = Class.new(Apotomo::RequestProcessor)
+      @class.instance_eval do
+        def kid=(kid); @kid=kid end
+        def kid; @kid end
+      end
+      @class.kid = @kid
     end
     
     context ":after_initialize hook" do
       should "be called after the has_widgets blocks invokation" do
-        @k = mouse_mock("kid")
         @class.after_initialize do |r|
-          r.root["mum"] << @k
+          r.root[:mum] << self.class.kid # requires that :mum is there, yet.
         end
         
         @r = @class.new(parent_controller, {}, 
-          [Proc.new { |root| root << widget(:mouse, 'mum') }])
+          [Proc.new { |root| root << widget(:mouse, :mum) }])
         
-        assert_equal @r.root["mum"]["kid"], @k
+        assert_equal @kid, @r.root[:mum][:kid]
       end
     end
     
     context ":after_fire hook" do
       should "be called in #process_for after fire" do
-        @k = mouse_mock("kid")
         @class.after_fire do |r|
-          r.root["mum"] << @k = mouse_mock("kid")
+          r.root[:mum] << self.class.kid
         end
         
         # DISCUSS: maybe add a trigger test here?
         @r = @class.new(parent_controller, {}, 
-          [Proc.new { |root| root << widget(:mouse, 'mum') }])
+          [Proc.new { |root| root << widget(:mouse, :mum) }])
         @r.process_for(:source => "root", :type => :noop) # calls ~after_fire.
         
-        assert_equal @k, @r.root["mum"]["kid"]
+        assert_equal @r.root[:mum][:kid], @kid
       end
     end
   end
