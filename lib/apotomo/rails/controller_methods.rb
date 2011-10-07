@@ -48,7 +48,7 @@ module Apotomo
         return @apotomo_request_processor if @apotomo_request_processor
         
         # happens once per request:
-        options = { :js_framework   => Apotomo.js_framework || :prototype } # FIXME: remove :prototype
+        options = {:js_framework   => Apotomo.js_framework}
         
         @apotomo_request_processor = Apotomo::RequestProcessor.new(self, options, self.class.has_widgets_blocks)
       end
