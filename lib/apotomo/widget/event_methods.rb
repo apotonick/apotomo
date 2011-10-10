@@ -6,7 +6,19 @@ module Apotomo
     extend ActiveSupport::Concern
     
     included do
-      after_initialize :add_class_event_handlers
+      after_initialize do
+        self.class.responds_to_event_options.each do |args|
+          type, options = args[0], args[1] || {}
+          target = self
+          
+          if target_id = options[:passing]
+             target = root.find_widget(target_id)
+             options[:on] ||= widget_id
+          end
+          
+          target.respond_to_event(type, options)
+        end
+      end
       
       inheritable_attr :responds_to_event_options
       self.responds_to_event_options = []
@@ -57,23 +69,7 @@ module Apotomo
       # Note that the observers are inherited. This allows deriving a widget class without having to redefine the
       # responds_to_event blocks.
       def responds_to_event(*options)
-        # DISCUSS: this is a Hooks.declarative_attr candidate, too.
-        return set_global_event_handler(*options) if options.dup.extract_options![:passing]
-        
         responds_to_event_options << options
-      end
-      
-    private
-      # Adds an event handler to a non-local widget. Called in #responds_to_event when the 
-      # :passing option is set.
-      #
-      # This usually leads to something like 
-      #   root.respond_to_event :click, :on => 'jerry'
-      def set_global_event_handler(type, options)
-        after_add do
-          opts = options.reverse_merge(:on => widget_id)
-          root.find_widget(opts.delete(:passing)).respond_to_event(type, opts)
-        end
       end
     end
     
@@ -81,10 +77,9 @@ module Apotomo
     def respond_to_event(type, options={})
       options = options.reverse_merge(:once => true,
                                       :with => type,
-                                      :on   => self.name)
+                                      :on   => widget_id)
       
       handler = InvokeEventHandler.new(:widget_id => options[:on], :state => options[:with])
-      
       return if options[:once] and event_table.all_handlers_for(type, options[:from]).include?(handler)
       
       on(type, :call => handler, :from => options[:from])
@@ -112,11 +107,6 @@ module Apotomo
   protected
     def event_for(*args)  # defined in Onfire: we want Apotomo::Event.
       Event.new(*args)
-    end
-    
-    # Actually executes the #responds_to_event calls from the class on the instance.
-    def add_class_event_handlers(*)
-      self.class.responds_to_event_options.each { |options| respond_to_event(*options) }
     end
   end
 end

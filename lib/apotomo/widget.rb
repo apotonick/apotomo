@@ -49,14 +49,11 @@ module Apotomo
     # Example:
     #
     #   class MouseWidget < Apotomo::Widget
-    #     after_initialize :setup_cheese
-    #     
-    #     # we need @cheese in every state:
-    #     def setup_cheese(*)
+    #     after_initialize do
     #       @cheese = Cheese.find options[:cheese_id]
+    #     end
     define_hook :after_initialize
     define_hook :has_widgets
-    define_hook :after_add
     
     attr_writer :visible
     
@@ -72,28 +69,21 @@ module Apotomo
     helper Apotomo::Rails::ActionViewMethods
     
     abstract!
-    
     undef :display  # We don't want #display to be listed in #internal_methods.
     
     alias_method :widget_id, :name
-    
-    
-    # Runs callbacks for +name+ hook in instance context.
-    # TODO: remove this and ~after_add.  
-    def run_widget_hook(name, *args)
-      self.class.callbacks_for_hook(name).each { |blk| instance_exec(*args, &blk) }
-    end
     
     after_initialize do
       run_hook :has_widgets, self
     end
     
     
-    def initialize(parent_controller, id, options={})
-      super(parent_controller, options)  # TODO: do that as long as cells do need a parent_controller. remember to remove options for cells 3.7.
-      
+    def initialize(parent, id, options={})
+      super(parent, options)  # TODO: do that as long as cells do need a parent_controller. remember to remove options for cells 3.7.
       @name         = id
       @visible      = true
+      
+      setup_tree_node(parent)
       
       run_hook :after_initialize, self
     end

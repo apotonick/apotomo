@@ -14,7 +14,8 @@ class WidgetTest < ActiveSupport::TestCase
     setup do
       @mum = Class.new(MouseWidget) do
         has_widgets do |me|
-          me << widget(:mouse, 'baby')
+          me << widget(:mouse, :baby)
+          #MouseWidget.new(me, :baby) # this is also possible.
         end
       end.new(@controller, 'mum')
       
@@ -23,42 +24,17 @@ class WidgetTest < ActiveSupport::TestCase
     
     should "setup the widget family at creation time" do
       assert_equal 1, @mum.children.size
-      assert_kind_of Apotomo::Widget, @mum['baby']
+      assert_kind_of MouseWidget, @mum[:baby]
     end
     
     should "inherit trees for now" do
       assert_equal 1, @mum.children.size
-      assert_kind_of Apotomo::Widget, @mum['baby']
+      assert_kind_of MouseWidget, @mum[:baby]
     end
   end
   
-  context "Widget.after_add" do
-    setup do
-      @mum = Class.new(MouseWidget) do
-        after_add do |me, parent|
-          parent << widget(:mouse, 'kid', :squeak)
-        end
-      end.new(@controller, 'mum', :squeak)
-      
-      @root = mouse_mock('root')
-    end
-    
-    should "be invoked after mum is added" do
-      assert_equal [], @root.children
-      @root << @mum
-      
-      assert_equal ['mum', 'kid'], @root.children.collect { |w| w.name }
-    end
-    
-    should "inherit callbacks" do
-      @berry = Class.new(@mum.class).new(@controller, 'berry', :squeak)
-      @root << @berry
-      
-      assert_equal ['berry', 'kid'], @root.children.collect { |w| w.name }
-    end
-  end
-
-  context "A stateless widget" do
+  
+  context "A widget" do
     setup do
       @mum = Apotomo::Widget.new(@controller, 'mum', :squeak)
     end
@@ -107,6 +83,7 @@ class WidgetTest < ActiveSupport::TestCase
       end
       
       should "find children" do
+      puts @mum.printTree
         assert_equal @kid, @mum.find_widget('kid')
       end
       
@@ -167,47 +144,47 @@ end
 
 class RenderWidgetTest < ActiveSupport::TestCase
   include Apotomo::TestCaseMethods::TestController
-
+  
   context "#render_widget" do
     should "allow passing widget id" do
-      assert_equal "squeak!", mouse_mock.render_widget('mouse', :squeak)
+      assert_equal "squeak!", mouse.render_widget('mouse', :squeak)
     end
     
     should "allow passing widget instance" do
-      assert_equal 'squeak!', mouse_mock.render_widget(mouse_mock('mum'), :squeak)
+      assert_equal 'squeak!', mouse.render_widget(mouse(:mum), :squeak)
     end
     
     should "use :display as standard state" do
-      mum = mouse_mock('Mum') do
+      mum = mouse('Mum') do
         def display
           render :text => "#{widget_id}, that's me!"
         end
       end
       
-      assert_equal "Mum, that's me!", mouse_mock.render_widget(mum)
+      assert_equal "Mum, that's me!", mouse.render_widget(mum)
     end
     
     should "raise an exception when a non-existent widget id is passed" do
       e = assert_raises RuntimeError do
-        mouse_mock.render_widget('mummy')
+        mouse.render_widget('mummy')
       end
       
       assert_equal "Couldn't render non-existent widget `mummy`", e.message
     end
     
     should "pass options as state-args" do
-      mum = mouse_mock do
+      mum = mouse do
         def display(color="grey")
           render :text => "I'm #{color}"
         end
       end
       
-      assert_equal("I'm grey", mouse_mock.render_widget(mum), "default value in state-arg didn't work")
-      assert_equal("I'm black", mouse_mock.render_widget(mum, :display, "black"))
+      assert_equal("I'm grey", mouse.render_widget(mum), "default value in state-arg didn't work")
+      assert_equal("I'm black", mouse.render_widget(mum, :display, "black"))
     end
     
     should "use #find_widget from self to find the passed widget id" do
-      mum = mouse_mock('mum') << mouse_mock(:kid)
+      mum = mouse << mouse_mock(:kid)
       
       assert_equal "<div id=\"kid\">burp!</div>\n", mum.render_widget(:kid, :eat)
     end 

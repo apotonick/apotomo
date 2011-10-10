@@ -18,9 +18,9 @@ class EventMethodsTest < Test::Unit::TestCase
       assert_equal ['be alerted', 'answer squeak'], @mum.list
     end
     
-    should "make @mum just squeak back when @jerry squeaks" do
-      @mum << @jerry = mouse_mock('jerry')
-      @jerry.fire :squeak
+    should "make @mum just squeak back when jerry squeaks" do
+      @mum << mouse_mock(:jerry)
+      @mum[:jerry].fire :squeak
       assert_equal ['answer squeak'], @mum.list
     end
     
@@ -82,17 +82,17 @@ class EventMethodsTest < Test::Unit::TestCase
           responds_to_event :squeak, :passing => :root
         end
         
-        @root = mouse_mock(:root)
+        @root = mouse(:root)
       end
       
       should "add handlers to root when called with :passing" do
-        @root << AdolescentMouse.new(parent_controller, 'jerry')
+        AdolescentMouse.new(@root, 'jerry')
         
         assert_equal [handler('jerry', :squeak)], @root.event_table.all_handlers_for(:squeak, 'jerry')
       end
       
       should "inherit :passing handlers" do
-        @root << Class.new(AdolescentMouse).new(parent_controller, 'jerry')
+        Class.new(AdolescentMouse).new(@root, 'jerry')
         
         assert_equal [handler('jerry', :squeak)], @root.event_table.all_handlers_for(:squeak, 'jerry')
       end
@@ -100,15 +100,15 @@ class EventMethodsTest < Test::Unit::TestCase
     end
     
     context "#responds_to_event in class context" do
-      setup do
-        class AdultMouse < MouseWidget
-          responds_to_event :peep, :with => :answer_squeak
-        end
-        class BabyMouse < AdultMouse
-          responds_to_event :peep
-          responds_to_event :footsteps, :with => :squeak
-        end
+      class AdultMouse < Apotomo::Widget
+        responds_to_event :peep, :with => :answer_squeak
+      end
+      class BabyMouse < AdultMouse
+        responds_to_event :peep
+        responds_to_event :footsteps, :with => :squeak
+      end
         
+      setup do
         @mum = AdultMouse.new(parent_controller, 'mum')
       end
       
@@ -117,8 +117,8 @@ class EventMethodsTest < Test::Unit::TestCase
       end
       
       should "inherit handlers" do
-        @peep_handlers = BabyMouse.new(parent_controller, 'kid', :show).event_table.all_handlers_for(:peep, 'kid')
-        assert_equal [handler('kid', :answer_squeak), handler('kid', :peep)], @peep_handlers
+        assert_equal [[:peep, {:with=>:answer_squeak}]], AdultMouse.responds_to_event_options
+        assert_equal [[:peep, {:with=>:answer_squeak}], [:peep], [:footsteps, {:with=>:squeak}]], BabyMouse.responds_to_event_options
       end
       
       should "not share responds_to_event options between different instances" do
