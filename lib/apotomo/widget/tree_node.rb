@@ -1,6 +1,3 @@
-# stolen from ... ? couldn't find the original lib on the net.
-### TODO: insert copyright notice!
-
 module Apotomo
   module TreeNode
     include Enumerable
@@ -8,15 +5,12 @@ module Apotomo
     attr_reader :name, :childrenHash
     attr_accessor :parent
   
-    def self.included(base)
-      base.after_initialize :initialize_tree_node
-    end
-  
-    def initialize_tree_node(*)
-      root!
-
+    def setup_tree_node(parent)
+      @parent       = nil
       @childrenHash = {}
-      @children = []
+      @children     = []
+      
+      parent.add_widget(self) if parent.kind_of? Widget # TODO: as long as cells needs parent_controller.
     end
 
     # Print the string representation of this node.
@@ -30,21 +24,16 @@ module Apotomo
     # children hierarchies in the tree.
     # E.g. root << child << grand_child
     def <<(child)
-      add(child)
+      constant_for(child[:class]).new(self, child[:id], child[:options]) if child.is_a?(Hash) # TODO: move to WidgetCreationProxy.
     end
 
-    # Adds the specified child node to the receiver node.
-    # The child node's parent is set to be the receiver.
-    # The child is added as the last child in the current
-    # list of children for the receiver node.
-    def add(child)
+    def add_widget(child)  # TODO: rename #add, make private
       raise "Child already added" if @childrenHash.has_key?(child.name)
-
-      @childrenHash[child.name]  = child
+      
+      @childrenHash[child.widget_id]  = child
       @children << child
       child.parent = self
     
-      child.run_widget_hook(:after_add, child, self)
       child
     end
 

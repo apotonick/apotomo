@@ -66,14 +66,16 @@ class ViewHelperTest < Apotomo::TestCase
     end
     
     should "respond to #render_widget" do
-      mum = mouse_mock 
-      mum << mouse_mock('kid')
+      mum = mouse
+      MouseWidget.new(mum, :kid)
+      
       assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum){ render_widget 'kid', :eat })
     end
     
     should "respond to #children" do
-      mum = mouse_mock 
-      mum << mouse_mock('kid')
+      mum = mouse
+      MouseWidget.new(mum, :kid)
+      
       assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum) do
         children.inject("") { |html, child| html += render_widget(child, :eat) }.html_safe
       end)

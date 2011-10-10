@@ -72,8 +72,9 @@ class RequestProcessorTest < ActiveSupport::TestCase
         def squeak; render :text => "squeak!"; end
       end
   
-      procs = [Proc.new{ |root,controller| 
-        root << widget(:mouse, 'mum') << KidWidget.new(parent_controller, 'kid', :squeak)
+      procs = [Proc.new{ |root| 
+        root << widget(:mouse, 'mum') 
+          KidWidget.new(root['mum'], 'kid')
       }]
     
       @processor = Apotomo::RequestProcessor.new(parent_controller, {:js_framework => :prototype}, procs)
@@ -156,7 +157,7 @@ class RequestProcessorHooksTest < ActiveSupport::TestCase
         @r = @class.new(parent_controller, {}, 
           [Proc.new { |root| root << widget(:mouse, :mum) }])
         
-        assert_equal @kid, @r.root[:mum][:kid]
+        assert @r.root[:mum][:kid]
       end
     end
     
@@ -171,7 +172,7 @@ class RequestProcessorHooksTest < ActiveSupport::TestCase
           [Proc.new { |root| root << widget(:mouse, :mum) }])
         @r.process_for(:source => "root", :type => :noop) # calls ~after_fire.
         
-        assert_equal @r.root[:mum][:kid], @kid
+        assert @r.root[:mum][:kid]
       end
     end
   end

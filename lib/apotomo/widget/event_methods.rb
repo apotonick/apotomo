@@ -75,6 +75,7 @@ module Apotomo
     
     # Same as #responds_to_event but executed on the widget instance, only.
     def respond_to_event(type, options={})
+      # DISCUSS: do we need the :once option? how could we avoid re-adding?
       options = options.reverse_merge(:once => true,
                                       :with => type,
                                       :on   => widget_id)

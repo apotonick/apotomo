@@ -87,6 +87,8 @@ module Apotomo
       
       # TODO: remove me! only needed in widget_shortcuts.
       def parent_controller
+        puts "parent_controller"
+        #apotomo_root
         self
       end
       

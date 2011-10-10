@@ -5,8 +5,9 @@ class OnfireIntegrationTest < Test::Unit::TestCase
   
   context "including Onfire into the StatefulWidget it" do
     setup do
-      @mum = mouse_mock('mum')
-      @mum << @kid = mouse_mock('kid')
+      @mum = mouse('mum')
+      @mum << mouse_mock(:kid)
+      @kid = @mum[:kid]
     end
     
     should "respond to #root" do

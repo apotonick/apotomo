@@ -21,7 +21,7 @@ class EventTest < Test::Unit::TestCase
     end
     
     should "respond to #to_s" do
-      @event = Apotomo::Event.new(:footsteps, mouse_mock('mum'))
+      @event = Apotomo::Event.new(:footsteps, mouse('mum'))
       assert_equal "<Event :footsteps source=mum>", @event.to_s
     end
   end

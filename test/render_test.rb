@@ -5,7 +5,7 @@ class RenderTest < ActionView::TestCase
   
   context "#render" do
     setup do
-      @mum = mouse_mock('mum', :eating)
+      @mum = mouse('mum')
     end
     
     should "per default display the state content framed in a div" do
@@ -31,7 +31,7 @@ class RenderTest < ActionView::TestCase
     end
     
     should "expose its instance variables in the rendered view" do
-      @mum = mouse_mock('mum', :educate) do
+      @mum = mouse('mum') do
         def educate
           @who  = "the cat"
           @what = "run away"

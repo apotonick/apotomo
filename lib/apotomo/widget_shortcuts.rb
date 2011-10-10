@@ -20,6 +20,7 @@ module Apotomo
       options = args.extract_options!
       id      = args.shift || prefix
       
+      return {:class => prefix, :id => id, :options => options}
       constant_for(prefix).new(parent_controller, id, options).tap do |object|
         yield object if block_given?  
       end

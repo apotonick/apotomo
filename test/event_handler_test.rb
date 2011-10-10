@@ -6,18 +6,18 @@ class EventHandlerTest < Test::Unit::TestCase
   
   context "an abstract EventHandler" do
     should "push nil to root's ordered page_updates when #call'ed" do
-      @mum = mouse_mock('mum')
-        @mum << @kid = mouse_mock('kid')
+      @mum = mouse
+        @mum << mouse_mock(:kid)
       
       assert_equal 0, @mum.page_updates.size
       
-      [@mum, @kid, @mum].each do |source|
+      [@mum, @mum[:kid], @mum].each do |source|
         Apotomo::EventHandler.new.call(Apotomo::Event.new(:squeak, source))
       end
       
       # order matters:
       assert_equal 3, @mum.page_updates.size
-      assert_equal 0, @kid.page_updates.size
+      assert_equal 0, @mum[:kid].page_updates.size
       assert_equal(nil, @mum.page_updates[0])
       assert_equal(nil, @mum.page_updates[1])
       assert_equal(nil, @mum.page_updates[2])
