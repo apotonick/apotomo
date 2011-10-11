@@ -41,12 +41,6 @@ module Apotomo
       child
     end
 
-    # Removes this node from its parent. If this is the root node,
-    # then does nothing.
-    def remove_from_parent!
-      @parent.remove!(self) unless root?
-    end
-
     # Removes all children from the receiver node.
     def remove_all!
       for child in @children
