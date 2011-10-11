@@ -41,17 +41,6 @@ module Apotomo
       child
     end
 
-    # Removes all children from the receiver node.
-    def remove_all!
-      for child in @children
-        child.root!
-      end
-      @childrenHash.clear
-      @children.clear
-      self
-    end
-  
-  
     # Private method which sets this node as a root node.
     def root!
       @parent = nil
