@@ -84,15 +84,6 @@ module Apotomo
       end
       
     protected
-      
-      # TODO: remove me! only needed in widget_shortcuts.
-      def parent_controller
-        puts "parent_controller"
-        #apotomo_root
-        self
-      end
-      
-      
       # Renders the page updates through an iframe. Copied from responds_to_parent,
       # see http://github.com/markcatley/responds_to_parent .
       def render_iframe_updates(page_updates)

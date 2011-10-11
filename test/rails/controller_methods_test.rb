@@ -22,10 +22,6 @@ class ControllerMethodsTest < ActionController::TestCase
       end
     end
     
-    should "respond to parent_controller" do
-      assert_equal @controller, @controller.send(:parent_controller)
-    end
-    
     context "invoking #has_widgets" do
       setup do
         @controller.class.has_widgets do |root|
