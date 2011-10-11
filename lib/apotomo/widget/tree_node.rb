@@ -1,6 +1,7 @@
 module Apotomo
   module TreeNode
     include Enumerable
+    include Apotomo::WidgetShortcuts::DSL
 
     attr_reader :name, :childrenHash
     attr_accessor :parent
@@ -19,18 +20,10 @@ module Apotomo
         " Children: #{children.length}" + " Total Nodes: #{size}"
     end
 
-    # Convenience synonym for Tree#add method.
-    # This method allows a convenient method to add
-    # children hierarchies in the tree.
-    # E.g. root << child << grand_child
-    def <<(child)
-      constant_for(child[:class]).new(self, child[:id], child[:options]) if child.is_a?(Hash) # TODO: move to WidgetCreationProxy.
-    end
-
     def add_widget(child)  # TODO: rename #add, make private
       raise "Child already added" if @childrenHash.has_key?(child.name)
       
-      @childrenHash[child.widget_id]  = child
+      @childrenHash[child.widget_id] = child
       @children << child
       child.parent = self
     

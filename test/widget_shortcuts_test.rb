@@ -4,73 +4,67 @@ class MumWidget < MouseWidget; end
 class MouseTabsWidget;end
 
 class WidgetShortcutsTest < Test::Unit::TestCase
-  include Apotomo::TestCaseMethods::TestController
+  context "FactoryProxy" do
+    setup do
+      @factory = Apotomo::WidgetShortcuts::FactoryProxy
+    end
+    
+    context "#constant_for" do
+      setup do
+        @dsl = @factory.new(:class, :id)
+      end
+      
+      should "constantize symbols" do
+        assert_equal MouseWidget, @dsl.send(:constant_for, :mouse)
+      end
   
-  context "#constant_for" do
-    should "constantize symbols" do
-      assert_equal MumWidget, constant_for(:mum)
+      should "not try to singularize the widget class" do
+        assert_equal MouseTabsWidget, @dsl.send(:constant_for, :mouse_tabs)
+      end
     end
     
-    should "not try to singularize the widget class" do
-      assert_equal MouseTabsWidget, constant_for(:mouse_tabs)
-    end
-  end
-  
-  context "#widget" do   
-    context "with all arguments" do
+    context "#widget and #<<" do
       setup do
-        @mum = widget(:mum, 'mum', :eating, :color => 'grey', :type => :hungry)
+        @root = Apotomo::Widget.new(nil, :root)
       end
-      
-      should "create a MumWidget instance" do
-        assert_kind_of MumWidget, @mum
-        assert_equal 'mum', @mum.name
+        
+      context "with all arguments" do
+        should "create a MumWidget instance with options" do
+          proxy = widget(:mum, :mummy, :eating, :color => 'grey', :type => :hungry)
+          @root << proxy
+          
+          assert_kind_of MumWidget, @root[:mummy]
+          assert_equal :mummy, @root[:mummy].name
+          assert_equal({:color => "grey", :type => :hungry}, @root[:mummy].options)
+        end
       end
-      
-      should "accept options" do
-        assert_equal({:color => "grey", :type => :hungry}, @mum.options)
-      end
-    end
     
-    context "with 3 arguments and no options" do
-      should "not set options" do
-        @mum = widget(:mum, 'mum', :squeak)
+      should "not set options with 2 arguments" do
+        @root << widget(:mum, :mummy)
+        @mum = @root[:mummy]
+        
         assert_kind_of MumWidget, @mum
-        assert_equal 'mum',     @mum.name
-        assert_equal({},        @mum.options)
+        assert_equal :mummy, @mum.widget_id
+        assert_equal({}, @mum.options)
       end
-    end
     
-    context "with class and id" do
-      setup do
-        @mum = widget(:mum, 'mummy')
-      end
-      
-      should "create a MumWidget instance" do
-        assert_kind_of MumWidget, @mum
-        assert_equal 'mummy', @mum.name
-      end
-    end
-    
-    context "with class, only" do
-      setup do
-        @mum = widget(:mum)
-      end
-      
-      should "create a MumWidget instance named :mum" do
+      should "set defaults with prefix, only" do
+        @root << widget(:mum)
+        @mum = @root[:mum]
+        
         assert_kind_of MumWidget, @mum
         assert_equal :mum, @mum.name
+        assert_equal({}, @mum.options)
       end
-    end
-    
-    
-    should "yield itself" do
-      @mum = widget(:mum, 'mum') do |mum|
-        assert_kind_of MumWidget, mum
-        mum << widget(:mum, 'kid')
+      
+      should "yield itself" do
+        ficken = widget(:mum) do |mum|
+          mum << widget(:mouse, :kid)
+        end
+        @root << ficken
+        assert_equal 2, @root[:mum].size
+        assert_kind_of MouseWidget, @root[:mum][:kid]
       end
-      assert_equal 2, @mum.size
-      assert_kind_of MumWidget, @mum['kid']
     end
   end
 end
