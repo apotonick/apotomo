@@ -41,10 +41,6 @@ module Farm
 end
 
 class MouseWidget < Apotomo::Widget
-end
-
-
-class MouseWidget < Apotomo::Widget
   def squeak
     render :text => "squeak!"
   end

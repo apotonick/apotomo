@@ -3,9 +3,26 @@ require 'test_helper'
 class RailsIntegrationTest < ActionController::TestCase
   include Apotomo::TestCaseMethods::TestController
   
+  class KidWidget < MouseWidget
+    responds_to_event :squeak, :passing => :root
+    
+    def feed
+      render  # invokes #url_for_event.
+    end
+    
+    def squeak
+      render :text => "squeak!"
+    end
+  end
+  
+  
   class MumWidget < MouseWidget
     responds_to_event :squeak
     responds_to_event :sniff
+    
+    has_widgets do |me|
+      me << widget("rails_integration_test/kid", :kid)
+    end
     
     def eat
       render
@@ -21,6 +38,10 @@ class RailsIntegrationTest < ActionController::TestCase
     
     def sniff(evt)
       render :text => "<b>sniff sniff</b>"
+    end
+    
+    def child
+      render :text => render_widget(:kid, :feed)
     end
   end
   
@@ -43,9 +64,21 @@ class RailsIntegrationTest < ActionController::TestCase
       assert_select "a", "mum"
     end
     
+    context "nested widgets" do
+      should "render" do
+        get 'mum', :state => :child
+        assert_equal "/rails_integration_test/mum/render_event_response?source=kid&amp;type=click\n", @response.body
+      end
+      
+      should "process events" do
+        get 'render_event_response', :source => 'root', :type => :squeak
+        assert_equal "squeak!", @response.body
+      end
+    end
+    
     should "pass the event with all params data as state-args" do
       get 'render_event_response', :source => 'mum', :type => :squeak, :pitch => :high
-      assert_equal "{\"source\"=>\"mum\", \"type\"=>\"squeak\", \"pitch\"=>\"high\", \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}", @response.body
+      assert_equal "{\"source\"=>\"mum\", \"type\"=>\"squeak\", \"pitch\"=>\"high\", \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}\nsqueak!", @response.body
     end
     
     should "render updates to the parent window for an iframe request" do

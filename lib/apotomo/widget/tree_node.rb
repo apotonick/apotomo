@@ -109,7 +109,6 @@ module Apotomo
 
     # Pretty prints the tree starting with the receiver node.
     def printTree(tab = 0)
-      puts((' ' * tab) + self.to_s)
       children {|child| child.printTree(tab + 4)}
     end
 
