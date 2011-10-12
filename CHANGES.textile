@@ -1,3 +1,14 @@
+h2. 1.2.0
+
+h3. Changes
+  * The @Widget.new@ constructor now expects the parent widget as first argument (except for the root widget, which still gets the damned ActionController instance). Nobody needed orphaned widgets so far so we decided to make it simpler. This makes the @#<<@ method a DSL-method, only.
+  * You can now access the root widget instance (or any other parent widget) in any subsequent @has_widgets@ block. This fixes "a famous issue":https://github.com/apotonick/apotomo/issues/34 and makes the @:passing@ option work as expected at every tree level.
+  * The @#widget@ shortcut method no longer returns a valid widget instance but a DSL-specific thing. Use the real constructor form if you need it right away (@MouseWidget.new(parent, :kid)@) or access the instance afterwards (@root[:kid]@).
+  * Removed the @after_add@ hook. Now that adding happens in the constructor, hook into @after_initialize@.
+  * Removed @#param@ in favor of @#options@.
+  * Removed @#emit@ in favor of @#render@.
+  * Removed @#remove_all!@ and @#remove_from_parent!@. Did you ever use these?
+  
 h2. 1.1.4
 
 h3. Changes
