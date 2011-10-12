@@ -41,12 +41,12 @@ class RenderTest < ActionView::TestCase
       assert_equal 'If you see the cat do run away!', @mum.invoke(:educate)
     end
     
-    context "with #emit" do
+    context "with #render" do
       context "and :text" do
         setup do
           @mum.instance_eval do
             def squeak
-              emit :text => "squeak();"
+              render :text => "squeak();"
             end
           end
         end
@@ -60,7 +60,7 @@ class RenderTest < ActionView::TestCase
         setup do
           @mum.instance_eval do
             def squeak
-              emit
+              render
             end
           end
         end
@@ -74,7 +74,7 @@ class RenderTest < ActionView::TestCase
         setup do
           @mum.instance_eval do
             def squeak
-              emit :view => :eating
+              render :view => :eating
             end
           end
         end

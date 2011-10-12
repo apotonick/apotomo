@@ -105,12 +105,6 @@ class WidgetTest < ActiveSupport::TestCase
       assert_equal @mum.name, @mum.widget_id
     end
     
-    should "mark #param as deprecated" do
-      assert_raises RuntimeError do
-        @mum.param(:volume)
-      end
-    end
-    
     should "respond to DEFAULT_VIEW_PATHS" do
       assert_equal ["app/widgets"], Apotomo::Widget::DEFAULT_VIEW_PATHS
     end
