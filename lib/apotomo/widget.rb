@@ -126,15 +126,6 @@ module Apotomo
       super
     end
     
-    alias_method :emit, :render
-    
-    def param(name)
-      msg = "Deprecated. Use #options for widget constructor options or #params for request data."
-      ActiveSupport::Deprecation.warn(msg)
-      raise msg
-    end
-    
-    
     # Returns the widget named +widget_id+ if it's a descendent or self.
     def find_widget(widget_id)
       find {|node| node.name.to_s == widget_id.to_s}
