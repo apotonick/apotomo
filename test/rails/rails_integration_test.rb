@@ -67,7 +67,7 @@ class RailsIntegrationTest < ActionController::TestCase
     context "nested widgets" do
       should "render" do
         get 'mum', :state => :child
-        assert_equal "/rails_integration_test/mum/render_event_response?source=kid&amp;type=click\n", @response.body
+        assert_equal "/barn/render_event_response?source=kid&amp;type=click\n", @response.body
       end
       
       should "process events" do

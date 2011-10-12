@@ -52,6 +52,7 @@ module Apotomo
       end
     end
     
+    # Mixed into Widget.      
     module DSL
       def <<(child)
         child.build(self)

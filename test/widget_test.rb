@@ -83,7 +83,6 @@ class WidgetTest < ActiveSupport::TestCase
       end
       
       should "find children" do
-      puts @mum.printTree
         assert_equal @kid, @mum.find_widget('kid')
       end
       
@@ -96,8 +95,10 @@ class WidgetTest < ActiveSupport::TestCase
       assert_respond_to @mum, :widget
     end
     
-    should "respond to #parent_controller" do
+    should "respond to #parent_controller and return the AC in root" do
+      @mum << mouse_mock(:kid)
       assert_equal @controller, @mum.parent_controller
+      assert_equal @controller, @mum[:kid].parent_controller
     end
     
     should "alias #widget_id to #name" do
