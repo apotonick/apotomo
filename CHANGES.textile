@@ -1,3 +1,8 @@
+h2. 1.2.1
+
+h3. Changes
+  * Save the <code>@options</code> hash in the constructor since we cannot rely on cells anymore.
+  
 h2. 1.2.0
 
 h3. Changes
