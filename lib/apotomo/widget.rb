@@ -72,6 +72,7 @@ module Apotomo
     undef :display  # We don't want #display to be listed in #internal_methods.
     
     alias_method :widget_id, :name
+    attr_reader :options
     
     after_initialize do
       run_hook :has_widgets, self
@@ -79,7 +80,8 @@ module Apotomo
     
     
     def initialize(parent, id, options={})
-      super(parent, options)  # TODO: do that as long as cells do need a parent_controller. remember to remove options for cells 3.7.
+      super(parent)  # TODO: do that as long as cells do need a parent_controller.
+      @options      = options
       @name         = id
       @visible      = true
       
@@ -99,7 +101,7 @@ module Apotomo
     
     # Invokes +state+ and hopefully returns the rendered content.
     def invoke(state, *args)
-      return render_state(state, *args) if state_accepts_args?(state)
+      return render_state(state, *args) if method(state).arity != 0 # TODO: remove check and make trigger states receive the evt default. 
       render_state(state)
     end
     

@@ -7,17 +7,9 @@ class ViewHelperTest < Apotomo::TestCase
   
   # TODO: use Cell::TestCase#in_view here.
   def in_view(subject, &block)
-    if subject.kind_of?(Apotomo::Widget)
-      subject.options[:block] = block
-    else
-      subject = subject.new(@controller, 'mum', :block => block)
-    end
-     
-    setup_test_states_in(subject) unless subject.respond_to?(:in_view)# add #in_view state to subject cell.
-    
-    subject.class.action_methods << "in_view"
-    
-    subject.invoke(:in_view)
+    subject = subject.new(@controller, :mum) unless subject.kind_of?(Apotomo::Widget)
+    setup_test_states_in(subject)
+    subject.invoke(:in_view, block)
   end
   def mouse_mock(id='mum', opts={}, &block)
     mouse = MouseWidget.new(parent_controller, id, opts)
