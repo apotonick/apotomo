@@ -35,11 +35,8 @@ module Apotomo
   #
   #   def update(evt)
   #     @cheese = Cheese.find evt[:cheese_id]
-  class Widget < Cell::Base
-    
-    DEFAULT_VIEW_PATHS = [
-      File.join('app', 'widgets'),
-    ]
+  class Widget < Cell::Rails
+    DEFAULT_VIEW_PATHS = [File.join('app', 'widgets')]
     
     include Hooks
     
