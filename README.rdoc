@@ -62,10 +62,10 @@ You now tell your controller about the new widget.
     include Apotomo::Rails::ControllerMethods
     
     has_widgets do |root|
-      root << widget('comments_widget', 'post-comments', :post => @post)
+      root << widget('comments_widget', :post => @post)
     end
 
-The widget is named <tt>post-comments</tt>. We pass the current post into the widget - the block is executed in controller instance context, that's were <tt>@post</tt> comes from. Handy, isn't it?
+This creates a widget instance called <tt>comments_widget</tt> from the class CommentsWidget.  We pass the current post into the widget - the block is executed in controller instance context, that's were <tt>@post</tt> comes from. Handy, isn't it?
 
 == Render the widget
 
@@ -77,7 +77,7 @@ Rendering usually happens in your controller view, <tt>views/posts/show.html.ham
     @post.body
   
   %p
-    = render_widget 'post-comments'
+    = render_widget 'comments_widget'
 
 == Write the widget
 
