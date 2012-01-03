@@ -62,7 +62,7 @@ You now tell your controller about the new widget.
     include Apotomo::Rails::ControllerMethods
     
     has_widgets do |root|
-      root << widget('comments_widget', :post => @post)
+      root << widget(:comments, :post => @post)
     end
 
 This creates a widget instance called <tt>comments_widget</tt> from the class CommentsWidget.  We pass the current post into the widget - the block is executed in controller instance context, that's were <tt>@post</tt> comes from. Handy, isn't it?
@@ -77,7 +77,7 @@ Rendering usually happens in your controller view, <tt>views/posts/show.html.ham
     @post.body
   
   %p
-    = render_widget 'comments_widget'
+    = render_widget :comments
 
 == Write the widget
 
@@ -148,7 +148,7 @@ Also, updating the page is in your hands. Where Apotomo provides handy helpers a
 
 Look, +replace+ basically generates
 
-  $("post-comments").replaceWith(<the rendered view>);
+  $("comments").replaceWith(<the rendered view>);
 
 If that's not what you want, do
 
@@ -166,11 +166,11 @@ Apotomo comes with its own test case and assertions to <b>build rock-solid web c
 
   class CommentsWidgetTest < Apotomo::TestCase
     has_widgets do |root|
-      root << widget(:comments_widget, 'me', :post => @pervert_post)
+      root << widget(:comments, :post => @pervert_post)
     end
     
     def test_render
-      render_widget 'me'
+      render_widget :comments
       assert_select "li#me"
       
       trigger :post, :comment => {:text => "Sex on the beach"}
@@ -202,4 +202,4 @@ If you wanna be cool, subscribe to our feed[http://feeds.feedburner.com/Apotomo]
 
 
 == License
-Copyright (c) 2007-2011 Nick Sutterer <apotonick@gmail.com> under the MIT License
+Copyright (c) 2007-2012 Nick Sutterer <apotonick@gmail.com> under the MIT License
