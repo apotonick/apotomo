@@ -42,7 +42,7 @@ module Apotomo
     
     module Jquery
       def jquery;                 end
-      def element(id);            "$(\"#{id}\")"; end
+      def element(id);            "jQuery(\"#{id}\")"; end
       def update(id, markup);     element(id) + '.html("'+escape(markup)+'");'; end
       def replace(id, markup);    element(id) + '.replaceWith("'+escape(markup)+'");'; end
       def update_id(id, markup);  update("##{id}", markup); end
