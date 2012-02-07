@@ -110,7 +110,11 @@ class WidgetTest < ActiveSupport::TestCase
     end
     
     should "respond to .view_paths" do
-      assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]), Apotomo::Widget.view_paths
+      if Cells.rails3_2_or_more?
+        assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]).paths, Apotomo::Widget.view_paths.paths
+      else
+        assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]), Apotomo::Widget.view_paths
+      end
     end
     
     should "respond to .controller_path" do
