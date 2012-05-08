@@ -70,19 +70,19 @@ class JavascriptGeneratorTest < Test::Unit::TestCase
       end
     
       should "respond to replace" do
-        assert_equal "$(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace("#drinks", 'EMPTY!')
+        assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace("#drinks", 'EMPTY!')
       end
       
       should "respond to replace_id" do
-        assert_equal "$(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
       end
       
       should "respond to update" do
-        assert_equal "$(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update("#drinks", '<li id="beer"></li>')
+        assert_equal "jQuery(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update("#drinks", '<li id="beer"></li>')
       end
       
       should "respond to update_id" do
-        assert_equal "$(\"#drinks\").html(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"#drinks\").html(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
     end
   end
