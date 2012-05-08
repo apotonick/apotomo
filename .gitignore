@@ -3,3 +3,4 @@ pkg/*
 .bundle
 test/dummy/log/*
 test/dummy/tmp/*
+.rvmrc
