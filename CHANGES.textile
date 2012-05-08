@@ -1,3 +1,7 @@
+h2. 1.2.3
+
+* Maintenance release to make happy people happy.
+
 h2. 1.2.2
 
 * Derive @Apotomo::Widget@ from @Cell::Rails@ now to make it compatible with 3.8.
