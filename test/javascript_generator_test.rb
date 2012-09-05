@@ -64,6 +64,10 @@ class JavascriptGeneratorTest < Test::Unit::TestCase
       setup do
         @gen = Apotomo::JavascriptGenerator.new(:jquery)
       end
+
+      should 'create _apo_xyz javascript variable for jQuery element' do
+        assert_equal "var _apo_xyz = $(\"#my_id\").find(\".item\");", @gen.selector_for(:xyz, 'my_id', '.item')
+      end
       
       should "respond to jquery" do
         assert_respond_to @gen, :jquery
@@ -72,13 +76,31 @@ class JavascriptGeneratorTest < Test::Unit::TestCase
       should "respond to replace" do
         assert_equal "$(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace("#drinks", 'EMPTY!')
       end
+
+      should "escape" do
+        assert_equal "<li id=\\\"beer\\\"><\\/li>", @gen.escape('<li id="beer"></li>')
+      end
+
+      should "respond to replace and escape" do
+        assert_equal "$(\"#drinks\").replaceWith(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.replace("#drinks", '<li id="beer"></li>')
+      end
+
+      should "respond to replace with block" do
+        txt = @gen.replace("#drinks") { '<li id="beer"></li>'}
+        assert_equal "$(\"#drinks\").replaceWith(\"<li id=\\\"beer\\\"><\\/li>\");", txt
+      end
       
       should "respond to replace_id" do
         assert_equal "$(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
       end
       
-      should "respond to update" do
+      should "respond to update and escape" do
         assert_equal "$(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update("#drinks", '<li id="beer"></li>')
+      end
+
+      should "respond to update with block" do
+        txt = @gen.update("#drinks") { '<li id="beer"></li>'}
+        assert_equal "$(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", txt
       end
       
       should "respond to update_id" do

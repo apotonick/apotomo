@@ -52,19 +52,20 @@ module Apotomo
         "$(#{selector})"
       end
 
-      def update(id, markup);     element(id) + '.html("'+escape(markup)+'");'; end
-      def replace(id, markup);    element(id) + '.replaceWith("'+escape(markup)+'");'; end
+      def update(*args, &block)
+        jq_helper.markup_act :html, *args, &block
+      end
+
+      def replace(*args, &block)
+        jq_helper.markup_act :replaceWith, *args, &block
+      end        
 
       def update_id(id, markup);  update("##{id}", markup); end
       def replace_id(id, markup); replace("##{id}", markup); end
 
-      def update_text(id, selector, markup)
-        element(id) + ".find(#{selector}).text('#{escape(markup)}');"
-      end
-
       def selector_for var, id, selector
         raise ArgumentError, "Must not be an _apo_ selector here: #{selector}" if jq_helper.apo_match?(selector)
-        "var _apo_#{var} = " + element("##{id}") + ".find('#{selector}');"
+        "var _apo_#{var} = " + element("##{id}") + ".find(\"#{selector}\");"
       end
 
       [:replace_all, :prepend_to, :append_to].each do |name|
@@ -73,7 +74,7 @@ module Apotomo
         end
       end
 
-      [:append, :prepend, :after, :before, :wrap, :wrap_inner, :wrap_all].each do |name|
+      [:update_text, :append, :prepend, :after, :before, :wrap, :wrap_inner, :wrap_all].each do |name|
         define_method name do |args|      
           jq_helper.markup_action *args, name
         end

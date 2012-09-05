@@ -5,7 +5,7 @@ module Apotomo
         if id == nil || apo_selector?(selector)
           return element(selector)
         end
-        element("##{id}") + ".find('#{selector}')"
+        element("##{id}") + ".find(\"#{selector}\")"
       end
 
       # - id, selector action 
@@ -22,9 +22,18 @@ module Apotomo
         "$(#{escaped(markup)}).#{action}(#{selector});"
       end      
 
+      def markup_act name, *args, &block
+        id, selector = extract_args *args, &block
+        markup = block_given? ? yield : args.last
+
+        find_element(id, selector) + mk_action(name, markup)        
+      end
+
+      # - id, selector, markup, action
+      # - selector, markup, action
       def markup_action *args, &block
         args = args.flatten    
-        id, selector, markup, action = extract_args(*args)
+        id, selector, markup, action = extract_args(*args, &block)
         action ||= yield if block_given?
         raise ArgumentError, "Must take action block or Symbol as last argument" unless action
         elem_action = case action
@@ -37,12 +46,14 @@ module Apotomo
         end
         find_element(id, selector) + elem_action
       end
-                
+
+      include ::ActionView::Helpers::JavaScriptHelper
+        
       def escaped markup
-        "'#{escape(markup)}'"
+        "\"#{escape_javascript(markup)}\""
       end      
 
-      def mk_action name, markup        
+      def mk_action name, markup
         js_action "#{name}(#{escaped(markup)})"
       end
 
@@ -51,11 +62,12 @@ module Apotomo
       end
 
       def js_camelize str
-        str.to_s.camelize.sub(/^\w/, s[0].downcase)
+        str = str.to_s
+        str.camelize.sub(/^\w/, str[0].downcase)
       end
 
       def calc_selector selector
-        selector = apo_selector?(selector) ? "_apo_#{selector}" : "'#{selector}'"
+        selector = apo_selector?(selector) ? "_apo_#{selector}" : "\"#{selector}\""
       end
 
       def apo_selector? selector
@@ -74,8 +86,8 @@ module Apotomo
       end      
 
       # id, selector, markup, action
-      def extract_args *args
-        [extract_id(*args), extract_selector(*args), extract_markup(*args), extract_action(*args)]
+      def extract_args *args, &block
+        [extract_id(*args), extract_selector(*args), extract_markup(*args, &block), extract_action(*args, &block)]
       end
 
       def extract_id *args
@@ -88,14 +100,12 @@ module Apotomo
         args.size == 4 ? args[1] : args[0]
       end
 
-      def extract_markup(*args)
-        args = args.flatten
-        args.size == 4 ? args[2] : args.last
+      def extract_markup(*args, &block)
+        block_given? ? args.last : args[-2]
       end
 
-      def extract_action(*args)
-        args = args.flatten
-        args.size == 4 ? args.last : nil
+      def extract_action(*args, &block)
+        args.last unless block_given?
       end
 
       extend self
