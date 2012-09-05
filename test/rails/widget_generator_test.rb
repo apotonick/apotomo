@@ -20,8 +20,8 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "app/widgets/gerbil/views/snuggle.html.erb", %r(<p>)
         assert_file "app/widgets/gerbil/views/squeak.html.erb", %r(app/widgets/gerbil/views/squeak\.html\.erb)
 
-        assert_file "test/widgets/gerbil_widget_test.rb", %r(class GerbilWidgetTest < Apotomo::TestCase)
-        assert_file "test/widgets/gerbil_widget_test.rb", %r(widget\(:gerbil\))
+        assert_file "test/widgets/gerbil/gerbil_widget_test.rb", %r(class GerbilWidgetTest < Apotomo::TestCase)
+        assert_file "test/widgets/gerbil/gerbil_widget_test.rb", %r(widget\(:gerbil\))
       end
 
       should "create javascript and css assets" do
@@ -42,7 +42,7 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "app/widgets/gerbil/views/snuggle.html.haml", %r(%p)
         assert_file "app/widgets/gerbil/views/squeak.html.haml", %r(app/widgets/gerbil/views/squeak\.html\.haml)
         
-        assert_file "test/widgets/gerbil_widget_test.rb"
+        assert_file "test/widgets/gerbil/gerbil_widget_test.rb"
       end
 
       should "create slim assets with -e slim" do
@@ -56,7 +56,7 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "app/widgets/gerbil/views/snuggle.html.slim", %r(p)
         assert_file "app/widgets/gerbil/views/squeak.html.slim", %r(app/widgets/gerbil/views/squeak\.html\.slim)
         
-        assert_file "test/widgets/gerbil_widget_test.rb"
+        assert_file "test/widgets/gerbil/gerbil_widget_test.rb"
       end
 
       should "work with namespaces" do
@@ -67,8 +67,9 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         
         assert_file "app/widgets/gerbil/mouse/views/squeak.html.erb", %r(app/widgets/gerbil/mouse/views/squeak\.html\.erb)
         
-        assert_file "test/widgets/gerbil/mouse_widget_test.rb"
+        assert_file "test/widgets/gerbil/mouse/mouse_widget_test.rb"
       end
 
     end
   end
+end
