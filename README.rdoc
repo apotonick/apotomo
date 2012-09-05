@@ -170,6 +170,7 @@ Apotomo doesn't depend on _any_ JS framework - you choose!
 
 Extras (jQuery only):
 
+* find_element(id, selector)
 * selector_for(var, id, selector)
 
 Example usage:
