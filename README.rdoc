@@ -181,29 +181,35 @@ render js: top_item + append_to(:_top_item, markup)
 Will select `.item:first` under the widget container element as a variable `_apo_top_item` and then append the markup to the DOM element(s) pointed to by that variable.
 ```
 
+Inverse jQuery actions
+
+* append_to(selector, markup)
+* prepend_to(selector, markup)
+* replace_all(selector, markup)
+
+Normal jQuery action
+
 * update_text(id, selector, markup)
 * append(id, selector, markup)
 * prepend(id, selector, markup)
-* append_to(selector, markup)
-* prepend_to(selector, markup)
-* after(selector, markup)
-* before(selector, markup)
-* replace_all(selector, markup)
-* unwrap(selector)
-* wrap(selector, markup)
-* wrap_inner(selector, markup)
-* wrap_all(selector, markup)
-* remove(selector)
-* remove_class(selector, *classes)
-* add_class(selector, *classes)
-* toggle_class(selector, *classes)
-* toggle_class_fun(selector, fun)
-* get_attr(selector, name)
-* get_prop(selector, name)
-* get_val selector
-* get_html(selector)
-* empty(selector)
+* after(id, selector, markup)
+* before(id, selector, markup)
+* unwrap(id, selector)
+* wrap(id, selector, markup)
+* wrap_inner(id, selector, markup)
+* wrap_all(id, selector, markup)
+* remove(id, selector)
+* remove_class(id, selector, *classes)
+* add_class(id, selector, *classes)
+* toggle_class(id, selector, *classes)
+* toggle_class_fun(id, selector, fun)
+* get_attr(id, selector, name)
+* get_prop(id, selector, name)
+* get_val(id, selector)
+* get_html(id, selector)
+* empty(id, selector)
 
+Note: The first argument id is always optional
 
 == Testing
 
