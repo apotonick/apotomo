@@ -344,6 +344,27 @@ Which will result in the statement:
 Widgets.firstWidget.flashLight('action': 'search');
 ```
 
+An even better way...
+
+See [namespace.coffee](https://github.com/CodeCatalyst/namespace.coffee) for a good namespacing/package solution for coffee classes, as described in [oop coffee](http://www.gridlinked.info/oop-with-coffeescript-javascript/)
+
+```coffeescript
+namespace "samples.coffeescript.oop"
+    PetMaker :
+        class PetMaker
+            constructor : ->
+ 
+            createDog : (name) -> new Dog(name)
+            createCat : (name) -> new Cat(name)
+            createBird: (name) -> new Bird(name)
+ 
+      # private variable declarations (aliases)
+      #
+      Dog = samples.coffeescript.oop.pets.Dog
+      Cat = samples.coffeescript.oop.pets.Cat
+      Bird= samples.coffeescript.oop.pets.Bird
+```
+
 == Testing
 
 Apotomo comes with its own test case and assertions to <b>build rock-solid web components</b>.
