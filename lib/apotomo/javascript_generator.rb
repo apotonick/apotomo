@@ -1,5 +1,4 @@
 require 'action_view/helpers/javascript_helper'
-require 'apotomo/javascript_generator/jquery_helper'
 
 module Apotomo
   class JavascriptGenerator
