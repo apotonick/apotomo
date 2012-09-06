@@ -22,6 +22,7 @@ end
 
 require 'apotomo/widget'
 require 'apotomo/railtie'
+require 'apotomo/cell/rendering'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'
 require 'apotomo/javascript_generator'
