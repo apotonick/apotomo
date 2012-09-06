@@ -9,7 +9,6 @@ module Apotomo
         File.join('app/widgets', class_path, file_name)
       end
 
-
       def js_path
         File.join('app/assets/javascripts/widgets', class_path, file_name)
       end
@@ -39,14 +38,26 @@ module Apotomo
       
       check_class_collision :suffix => "Widget"
 
+      class_option :js, :type => :boolean, :default => false, :desc => 'Generate javascript asset file'
+
       def create_cell_file
         template 'widget.rb', File.join(base_path, "#{file_name}_widget.rb")
       end
 
-      def create_assets_files
-        template 'widget.coffee', "#{js_path}_widget.coffee"
+      def create_stylesheet_file
         template 'widget.css', "#{css_path}_widget.css"
       end            
+
+      def creates_script_file
+        return template 'widget.coffee', "#{js_path}_widget.coffee" if !javascript?
+        template 'widget.js', "#{js_path}_widget.js"
+      end
+
+      protected
+
+      def javascript?
+        options[:js]
+      end
     end
   end
 end

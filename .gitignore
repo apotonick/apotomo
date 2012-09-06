@@ -4,3 +4,4 @@ pkg/*
 test/dummy/log/*
 test/dummy/tmp/*
 Gemfile.lock
+.DS_Store

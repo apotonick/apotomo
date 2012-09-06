@@ -42,17 +42,36 @@ Let's wrap that comments block in a widget.
 
 == Generate
 
-Go and generate a widget stub.
+  $ rails g apotomo:widget comments show -e haml
+    invoke  haml
+    create  app/widgets/comments/views/show.html.haml
+    invoke  rspec
+    create  spec/widgets/comments/comments_widget_spec.rb
+    create  app/widgets/comments/comments_widget.rb
+    create  app/assets/stylesheets/widgets/comments_widget.css
+    create  app/assets/javascripts/widgets/comments_widget.coffee
 
-  $ rails generate apotomo:widget Comments display write -e haml
-    create  app/cells/
-    create  app/cells/comments
-    create  app/cells/comments/comments_widget.rb
-    create  app/cells/comments/views/display.html.haml
-    create  app/cells/comments/views/write.html.haml
-    create  test/widgets/comments/comments_widget_test.rb
+Go and generate a widget TopBar stub.
 
-Nothing special.
+  $ rails g apotomo:widget TopBar show -e haml
+    invoke  haml
+    create  app/widgets/top_bar/views/show.html.haml
+    invoke  rspec
+    create  spec/widgets/top_bar/top_bar_widget_spec.rb
+    create  app/widgets/top_bar/top_bar_widget.rb
+    create  app/assets/stylesheets/widgets/top_bar_widget.css
+    create  app/assets/javascripts/widgets/top_bar_widget.coffee
+
+And a Form widget within the TopBar namespace
+
+  $ rails g apotomo:widget TopBar::Form show -e haml
+    invoke  haml
+    create  app/widgets/top_bar/form/views/show.html.haml
+    invoke  rspec
+    create  spec/widgets/top_bar/form/form_widget_spec.rb
+    create  app/widgets/top_bar/form/form_widget.rb
+    create  app/assets/javascripts/widgets/top_bar/form_widget.coffee
+    create  app/assets/stylesheets/widgets/top_bar/form_widget.css
 
 == Plug it in
 
@@ -86,12 +105,12 @@ A widget is like a cell which is like a mini-controller.
   class CommentsWidget < Apotomo::Widget
     responds_to_event :post
     
-    def display(args)
+    def show(args)
       @comments = args[:post].comments # the parameter from outside.
       render
     end
 
-Having +display+ as the default state when rendering, this method collects comments to show and renders its view.
+Having +show+ as the default state when rendering, this method collects comments to show and renders its view.
 
 And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, which is simply another state. How cool is that? 
 
@@ -99,7 +118,7 @@ And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, w
       @comment = Comment.new(:post_id => evt[:post_id])
       @comment.update_attributes evt[:comment]  # a bit like params[].
       
-      update :state => :display
+      update :state => :show
     end
   end
 
@@ -107,7 +126,7 @@ And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, w
 The event is processed with three steps in our widget:
 
 * create the new comment
-* re-render the +display+ state
+* re-render the +show+ state
 * update itself on the page
 
 Apotomo helps you focusing on your app and takes away the pain of <b>action dispatching</b> and <b>page updating</b>.
@@ -116,7 +135,7 @@ Apotomo helps you focusing on your app and takes away the pain of <b>action disp
 
 So how and where is the <tt>:post</tt> event triggered?
 
-Take a look at the widget's view <tt>display.html.haml</tt>.
+Take a look at the widget's view <tt>show.html.haml</tt>.
   = widget_div do
     %ul
       - for c in @comments
@@ -172,6 +191,7 @@ Extras (jQuery only):
 
 * find_element(id, selector)
 * selector_for(var, id, selector)
+* call_fun(name, id, hash)
 
 Example usage:
 
@@ -182,13 +202,13 @@ render js: top_item + append_to(:_top_item, markup)
 Will select `.item:first` under the widget container element as a variable `_apo_top_item` and then append the markup to the DOM element(s) pointed to by that variable.
 ```
 
-Inverse jQuery actions
+Inverse jQuery manipulation API
 
 * append_to(selector, markup)
 * prepend_to(selector, markup)
 * replace_all(selector, markup)
 
-Normal jQuery action
+Normal jQuery manipulation API
 
 * update_text(id, selector, markup)
 * append(id, selector, markup)
@@ -204,13 +224,125 @@ Normal jQuery action
 * add_class(id, selector, *classes)
 * toggle_class(id, selector, *classes)
 * toggle_class_fun(id, selector, fun)
+* empty(id, selector)
+
+jQuery "get" functions
+
 * get_attr(id, selector, name)
 * get_prop(id, selector, name)
 * get_val(id, selector)
 * get_html(id, selector)
-* empty(id, selector)
 
-Note: The first argument id is always optional
+The first argument `id` is always optional. It is meant to be used to select the div for the widget. The `selector` then finds one or more elements within the widget to perform the action on.
+
+These functions should be used sparingly, for _Proof of Concept_ only if possible. It is far better to have javascript asset files if possible (== non-intrusive javascript).
+
+A non-intrusive approach could involve the use of the `call_fun` method which takes the `name` of the javascript method to call, the widget `id` and a hash of data.
+
+Example: 
+
+`call_fun :toggle_active, 'TopBar', {item: 'item:first'}`
+
+This will result in the call:
+
+```javascript
+Widget.TopBar.toggleActive({'item': 'item:first'});
+```
+
+This ensures that all our javascript for a widget is namespace contained nicely.
+
+In your `application.js` manifest file
+
+```
+//= require apotomo/Namespace
+```
+
+In the `top_bar.coffee` file the following is generated for our convenience
+
+```javascript
+Widget.TopBar = Namespace('Apotomo.Widget.TopBar');
+
+Widget.TopBar = {}
+```
+
+We can then implement clean non-intrusive, namespaced javascript functionality as follows:
+
+```javascript
+Widget.TopBar = Namespace('Apotomo.Widget.TopBar');
+
+Widget.TopBar = {
+  update: function(item) {
+    'updated:' + item }
+  },
+  
+  toggleActive: function(widget_id, options) {
+    item = options['item'];
+    // do some toggle magic!!!
+    $(widget_id).find(item).toggleClass('active');
+  }
+}
+```
+
+Note that you can use fx jQuery [extend](http://api.jquery.com/jQuery.extend/) to extend javascript widget functionality similar to modules (prototypical inheritance). 
+There are many other powerful javascript libraries out there (fx Base2, Prototype.js, JS.Class) that can be used to great effect for OOP javascript with inheritance etc. 
+
+```coffeescript
+$.extend Widget.Admin.TopBar, Widget.TopBar
+```
+
+Here we extended the `Admin.TopBar` with base functionality from `TopBar` :)
+
+== Using Coffeescript
+
+Coffeescript has built in [class structure](http://coffeescript.org/#classes).
+and [namespaces](http://spin.atomicobject.com/2011/04/01/namespace-a-coffeescript-nugget/). Also see [namespaced classes](http://stackoverflow.com/questions/8730859/classes-within-coffeescript-namespace)
+
+```coffeescript
+namespace "Widget.TopBar", (exports) ->
+  # add functions or classes here
+  bar: (foo) ->
+```
+
+```coffeescript
+class MyFirstWidget
+  constructor: (options = {}) ->
+    @options = options
+    @name = options.name
+  myFunc: () ->
+    console.log 'works'
+
+namespace "Widget.TopBar", (exports) ->
+  exports.MyFirstWidget = MyFirstWidget
+
+  toggleActive: (widget_id, options) ->
+    item = options.item
+    $(widget_id).find(item).toggleClass 'active'
+```
+
+```coffeescript
+firstWidget = new Widget.TopBar.MyFirstWidget
+firstWidget.myFunc
+```
+
+=== javascript Widget instance
+
+For an Ajax enabled page, you can create javascript widget instances in the `Widgets` namespace.
+
+```coffeescript
+Widgets.firstWidget = new Widget.TopBar.MyFirstWidget name: "cool widget"
+``
+
+Then you can update an existing widget instance from your Widget (controller) using `call_widget` as follows:
+
+```ruby
+call_widget :firstWidget, :flash_light, action: 'search'
+```
+
+Which will result in the statement:
+
+```javascript
+Widgets.firstWidget.flashLight('action': 'search');
+```
 
 == Testing
 
