@@ -5,6 +5,8 @@ Script: Namespace.js
 Copyright:
   Copyright (c) 2009 Maxime Bouroumeau-Fuseau
 
+https://github.com/maximebf/Namespace.js
+
 License:
   MIT-style license.
   
@@ -477,7 +479,7 @@ Namespace.baseUri = './';
 Namespace.autoInclude = true;
 
 // for widget namespaces
-var Widget = Namespace('Apotomo.Widget');
+var widget = Namespace('widget');
 
 // for widget instances
 var Widgets = {};

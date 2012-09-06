@@ -69,23 +69,24 @@ module Apotomo
       end
 
       # call existing widget
-      # - call_fun :update, :top_bar, item: 1
+      # - widget_class_call :top_bar, :update, item: 1
 
       # --> Widget.TopBar.update('action': 1)
-      def call_fun name, id, hash
-        function_name = jq_helper.js_camelize name
-        namespace = "Widget.#{id.to_s.camelize}"
-        "#{namespace}.#{function_name}(\"##{id}\", #{hash.to_json});"
+      def widget_class_call id, function, hash
+        function_name = jq_helper.js_camelize function
+        widget_name = jq_helper.ns_name id.to_s.camelize
+        namespace = "Widget.#{widget_name}"
+        "#{namespace}.#{function_name}(#{hash.to_json});"
       end
 
       # call existing widget
-      # - call_widget :top_bar, :flash_light, action: 'search'
+      # - widget_call :top_bar, :flash_light, action: 'search'
 
       # --> Widgets.topBar.flashLight('action': 'search')
 
-      def call_widget name, fun, hash
-        function_name = jq_helper.js_camelize name
-        "#{name}.#{function_name}(#{hash.to_json});"
+      def widget_call id, function, hash
+        function_name = jq_helper.js_camelize function
+        "Widgets.#{id}.#{function_name}(#{hash.to_json});"
       end
 
       [:replace_all, :prepend_to, :append_to].each do |name|

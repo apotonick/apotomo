@@ -49,11 +49,23 @@ module Apotomo
       end            
 
       def creates_script_file
-        return template 'widget.coffee', "#{js_path}_widget.coffee" if !javascript?
+        return template 'widget.js.coffee', "#{js_path}_widget.js.coffee" if !javascript?
         template 'widget.js', "#{js_path}_widget.js"
       end
 
       protected
+
+      def ns_name
+        names = class_name.split('::')
+        ns = names[0..-2].map {|name| js_camelize name }.join('.')
+        return names.last if ns.blank?
+        ns << ".#{names.last}"
+      end
+
+      def js_camelize str
+        str = str.to_s
+        str.camelize.sub(/^\w/, str[0].downcase)
+      end
 
       def javascript?
         options[:js]

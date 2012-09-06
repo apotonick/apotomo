@@ -191,7 +191,6 @@ Extras (jQuery only):
 
 * find_element(id, selector)
 * selector_for(var, id, selector)
-* call_fun(name, id, hash)
 
 Example usage:
 
@@ -237,38 +236,56 @@ The first argument `id` is always optional. It is meant to be used to select the
 
 These functions should be used sparingly, for _Proof of Concept_ only if possible. It is far better to have javascript asset files if possible (== non-intrusive javascript).
 
-A non-intrusive approach could involve the use of the `call_fun` method which takes the `name` of the javascript method to call, the widget `id` and a hash of data.
+A non-intrusive approach could involve the use of:
+
+* widget_class_call(id, function, hash)
+* widget_call(id, function, hash)
 
 Example: 
 
-`call_fun :toggle_active, 'TopBar', {item: 'item:first'}`
+`widget_class_call 'TopBar', :toggle_active, {item: 'item:first'}`
 
-This will result in the call:
+Will call a function on the widget class (or module):
 
 ```javascript
 Widget.TopBar.toggleActive({'item': 'item:first'});
 ```
 
-This ensures that all our javascript for a widget is namespace contained nicely.
+`widget_call 'Admin::TopBar', :toggle_active, {item: 'item:first'}`
+
+Will call a function on a particular instance of that widget!
+
+```javascript
+Widgets.admin.topBar.toggleActive({'item': 'item:first'});
+```
+
+This ensures that all our javascript for a widget is nicely namespace contained.
 
 In your `application.js` manifest file
 
 ```
-//= require apotomo/Namespace
+//= require apotomo/namespaces
 ```
+
+An alternative `apotomo/Namespace.js` is also available, which you might want to experiment with also.
 
 In the `top_bar.coffee` file the following is generated for our convenience
 
 ```javascript
-Widget.TopBar = Namespace('Apotomo.Widget.TopBar');
+Widget.TopBar = namespace('Widget.TopBar');
 
-Widget.TopBar = {}
+Widget.TopBar = {
+  // add widget functions here
+  foo: function(bar) {},
+  
+  bar: function(foor) {}  
+}
 ```
 
 We can then implement clean non-intrusive, namespaced javascript functionality as follows:
 
 ```javascript
-Widget.TopBar = Namespace('Apotomo.Widget.TopBar');
+Widget.TopBar = namespace('Widget.TopBar');
 
 Widget.TopBar = {
   update: function(item) {
@@ -286,83 +303,107 @@ Widget.TopBar = {
 Note that you can use fx jQuery [extend](http://api.jquery.com/jQuery.extend/) to extend javascript widget functionality similar to modules (prototypical inheritance). 
 There are many other powerful javascript libraries out there (fx Base2, Prototype.js, JS.Class) that can be used to great effect for OOP javascript with inheritance etc. 
 
-```coffeescript
-$.extend Widget.Admin.TopBar, Widget.TopBar
+```javascript
+$.extend(Widget.admin.TopBar, Widget.TopBar);
 ```
 
-Here we extended the `Admin.TopBar` with base functionality from `TopBar` :)
+Here we extended the `admin.TopBar` with base functionality from `TopBar` :)
+
+Also see the Coffeescript section below to see how to use namespaces.
 
 == Using Coffeescript
 
 Coffeescript has built in [class structure](http://coffeescript.org/#classes).
-and [namespaces](http://spin.atomicobject.com/2011/04/01/namespace-a-coffeescript-nugget/). Also see [namespaced classes](http://stackoverflow.com/questions/8730859/classes-within-coffeescript-namespace)
+and [namespaces](http://spin.atomicobject.com/2011/04/01/namespace-a-coffeescript-nugget/). 
+
+Please also see:
+
+* [namespaced classes](http://stackoverflow.com/questions/8730859/classes-within-coffeescript-namespace)
+* [namespace.coffee](https://github.com/CodeCatalyst/namespace.coffee) 
+* [oop coffee](http://www.gridlinked.info/oop-with-coffeescript-javascript/)
+
+Here an appetizer :) replace animals with widgets and you get the idea...
 
 ```coffeescript
-namespace "Widget.TopBar", (exports) ->
-  # add functions or classes here
-  bar: (foo) ->
+namespace "samples.coffeescript.oop.abstract"
+    Animal :
+        class Animal
+            constructor : (@species, @isMammal=false) ->
+                return this
+ 
+# NOTE: Animal must be defined BEFORE Dog 
+#
+namespace "samples.coffeescript.oop.pets"
+    Dog :
+        class Dog extends samples.coffeescript.oop.abstract.Animal
+            constructor : (@name) ->
+```            
+
+You should first require `namespaces`:
+
+```
+//= require apotomo/namespaces.min
+```
+
+When you generate a widget, the coffescript file for it should look like this:
+
+`rails g apotomo:widget TopBar show -e haml`
+
+```coffeescript
+namespace "Widget"
+  TopBar :
+    class TopBar
+      constructor : (@widget_id = widget_id) ->
+
+      toggleActive: (options) ->
 ```
 
 ```coffeescript
-class MyFirstWidget
-  constructor: (options = {}) ->
-    @options = options
-    @name = options.name
-  myFunc: () ->
-    console.log 'works'
+namespace "Widget"
+  TopBar :
+    class TopBar
+      constructor : (@widget_id = widget_id) ->
 
-namespace "Widget.TopBar", (exports) ->
-  exports.MyFirstWidget = MyFirstWidget
-
-  toggleActive: (widget_id, options) ->
-    item = options.item
-    $(widget_id).find(item).toggleClass 'active'
+      toggleActive: (options) ->
+        item = options.item
+        $(@widget_id).find(item).toggleClass 'active'
 ```
+
+`rails g apotomo:widget TopBar::SuperThang show -e haml`
 
 ```coffeescript
-firstWidget = new Widget.TopBar.MyFirstWidget
-firstWidget.myFunc
+namespace "Widget.topBar"
+  SuperThang :
+    class SuperThang extends Widget.TopBar
+        constructor : (@widget_id = widget_id) ->
+
+        createBottomBar : (widget_id) -> new BottomBar(widget_id)
+        createFooter : (widget_id) -> new Footer(widget_id)
+
+    # private variable declarations (aliases)
+    #
+    BottomBar = Widget.BottomBar
+    Footer = Widget.Footer
 ```
 
-=== javascript Widget instance
+=== Browser Widget instances
 
 For an Ajax enabled page, you can create javascript widget instances in the `Widgets` namespace.
 
 ```coffeescript
-Widgets.firstWidget = new Widget.TopBar.MyFirstWidget name: "cool widget"
+Widgets.thang = new Widget.topBar.SuperThang
 ``
 
 Then you can update an existing widget instance from your Widget (controller) using `call_widget` as follows:
 
 ```ruby
-call_widget :firstWidget, :flash_light, action: 'search'
+call_widget :thang, :toggleActive, item: ".item:first"
 ```
 
 Which will result in the statement:
 
 ```javascript
-Widgets.firstWidget.flashLight('action': 'search');
-```
-
-An even better way...
-
-See [namespace.coffee](https://github.com/CodeCatalyst/namespace.coffee) for a good namespacing/package solution for coffee classes, as described in [oop coffee](http://www.gridlinked.info/oop-with-coffeescript-javascript/)
-
-```coffeescript
-namespace "samples.coffeescript.oop"
-    PetMaker :
-        class PetMaker
-            constructor : ->
- 
-            createDog : (name) -> new Dog(name)
-            createCat : (name) -> new Cat(name)
-            createBird: (name) -> new Bird(name)
- 
-      # private variable declarations (aliases)
-      #
-      Dog = samples.coffeescript.oop.pets.Dog
-      Cat = samples.coffeescript.oop.pets.Cat
-      Bird= samples.coffeescript.oop.pets.Bird
+Widgets.thang.toggleActive('action': ".item:first");
 ```
 
 == Testing

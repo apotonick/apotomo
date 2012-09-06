@@ -61,6 +61,13 @@ module Apotomo
         ".#{action};"
       end
 
+      def ns_name class_name 
+        names = class_name.split('::')
+        ns = names[0..-2].map {|name| js_camelize name }.join('.')
+        return names.last if ns.blank?
+        ns << ".#{names.last}"
+      end
+
       def js_camelize str
         str = str.to_s
         str.camelize.sub(/^\w/, str[0].downcase)
