@@ -6,7 +6,7 @@ module Apotomo
       private
 
       def base_path
-        File.join('app/widgets', class_path, file_name)
+        File.join('app/widgets', class_path)
       end
 
       def js_path

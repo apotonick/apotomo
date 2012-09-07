@@ -151,9 +151,12 @@ module Apotomo
         widget = widget_id
       else
         widget = find_widget(widget_id) or raise "Couldn't render non-existent widget `#{widget_id}`"
-      end
-      
+      end      
+
       widget.invoke(state, *args)
+    rescue NameError => e
+      return widget.invoke(:show, *args)  if state == :display
+      raise e
     end
   end
 end
