@@ -21,7 +21,7 @@ module Apotomo
 end
 
 require 'apotomo/widget'
-require 'apotomo/railtie'
+require 'apotomo/engine'
 require 'apotomo/cell/rendering'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'

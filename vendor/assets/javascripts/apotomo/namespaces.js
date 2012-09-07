@@ -30,5 +30,5 @@
 
 }).call(this);
 
-namespace "Widget";
-namespace "Widgets";
+namespace("Widget"); 
+namespace("Widgets");

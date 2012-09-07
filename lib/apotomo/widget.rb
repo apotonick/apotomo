@@ -35,7 +35,7 @@ module Apotomo
   #
   #   def update(evt)
   #     @cheese = Cheese.find evt[:cheese_id]
-  class Widget < Cell::Rails
+  class Widget < Cell::Rails    
     DEFAULT_VIEW_PATHS = [File.join('app', 'widgets')]
     
     include Hooks
@@ -82,8 +82,8 @@ module Apotomo
       @name         = id
       @visible      = true
       
-      setup_tree_node(parent)
-      
+      setup_tree_node(parent)      
+
       run_hook :after_initialize, self
     end
     
@@ -122,6 +122,7 @@ module Apotomo
     #
     # issues a squeaking alert dialog on the page.
     def render(*args, &block)
+      puts "apotomo render: #{args}"
       super
     end
     
