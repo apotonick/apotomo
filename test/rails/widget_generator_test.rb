@@ -24,18 +24,24 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "test/widgets/gerbil/gerbil_widget_test.rb", %r(widget\(:gerbil\))
       end
 
-      should "create coffescript and css assets" do
+      should "create coffescript and scss assets" do
         run_generator %w(Gerbil squeak snuggle -t test_unit)
 
         assert_file "app/assets/javascripts/widgets/gerbil_widget.js.coffee", /Define your coffeescript code for the Gerbil widget*/
-        assert_file "app/assets/stylesheets/widgets/gerbil_widget.css", /Define your css code for the Gerbil widget*/
+        assert_file "app/assets/stylesheets/widgets/gerbil_widget.css.scss", /Define your SCSS code for the Gerbil widget*/
       end
 
       should "create javascript and css assets" do
-        run_generator %w(Gerbil squeak snuggle -t test_unit --js)
+        run_generator %w(Gerbil squeak snuggle -t test_unit --js --style css)
 
         assert_file "app/assets/javascripts/widgets/gerbil_widget.js", /Define your javascript code for the Gerbil widget*/
-        assert_file "app/assets/stylesheets/widgets/gerbil_widget.css", /Define your css code for the Gerbil widget*/
+        assert_file "app/assets/stylesheets/widgets/gerbil_widget.css", /Define your CSS code for the Gerbil widget*/
+      end
+
+      should "create javascript and sass assets" do
+        run_generator %w(Gerbil squeak snuggle -t test_unit --js --style sass)
+
+        assert_file "app/assets/stylesheets/widgets/gerbil_widget.css.sass", /Define your SASS code for the Gerbil widget*/
       end
 
       should "create haml assets with -e haml" do
