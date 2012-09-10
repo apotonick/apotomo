@@ -5,8 +5,7 @@ module Haml
   module Generators
     class WidgetGenerator < CellGenerator
       include ::Apotomo::Generators::BasePathMethods
-      include ::Apotomo::Generators::Views
-      source_root File.expand_path('../../templates', __FILE__)
+      include ::Apotomo::Generators::Views      
     end
   end
 end

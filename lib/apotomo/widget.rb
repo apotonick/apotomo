@@ -122,7 +122,6 @@ module Apotomo
     #
     # issues a squeaking alert dialog on the page.
     def render(*args, &block)
-      puts "apotomo render: #{args}"
       super
     end
     

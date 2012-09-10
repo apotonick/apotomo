@@ -9,6 +9,10 @@ module Apotomo
         File.join('app/widgets', class_path)
       end
 
+      def view_base_path
+        File.join('app/widgets', class_path, file_name)
+      end
+
       def js_path
         File.join('app/assets/javascripts/widgets', class_path, file_name)
       end
@@ -19,13 +23,33 @@ module Apotomo
     end
     
     module Views
+      extend ActiveSupport::Concern
+
+      included do
+        class_option :parent, :type => :boolean, :default => false, :desc => 'Parent widget'
+
+        source_root File.expand_path('../../templates', __FILE__)
+      end
+
       def create_views
         for state in actions do
           @state  = state
-          @path   = File.join(base_path, 'views', "#{state}.html.#{handler}")  #base_path defined in Cells::Generators::Base.
+          # only make views container for top level widgets, since they are most likely to have
+          # child widgets
+          @path = if parent_widget?
+            File.join(view_base_path, 'views', "#{state}.html.#{handler}")  #base_path defined in Cells::Generators::Base.
+          else
+            File.join(view_base_path, "#{state}.html.#{handler}")  #base_path defined in Cells::Generators::Base.
+          end
           template "view.#{handler}", @path
         end
       end
+
+      protected
+
+      def parent_widget?
+        options[:parent]
+      end      
     end        
     
     class WidgetGenerator < ::Cells::Generators::Base
@@ -38,7 +62,7 @@ module Apotomo
       
       check_class_collision :suffix => "Widget"
 
-      class_option :js, :type => :boolean, :default => false, :desc => 'Generate javascript asset file'
+      class_option :js,     :type => :boolean, :default => false, :desc => 'Generate javascript asset file'
 
       def create_cell_file
         template 'widget.rb', File.join(base_path, "#{file_name}_widget.rb")
@@ -48,9 +72,15 @@ module Apotomo
         template 'widget.css', "#{css_path}_widget.css"
       end            
 
-      def creates_script_file
-        return template 'widget.js.coffee', "#{js_path}_widget.js.coffee" if !javascript?
-        template 'widget.js', "#{js_path}_widget.js"
+      def create_script_file
+        puts "create_script_file"
+        if !javascript?
+          # raise "coffee: #{js_path}_widget.js.coffee" 
+          template 'widget.js.coffee', "#{js_path}_widget.js.coffee" 
+        else
+          puts "js: #{js_path}_widget.js" 
+          template 'widget.js', "#{js_path}_widget.js"
+        end
       end
 
       protected
@@ -68,7 +98,7 @@ module Apotomo
       end
 
       def javascript?
-        options[:js]
+        options[:js] == true
       end
     end
   end
