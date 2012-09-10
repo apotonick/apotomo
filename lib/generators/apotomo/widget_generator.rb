@@ -80,7 +80,6 @@ module Apotomo
       end            
 
       def create_script_file
-        puts "create_script_file"
         if coffee?
           template 'widget.coffee', "#{js_path}_widget.js.coffee" 
         else
@@ -96,6 +95,10 @@ module Apotomo
         ns = names[0..-2].map {|name| js_camelize name }.join('.')
         return names.last if ns.blank?
         ns << ".#{names.last}"
+      end
+
+      def simple_name
+        class_name.to_s.demodulize
       end
 
       def js_camelize str
