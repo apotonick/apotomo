@@ -520,7 +520,9 @@ Alternatively, to use Rspec use {rspec-apotomo}[https://github.com/apotonick/rsp
     gem 'rspec-apotomo'
   end
 
-Put specs in the spec/widgets directory
+Now when you run your widget generator, it should generate spec stubs `*_specs.rb` in the `spec/widgets` folder instead.
+
+Specs should be in the `spec/widgets` directory
 
   describe CommentsWidget do
     has_widgets do |root|
@@ -535,7 +537,6 @@ Put specs in the spec/widgets directory
       trigger(:post, :comments, :text => "I like you!").should == ["Thanks!"]
     end
   end
-
 
 Run your examples with:
 
