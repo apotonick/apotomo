@@ -96,6 +96,31 @@ This will add the following initialization code
 
 This instructs the Rails app hosting the engine to append this engine's widgets path to the global list of apotomo widget paths.
 
+== Generator configuration
+
+If you use apotomo within a Rails app, go to the `config/application.rb` file and configure as you see fit.
+See {configuring-generators}[http://guides.rubyonrails.org/configuring.html#configuring-generators] for details.
+
+  module FriendlyRent
+    class Application < Rails::Application
+      config.generators do |g|
+        g.view_specs          false
+        g.helper_specs        false
+        g.test_framework      :rspec, fixture: true
+        g.fixture_replacement :fabrication
+      end
+
+
+If you use apotomo within a Rails engine, go to the main engine files, fx `lib/mycool/engine.rb`and add a `config.generators` block.
+
+  class MyCool
+    class Engine < ::Rails::Engine
+
+      config.generators do |g|
+        g.template_engine :haml
+        g.test_framework :rspec
+      end
+
 == Devise integration
 
   class MySessionWidget < Apotomo::Widget
@@ -520,7 +545,9 @@ Alternatively, to use Rspec use {rspec-apotomo}[https://github.com/apotonick/rsp
     gem 'rspec-apotomo'
   end
 
-Now when you run your widget generator, it should generate spec stubs `*_specs.rb` in the `spec/widgets` folder instead.
+See the *Generator configuration* for how to configure generator defaults.
+
+When you run your widget generator, it will generate spec stubs `*_specs.rb` in the `spec/widgets` folder.
 
 Specs should be in the `spec/widgets` directory
 
