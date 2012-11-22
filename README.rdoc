@@ -108,6 +108,7 @@ See {configuring-generators}[http://guides.rubyonrails.org/configuring.html#conf
         g.helper_specs        false
         g.test_framework      :rspec, fixture: true
         g.fixture_replacement :fabrication
+        # g.fixture_replacement :factory_girl, :dir => "spec/factories"
       end
 
 
