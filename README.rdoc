@@ -132,6 +132,19 @@ A call to
 
 will render the configured UnauthorizedUserCell instead of the original LoginCell if the login test fails.
 
+Note: Not sure Cell Builders are supported in Apotomo widgets?
+
+== URL helpers
+
+Using the *_url helpers implies accessing the request instance, which kinda breaks encapsulation. Cells doesn’t support breaking things, that’s why you have to include it manually.
+
+Include the UrlFor module into your widget.
+
+  class MyLinkingWidget < Apotomo::Widget
+    include ActionController::UrlFor
+
+Inside a cell there should normally be no need to generate urls this way, since the cell should only render the views that relate directly to its actions. The url helpers would instead be used in the templates. Try to avoid "complex" redirection logic in your cells.
+
 == Plug it in
 
 You now tell your controller about the new widget.
