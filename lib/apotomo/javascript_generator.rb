@@ -27,7 +27,7 @@ module Apotomo
     
     module Prototype
       def prototype;              end
-      def element(selector);            "$(\"#{selector}\")"; end
+      def element(selector);            "jQuery(\"#{selector}\")"; end
       def update(selector, markup);     element(selector) + '.update("'+escape(markup)+'");'; end
       def replace(selector, markup);    element(selector) + '.replace("'+escape(markup)+'");'; end
 
@@ -37,7 +37,7 @@ module Apotomo
     
     module Right
       def right;                  end
-      def element(selector);            "$(\"#{selector}\")"; end
+      def element(selector);            "jQuery(\"#{selector}\")"; end
       def update(selector, markup);     element(selector) + '.update("'+escape(markup)+'");'; end
       def replace(selector, markup);    element(selector) + '.replace("'+escape(markup)+'");'; end
 

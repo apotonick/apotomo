@@ -15,12 +15,12 @@ module Apotomo
     #
     # will render the current state's view and wrap it like
     #
-    #   "$(\"#mouse\").replaceWith(\"<div id=\\\"mouse\\\">hungry!<\\/div>\")"
+    #   "jQuery(\"#mouse\").replaceWith(\"<div id=\\\"mouse\\\">hungry!<\\/div>\")"
     #
     # You may pass a selector and pass options to render here, as well.
     #
     #     replace "#jerry h1", :view => :squeak 
-    #     #=> "$(\"#jerry h1\").replaceWith(\"<div id=\\\"mouse\\\">squeak!<\\/div>\")"
+    #     #=> "jQuery(\"#jerry h1\").replaceWith(\"<div id=\\\"mouse\\\">squeak!<\\/div>\")"
     def replace(*args)
       wrap_in_javascript_for(:replace, *args)
     end
@@ -30,7 +30,7 @@ module Apotomo
     # Example for +:jquery+:
     #
     #   update :view => :peek
-    #   #=> "$(\"#mouse\").html(\"looking...")"
+    #   #=> "jQuery(\"#mouse\").html(\"looking...")"
     def update(*args)
       wrap_in_javascript_for(:update, *args)
     end

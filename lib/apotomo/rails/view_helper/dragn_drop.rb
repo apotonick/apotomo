@@ -13,7 +13,7 @@ module Apotomo::Rails::ViewHelper
     # fx 
     # draggable "##{widget_id} li", {revert: "invalid"}
     def draggable selector, options
-      %Q{$(\"#{selector}\").draggable(#{options.to_json});}
+      %Q{jQuery(\"#{selector}\").draggable(#{options.to_json});}
     end
   end
 end
