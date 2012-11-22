@@ -18,6 +18,8 @@ Apotomo is based on {Cells}[http://github.com/apotonick/cells], the popular View
 
 It gives you widgets and encapsulation, bubbling events, AJAX page updates, rock-solid testing and more. Check out http://apotomo.de for a bunch of tutorials and a nice web 2.0 logo.
 
+To get the most out of Apotomo, you should carefully read through the {Cells}[http://github.com/apotonick/cells] README documentation and {wiki}[https://github.com/apotonick/cells/wiki]
+
 == Installation
 
 Easy as hell.
@@ -93,6 +95,37 @@ This will add the following initialization code
   end
 
 This instructs the Rails app hosting the engine to append this engine's widgets path to the global list of apotomo widget paths.
+
+== Devise integration
+
+  class MySessionWidget < Apotomo::Widget
+    include Devise::Controllers::Helpers
+    helper_method :current_user #all your needed helper
+
+== Kaminari integration
+
+In your Kaminari initializer file, add this:
+
+  Kaminari::Helpers::Tag.class_eval do
+    def to_s(locals = {}) #:nodoc:
+      @template.render :partial => "../views/kaminari/#{@theme}#{self.class.name.demodulize.underscore}", :locals => @options.merge(locals)
+    end
+  end
+
+After that, Kaminari calls from Cell will render app/cells/../views/kaminari/* files, so you don’t need to add the entire app/views folder to Cells view paths
+
+== Builders
+
+  class LoginCell < Cell::Rails
+    build do
+      UnauthorizedUserCell unless logged_in?
+    end
+
+A call to
+
+  render_cell(:login, :box)
+
+will render the configured UnauthorizedUserCell instead of the original LoginCell if the login test fails.
 
 == Plug it in
 

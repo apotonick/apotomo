@@ -156,20 +156,20 @@ module Apotomo
     def self.controller_path
       @controller_path ||= name.sub(/Widget$/, '').underscore unless anonymous?
     end
+
+    def cell(name, *args, &block)
+      Cell::Rails.create_cell_for(name, parent_controller, *args).tap do |cell|
+        cell.instance_eval &block if block_given?
+      end
+    end    
     
     # Renders the +widget+ (instance or id).
-    def render_widget(widget_id, state=:display, *args)
+    def render_widget(widget_id, state=:display, *args, &block)
       if widget_id.kind_of?(Widget)
         widget = widget_id
       else
         widget = find_widget(widget_id) or raise "Couldn't render non-existent widget `#{widget_id}`"
       end      
-
-      # support for Cells builders feature
-      # target_class = self.class.build_class_for(parent_controller, widget.class, args.first)
-      # if widget.class != target_class
-      #   widget = target_class.new(parent_controller, widget_id, args.first)
-      # end      
 
       widget.invoke(state, *args)
     rescue NameError => e
