@@ -33,6 +33,7 @@ module Apotomo
       @mum.respond_to_event :squeak, :with => :answer_squeak
       @mum.respond_to_event :squeak, :from => 'kid', :with => :alert
       @mum.respond_to_event :footsteps, :with => :escape
+      @mum.respond_to_event :load, :with => :load
       
       @kid.respond_to_event :footsteps, :with => :peek
       
@@ -43,6 +44,7 @@ module Apotomo
         def answer_squeak;  self.list << 'answer squeak'; render :text => "squeak", :render_children => false; end
         def alert;          self.list << 'be alerted';    render :text => "alert!", :render_children => false; end
         def escape;         self.list << 'escape';        render :text => "escape", :render_children => false; end
+        def load;           self.list << 'load';          render :text => "load",   :render_children => false; end
       end
       
       @kid.instance_eval do

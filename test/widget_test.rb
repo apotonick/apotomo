@@ -133,6 +133,12 @@ class WidgetTest < ActiveSupport::TestCase
       assert MouseWidget.action_methods.collect{ |m| m.to_s }.include?("squeak")
       assert Class.new(MouseWidget).action_methods.collect{ |m| m.to_s }.include?("squeak")
     end
+
+    should "list 'load' in local and inherited states in Widget.action_methods" do
+      pending 'TODO - currently fails'
+      # assert MouseWidget.action_methods.collect{ |m| m.to_s }.include?("load")
+      # assert Class.new(MouseWidget).action_methods.collect{ |m| m.to_s }.include?("load")
+    end    
     
     should "not list #display in internal_methods although it's defined in Object" do
       assert_not Apotomo::Widget.internal_methods.include?(:display)
