@@ -73,6 +73,27 @@ And a Form widget within the TopBar namespace
     create  app/assets/javascripts/widgets/top_bar/form_widget.coffee
     create  app/assets/stylesheets/widgets/top_bar/form_widget.css
 
+Note that the widget generator supports the following templating engines:
+
+* erb
+* haml
+* slim
+
+=== Engines
+
+Apotomo can also be used with engines. In your engine, simply run the apotomo engine_setup generator.
+
+  $ rails g apotomo:engine_setup my_cool
+    create  config/initializers/apotomo.rb
+
+This will add the following initialization code
+
+  Rails.application.config.after_initialize do
+    Apotomo::Widget.append_view_path MyCool::Engine.root + 'app/widgets'
+  end
+
+This instructs the Rails app hosting the engine to append this engine's widgets path to the global list of apotomo widget paths.
+
 == Plug it in
 
 You now tell your controller about the new widget.
@@ -405,6 +426,15 @@ Which will result in the statement:
 ```javascript
 Widgets.thang.toggleActive('action': ".item:first");
 ```
+
+== Render buffer
+
+A render buffer can be used for the views like this:
+
+  render_buffer do |b|
+    b.replace "##{widget_id}", :view => :display if invitation
+    b.replace "section#invite", :text => ""
+  end
 
 == Testing
 

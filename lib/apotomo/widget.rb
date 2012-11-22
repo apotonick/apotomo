@@ -86,6 +86,18 @@ module Apotomo
 
       run_hook :after_initialize, self
     end
+
+    # See # https://github.com/apotonick/apotomo/issues/72
+
+    # render_buffer do |b|
+    #   b.replace "##{widget_id}", :view => :display if invitation
+    #   b.replace "section#invite", :text => ""
+    # end
+    def render_buffer
+      buffer = Apotomo::WidgetRenderBuffer.new self
+      yield buffer
+      buffer.to_s
+    end    
     
     def parent_controller
       # i hope we'll get rid of any parent_controller dependency, soon.

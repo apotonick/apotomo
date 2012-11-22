@@ -21,6 +21,7 @@ module Apotomo
 end
 
 require 'apotomo/widget'
+require 'apotomo/widget_render_buffer'
 require 'apotomo/engine'
 require 'apotomo/cell/rendering'
 require 'apotomo/widget_shortcuts'
@@ -29,18 +30,3 @@ require 'apotomo/javascript_generator'
 require 'apotomo/test_case' if Rails.env == "test"
 
 Apotomo.js_framework = :jquery ### DISCUSS: move to rails.rb
-
-# https://github.com/apotonick/apotomo/issues/72
-
-# USAGE
-# render_buffer do |b|
-#   b.replace "##{widget_id}", :view => :display if invitation
-#   b.replace "section#invite", :text => ""
-# end
-
-# where to better put this?
-def render_buffer
-  buffer = WidgetRenderBuffer.new self
-  yield buffer
-  buffer.to_s
-end
