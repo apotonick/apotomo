@@ -514,6 +514,37 @@ Apotomo comes with its own test case and assertions to <b>build rock-solid web c
 
 You can render your widgets, spec the markup, trigger events and assert the event responses, so far. If you need more, let us know!
 
+Alternatively, to use Rspec use {rspec-apotomo}[https://github.com/apotonick/rspec-apotomo]
+
+  group :test do
+    gem 'rspec-apotomo'
+  end
+
+Put specs in the spec/widgets directory
+
+  describe CommentsWidget do
+    has_widgets do |root|
+      root << widget(:comments)
+    end
+
+    it 'renders properly' do
+      render_widget(:comments).should == "<h1>No Comment!</h1>"
+    end
+
+    it 'responds to :post events' do
+      trigger(:post, :comments, :text => "I like you!").should == ["Thanks!"]
+    end
+  end
+
+
+Run your examples with:
+
+  rake spec:widgets
+
+Or...
+
+  bundle exec rspec spec/widgets
+
 == More features
 
 There's even more, too much for a simple README.
