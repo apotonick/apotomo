@@ -49,7 +49,7 @@ module Apotomo
       def jquery;                 end
       def element(selector)
         selector = jq_helper.calc_selector selector
-        "$(#{selector})"
+        "jQuery(#{selector})"
       end
 
       def update(*args, &block)

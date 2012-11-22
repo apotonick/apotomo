@@ -19,7 +19,7 @@ module Apotomo
       def inv_markup_action(selector, markup, action)
         selector = calc_selector selector
         action = js_camelize(action)
-        "$(#{escaped(markup)}).#{action}(#{selector});"
+        "jQuery(#{escaped(markup)}).#{action}(#{selector});"
       end      
 
       def markup_act name, *args, &block
@@ -89,7 +89,7 @@ module Apotomo
 
       def element(selector)
         selector = calc_selector selector
-        "$(#{selector})"
+        "jQuery(#{selector})"
       end      
 
       # id, selector, markup, action

@@ -3,7 +3,7 @@ module Apotomo::Rails::ViewHelper
     # fx
     # droppable "#trashbin", ajax_url("#trashbin", "&id=" + ui.draggable.attr("data-id"))
     def droppable selector, &block
-      %Q{$("#{selector}").droppable({
+      %Q{jQuery("#{selector}").droppable({
   drop: function(event, ui) {
     #{yield}
   }

@@ -188,7 +188,7 @@ Also, updating the page is in your hands. Where Apotomo provides handy helpers a
 
 Look, +replace+ basically generates
 
-  $("comments").replaceWith(<the rendered view>);
+  jQuery("comments").replaceWith(<the rendered view>);
 
 If that's not what you want, do
 
@@ -316,7 +316,7 @@ Widget.TopBar = {
   toggleActive: function(widget_id, options) {
     item = options['item'];
     // do some toggle magic!!!
-    $(widget_id).find(item).toggleClass('active');
+    jQuery(widget_id).find(item).toggleClass('active');
   }
 }
 ```
@@ -387,7 +387,7 @@ namespace "Widget"
 
       toggleActive: (options) ->
         item = options.item
-        $(@widget_id).find(item).toggleClass 'active'
+        jQuery(@widget_id).find(item).toggleClass 'active'
 ```
 
 `rails g apotomo:widget TopBar::SuperThang show -e haml`
