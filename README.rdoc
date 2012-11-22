@@ -114,6 +114,11 @@ In your Kaminari initializer file, add this:
 
 After that, Kaminari calls from Cell will render app/cells/../views/kaminari/* files, so you don’t need to add the entire app/views folder to Cells view paths
 
+To automate this, a generator is can be used:
+
+  $ rails g apotomo:kaminary_setup
+    append config/initializers/kaminari_config.rb
+
 == Builders
 
   class LoginCell < Cell::Rails
