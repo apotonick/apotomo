@@ -436,6 +436,13 @@ A render buffer can be used for the views like this:
     b.replace "section#invite", :text => ""
   end
 
+== Rendering global partials from within a widget
+
+Sometimes you need to render a global partial from app/views within a cell. For instance, the `gmaps4rails` helper depends on a global partial. While this breaks encapsulation it’s still possible in cells - just add the global view path to the widget. To add the view path to a group of widgets, simply add it to their shared base widget.
+
+  class MyWidget < Apotomo::Widget 
+    append_view_path "app/views"
+
 == Testing
 
 Apotomo comes with its own test case and assertions to <b>build rock-solid web components</b>.
