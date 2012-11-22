@@ -35,7 +35,7 @@ module Apotomo
   #
   #   def update(evt)
   #     @cheese = Cheese.find evt[:cheese_id]
-  class Widget < Cell::Rails
+  class Widget < Cell::Rails    
     DEFAULT_VIEW_PATHS = [File.join('app', 'widgets')]
     
     include Hooks
@@ -82,10 +82,22 @@ module Apotomo
       @name         = id
       @visible      = true
       
-      setup_tree_node(parent)
-      
+      setup_tree_node(parent)      
+
       run_hook :after_initialize, self
     end
+
+    # See # https://github.com/apotonick/apotomo/issues/72
+
+    # render_buffer do |b|
+    #   b.replace "##{widget_id}", :view => :display if invitation
+    #   b.replace "section#invite", :text => ""
+    # end
+    def render_buffer
+      buffer = Apotomo::WidgetRenderBuffer.new self
+      yield buffer
+      buffer.to_s
+    end    
     
     def parent_controller
       # i hope we'll get rid of any parent_controller dependency, soon.
@@ -144,16 +156,25 @@ module Apotomo
     def self.controller_path
       @controller_path ||= name.sub(/Widget$/, '').underscore unless anonymous?
     end
+
+    def cell(name, *args, &block)
+      Cell::Rails.create_cell_for(name, parent_controller, *args).tap do |cell|
+        cell.instance_eval &block if block_given?
+      end
+    end    
     
     # Renders the +widget+ (instance or id).
-    def render_widget(widget_id, state=:display, *args)
+    def render_widget(widget_id, state=:display, *args, &block)
       if widget_id.kind_of?(Widget)
         widget = widget_id
       else
         widget = find_widget(widget_id) or raise "Couldn't render non-existent widget `#{widget_id}`"
-      end
-      
+      end      
+
       widget.invoke(state, *args)
+    rescue NameError => e
+      return widget.invoke(:show, *args)  if state == :display
+      raise e
     end
   end
 end

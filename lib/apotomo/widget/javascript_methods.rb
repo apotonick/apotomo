@@ -15,12 +15,12 @@ module Apotomo
     #
     # will render the current state's view and wrap it like
     #
-    #   "$(\"#mouse\").replaceWith(\"<div id=\\\"mouse\\\">hungry!<\\/div>\")"
+    #   "jQuery(\"#mouse\").replaceWith(\"<div id=\\\"mouse\\\">hungry!<\\/div>\")"
     #
     # You may pass a selector and pass options to render here, as well.
     #
     #     replace "#jerry h1", :view => :squeak 
-    #     #=> "$(\"#jerry h1\").replaceWith(\"<div id=\\\"mouse\\\">squeak!<\\/div>\")"
+    #     #=> "jQuery(\"#jerry h1\").replaceWith(\"<div id=\\\"mouse\\\">squeak!<\\/div>\")"
     def replace(*args)
       wrap_in_javascript_for(:replace, *args)
     end
@@ -30,10 +30,20 @@ module Apotomo
     # Example for +:jquery+:
     #
     #   update :view => :peek
-    #   #=> "$(\"#mouse\").html(\"looking...")"
+    #   #=> "jQuery(\"#mouse\").html(\"looking...")"
     def update(*args)
       wrap_in_javascript_for(:update, *args)
     end
+
+    # Instruct the browser to perform a redirect to the specified url.    
+    # 
+    # Example:
+    #
+    #   redirect_to course_path(@course.id)
+    #   #=> "window.location.replace(\"davinci.dev/courses/4f592ee4b5a482327b000008\");"    
+    def redirect_to(url)
+      render :text => "window.location.replace(\"#{url}\");"
+    end    
     
   private
     def wrap_in_javascript_for(mode, *args)

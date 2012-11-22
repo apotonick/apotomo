@@ -1,7 +1,10 @@
 require 'action_view/helpers/javascript_helper'
+require "active_support/core_ext" # for Hash.to_json etc.
 
 module Apotomo
   class JavascriptGenerator
+    autoload :JqueryHelper, 'apotomo/javascript_generator/jquery_helper'
+
     def initialize(framework)
       raise "No JS framework specified" if framework.blank?
       extend "apotomo/javascript_generator/#{framework}".camelize.constantize
@@ -24,29 +27,135 @@ module Apotomo
     
     module Prototype
       def prototype;              end
-      def element(id);            "$(\"#{id}\")"; end
-      def update(id, markup);     element(id) + '.update("'+escape(markup)+'");'; end
-      def replace(id, markup);    element(id) + '.replace("'+escape(markup)+'");'; end
-      def update_id(id, markup);  update(id, markup); end
-      def replace_id(id, markup); replace(id, markup); end
+      def element(selector);            "jQuery(\"#{selector}\")"; end
+      def update(selector, markup);     element(selector) + '.update("'+escape(markup)+'");'; end
+      def replace(selector, markup);    element(selector) + '.replace("'+escape(markup)+'");'; end
+
+      alias_method :update_id, :update
+      alias_method :replace_id, :replace
     end
     
     module Right
       def right;                  end
-      def element(id);            "$(\"#{id}\")"; end
-      def update(id, markup);     element(id) + '.update("'+escape(markup)+'");'; end
-      def replace(id, markup);    element(id) + '.replace("'+escape(markup)+'");'; end
-      def update_id(id, markup);  update(id, markup); end
-      def replace_id(id, markup); replace(id, markup); end
+      def element(selector);            "jQuery(\"#{selector}\")"; end
+      def update(selector, markup);     element(selector) + '.update("'+escape(markup)+'");'; end
+      def replace(selector, markup);    element(selector) + '.replace("'+escape(markup)+'");'; end
+
+      alias_method :update_id, :update
+      alias_method :replace_id, :replace
     end
     
     module Jquery
       def jquery;                 end
-      def element(id);            "$(\"#{id}\")"; end
-      def update(id, markup);     element(id) + '.html("'+escape(markup)+'");'; end
-      def replace(id, markup);    element(id) + '.replaceWith("'+escape(markup)+'");'; end
+      def element(selector)
+        selector = jq_helper.calc_selector selector
+        "jQuery(#{selector})"
+      end
+
+      def update(*args, &block)
+        jq_helper.markup_act :html, *args, &block
+      end
+
+      def replace(*args, &block)
+        jq_helper.markup_act :replaceWith, *args, &block
+      end        
+
       def update_id(id, markup);  update("##{id}", markup); end
       def replace_id(id, markup); replace("##{id}", markup); end
+
+      def selector_for var, id, selector
+        raise ArgumentError, "Must not be an _apo_ selector here: #{selector}" if jq_helper.apo_match?(selector)
+        "var _apo_#{var} = " + element("##{id}") + ".find(\"#{selector}\");"
+      end
+
+      # call existing widget
+      # - widget_class_call :top_bar, :update, item: 1
+
+      # --> Widget.TopBar.update('action': 1)
+      def widget_class_call id, function, hash
+        function_name = jq_helper.js_camelize function
+        widget_name = jq_helper.ns_name id.to_s.camelize
+        namespace = "Widget.#{widget_name}"
+        "#{namespace}.#{function_name}(#{hash.to_json});"
+      end
+
+      # call existing widget
+      # - widget_call :top_bar, :flash_light, action: 'search'
+
+      # --> Widgets.topBar.flashLight('action': 'search')
+
+      def widget_call id, function, hash
+        function_name = jq_helper.js_camelize function
+        "Widgets.#{id}.#{function_name}(#{hash.to_json});"
+      end
+
+      [:replace_all, :prepend_to, :append_to].each do |name|
+        define_method name do |selector, markup|
+          jq_helper.inv_markup_action selector, markup, name.to_sym
+        end
+      end
+
+      [:update_text, :append, :prepend, :after, :before, :wrap, :wrap_inner, :wrap_all].each do |name|
+        define_method name do |args|      
+          jq_helper.markup_action *args, name
+        end
+      end
+
+      def unwrap *args
+        jq_helper.markup_action *args, 'unwrap()'
+      end    
+
+      def remove *args
+        jq_helper.markup_action *args, 'remove()'
+      end
+
+      def remove_class(id, selector, *classes)
+        classes = classes.flatten.join(' ')
+        jq_helper.jq_action id, selector, "removeClass('#{classes}')"
+      end
+      alias_method :remove_classes, :remove_class
+
+      def add_class(id, selector, *classes)
+        classes = classes.flatten.join(' ')
+        jq_helper.jq_action id, selector, "addClass('#{classes}')"
+      end
+      alias_method :add_classes, :add_class
+
+      def toggle_class(id, selector, *classes)
+        classes = classes.flatten.join(' ')
+        jq_helper.jq_action id, selector, "toggleClass('#{classes}')"
+      end
+      alias_method :toggle_classes, :toggle_class
+
+      def toggle_class_fun(id, selector, fun)        
+        jq_helper.jq_action id, selector, "toggleClass(function() {#{fun}})"
+      end
+
+      def get_attr(id, selector, name)
+        jq_helper.jq_action id, selector, "attr('#{name}')"
+      end
+
+      def get_prop(id, selector, name)        
+        jq_helper.jq_action id, selector, "prop('#{name}')"
+      end
+
+      def get_val id, selector        
+        jq_helper.jq_action id, selector, "val()"
+      end
+
+      def get_html(id, selector)
+        jq_helper.jq_action id, selector, "html()"
+      end
+
+      def empty(id, selector)
+        jq_helper.jq_action id, selector, "empty()"
+      end
+
+      private 
+
+      def jq_helper
+        JqueryHelper
+      end
     end
   end
 end

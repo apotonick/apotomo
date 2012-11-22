@@ -1,0 +1,5 @@
+# Adds this engines' widget view path root to the hosting Rails app widget paths list 
+
+Rails.application.config.after_initialize do
+  Apotomo::Widget.append_view_path <%= name.to_s.camelize %>::Engine.root + 'app/widgets'
+end

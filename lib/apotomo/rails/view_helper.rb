@@ -15,8 +15,13 @@ module Apotomo
     #   - children.each do |kid|
     #     = render_widget kid
     module ViewHelper
+      autoload :DragnDrop, 'apotomo/rails/view_helper/dragn_drop'
+      autoload :Ajax,      'apotomo/rails/view_helper/ajax'
+
       delegate :children, :url_for_event, :widget_id, :to => :controller
       
+      include DragnDrop, Ajax
+
       # Returns the app JavaScript generator.
       def js_generator
         Apotomo.js_generator
@@ -50,6 +55,6 @@ module Apotomo
         options.reverse_merge!(:id => widget_id) 
         content_tag(:div, options, &block)
       end
-    end  
+    end
   end
 end

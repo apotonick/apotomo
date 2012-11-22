@@ -18,6 +18,8 @@ Apotomo is based on {Cells}[http://github.com/apotonick/cells], the popular View
 
 It gives you widgets and encapsulation, bubbling events, AJAX page updates, rock-solid testing and more. Check out http://apotomo.de for a bunch of tutorials and a nice web 2.0 logo.
 
+To get the most out of Apotomo, you should carefully read through the {Cells}[http://github.com/apotonick/cells] README documentation and {wiki}[https://github.com/apotonick/cells/wiki]
+
 == Installation
 
 Easy as hell.
@@ -42,17 +44,132 @@ Let's wrap that comments block in a widget.
 
 == Generate
 
-Go and generate a widget stub.
+  $ rails g apotomo:widget comments show -e haml
+    invoke  haml
+    create  app/widgets/comments/views/show.html.haml
+    invoke  rspec
+    create  spec/widgets/comments/comments_widget_spec.rb
+    create  app/widgets/comments/comments_widget.rb
+    create  app/assets/stylesheets/widgets/comments_widget.css
+    create  app/assets/javascripts/widgets/comments_widget.coffee
 
-  $ rails generate apotomo:widget Comments display write -e haml
-    create  app/cells/
-    create  app/cells/comments_widget
-    create  app/cells/comments_widget.rb
-    create  app/cells/comments_widget/display.html.haml
-    create  app/cells/comments_widget/write.html.haml
-    create  test/widgets/comments_widget_test.rb
+Go and generate a widget TopBar stub.
 
-Nothing special.
+  $ rails g apotomo:widget TopBar show -e haml
+    invoke  haml
+    create  app/widgets/top_bar/views/show.html.haml
+    invoke  rspec
+    create  spec/widgets/top_bar/top_bar_widget_spec.rb
+    create  app/widgets/top_bar/top_bar_widget.rb
+    create  app/assets/stylesheets/widgets/top_bar_widget.css
+    create  app/assets/javascripts/widgets/top_bar_widget.coffee
+
+And a Form widget within the TopBar namespace
+
+  $ rails g apotomo:widget TopBar::Form show -e haml
+    invoke  haml
+    create  app/widgets/top_bar/form/views/show.html.haml
+    invoke  rspec
+    create  spec/widgets/top_bar/form/form_widget_spec.rb
+    create  app/widgets/top_bar/form/form_widget.rb
+    create  app/assets/javascripts/widgets/top_bar/form_widget.coffee
+    create  app/assets/stylesheets/widgets/top_bar/form_widget.css
+
+Note that the widget generator supports the following templating engines:
+
+* erb
+* haml
+* slim
+
+=== Engines
+
+Apotomo can also be used with engines. In your engine, simply run the apotomo engine_setup generator.
+
+  $ rails g apotomo:engine_setup my_cool
+    create  config/initializers/apotomo.rb
+
+This will add the following initialization code
+
+  Rails.application.config.after_initialize do
+    Apotomo::Widget.append_view_path MyCool::Engine.root + 'app/widgets'
+  end
+
+This instructs the Rails app hosting the engine to append this engine's widgets path to the global list of apotomo widget paths.
+
+== Generator configuration
+
+If you use apotomo within a Rails app, go to the `config/application.rb` file and configure as you see fit.
+See {configuring-generators}[http://guides.rubyonrails.org/configuring.html#configuring-generators] for details.
+
+  module FriendlyRent
+    class Application < Rails::Application
+      config.generators do |g|
+        g.view_specs          false
+        g.helper_specs        false
+        g.test_framework      :rspec, fixture: true
+        g.fixture_replacement :fabrication
+        # g.fixture_replacement :factory_girl, :dir => "spec/factories"
+      end
+
+
+If you use apotomo within a Rails engine, go to the main engine files, fx `lib/mycool/engine.rb`and add a `config.generators` block.
+
+  class MyCool
+    class Engine < ::Rails::Engine
+
+      config.generators do |g|
+        g.template_engine :haml
+        g.test_framework :rspec
+      end
+
+== Devise integration
+
+  class MySessionWidget < Apotomo::Widget
+    include Devise::Controllers::Helpers
+    helper_method :current_user #all your needed helper
+
+== Kaminari integration
+
+In your Kaminari initializer file, add this:
+
+  Kaminari::Helpers::Tag.class_eval do
+    def to_s(locals = {}) #:nodoc:
+      @template.render :partial => "../views/kaminari/#{@theme}#{self.class.name.demodulize.underscore}", :locals => @options.merge(locals)
+    end
+  end
+
+After that, Kaminari calls from Cell will render app/cells/../views/kaminari/* files, so you don’t need to add the entire app/views folder to Cells view paths
+
+To automate this, a generator is can be used:
+
+  $ rails g apotomo:kaminary_setup
+    append config/initializers/kaminari_config.rb
+
+== Builders
+
+  class LoginCell < Cell::Rails
+    build do
+      UnauthorizedUserCell unless logged_in?
+    end
+
+A call to
+
+  render_cell(:login, :box)
+
+will render the configured UnauthorizedUserCell instead of the original LoginCell if the login test fails.
+
+Note: Not sure Cell Builders are supported in Apotomo widgets?
+
+== URL helpers
+
+Using the *_url helpers implies accessing the request instance, which kinda breaks encapsulation. Cells doesn’t support breaking things, that’s why you have to include it manually.
+
+Include the UrlFor module into your widget.
+
+  class MyLinkingWidget < Apotomo::Widget
+    include ActionController::UrlFor
+
+Inside a cell there should normally be no need to generate urls this way, since the cell should only render the views that relate directly to its actions. The url helpers would instead be used in the templates. Try to avoid "complex" redirection logic in your cells.
 
 == Plug it in
 
@@ -86,12 +203,12 @@ A widget is like a cell which is like a mini-controller.
   class CommentsWidget < Apotomo::Widget
     responds_to_event :post
     
-    def display(args)
+    def show(args)
       @comments = args[:post].comments # the parameter from outside.
       render
     end
 
-Having +display+ as the default state when rendering, this method collects comments to show and renders its view.
+Having +show+ as the default state when rendering, this method collects comments to show and renders its view.
 
 And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, which is simply another state. How cool is that? 
 
@@ -99,7 +216,7 @@ And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, w
       @comment = Comment.new(:post_id => evt[:post_id])
       @comment.update_attributes evt[:comment]  # a bit like params[].
       
-      update :state => :display
+      update :state => :show
     end
   end
 
@@ -107,7 +224,7 @@ And look at line 2 - if encountering a <tt>:post</tt> event we invoke +#post+, w
 The event is processed with three steps in our widget:
 
 * create the new comment
-* re-render the +display+ state
+* re-render the +show+ state
 * update itself on the page
 
 Apotomo helps you focusing on your app and takes away the pain of <b>action dispatching</b> and <b>page updating</b>.
@@ -116,7 +233,7 @@ Apotomo helps you focusing on your app and takes away the pain of <b>action disp
 
 So how and where is the <tt>:post</tt> event triggered?
 
-Take a look at the widget's view <tt>display.html.haml</tt>.
+Take a look at the widget's view <tt>show.html.haml</tt>.
   = widget_div do
     %ul
       - for c in @comments
@@ -148,7 +265,7 @@ Also, updating the page is in your hands. Where Apotomo provides handy helpers a
 
 Look, +replace+ basically generates
 
-  $("comments").replaceWith(<the rendered view>);
+  jQuery("comments").replaceWith(<the rendered view>);
 
 If that's not what you want, do
 
@@ -159,6 +276,249 @@ If that's not what you want, do
   end
 
 Apotomo doesn't depend on _any_ JS framework - you choose!
+
+== jQuery helpers
+
+* element(id)
+* update(id, markup)
+* replace(id, markup)
+* update_id(id, markup)
+* replace_id(id, markup)
+
+Extras (jQuery only):
+
+* find_element(id, selector)
+* selector_for(var, id, selector)
+
+Example usage:
+
+```ruby
+top_item = selector_for(:top_item, widget_id, '.item:first')
+render js: top_item + append_to(:_top_item, markup)
+
+Will select `.item:first` under the widget container element as a variable `_apo_top_item` and then append the markup to the DOM element(s) pointed to by that variable.
+```
+
+Inverse jQuery manipulation API
+
+* append_to(selector, markup)
+* prepend_to(selector, markup)
+* replace_all(selector, markup)
+
+Normal jQuery manipulation API
+
+* update_text(id, selector, markup)
+* append(id, selector, markup)
+* prepend(id, selector, markup)
+* after(id, selector, markup)
+* before(id, selector, markup)
+* unwrap(id, selector)
+* wrap(id, selector, markup)
+* wrap_inner(id, selector, markup)
+* wrap_all(id, selector, markup)
+* remove(id, selector)
+* remove_class(id, selector, *classes)
+* add_class(id, selector, *classes)
+* toggle_class(id, selector, *classes)
+* toggle_class_fun(id, selector, fun)
+* empty(id, selector)
+
+jQuery "get" functions
+
+* get_attr(id, selector, name)
+* get_prop(id, selector, name)
+* get_val(id, selector)
+* get_html(id, selector)
+
+The first argument `id` is always optional. It is meant to be used to select the div for the widget. The `selector` then finds one or more elements within the widget to perform the action on.
+
+These functions should be used sparingly, for _Proof of Concept_ only if possible. It is far better to have javascript asset files if possible (== non-intrusive javascript).
+
+A non-intrusive approach could involve the use of:
+
+* widget_class_call(id, function, hash)
+* widget_call(id, function, hash)
+
+Example: 
+
+`widget_class_call 'TopBar', :toggle_active, {item: 'item:first'}`
+
+Will call a function on the widget class (or module):
+
+```javascript
+Widget.TopBar.toggleActive({'item': 'item:first'});
+```
+
+`widget_call 'Admin::TopBar', :toggle_active, {item: 'item:first'}`
+
+Will call a function on a particular instance of that widget!
+
+```javascript
+Widgets.admin.topBar.toggleActive({'item': 'item:first'});
+```
+
+This ensures that all our javascript for a widget is nicely namespace contained.
+
+In your `application.js` manifest file
+
+```
+//= require apotomo/namespaces
+```
+
+An alternative `apotomo/Namespace.js` is also available, which you might want to experiment with also.
+
+In the `top_bar.coffee` file the following is generated for our convenience
+
+```javascript
+Widget.TopBar = namespace('Widget.TopBar');
+
+Widget.TopBar = {
+  // add widget functions here
+  foo: function(bar) {},
+  
+  bar: function(foor) {}  
+}
+```
+
+We can then implement clean non-intrusive, namespaced javascript functionality as follows:
+
+```javascript
+Widget.TopBar = namespace('Widget.TopBar');
+
+Widget.TopBar = {
+  update: function(item) {
+    'updated:' + item }
+  },
+  
+  toggleActive: function(widget_id, options) {
+    item = options['item'];
+    // do some toggle magic!!!
+    jQuery(widget_id).find(item).toggleClass('active');
+  }
+}
+```
+
+Note that you can use fx jQuery [extend](http://api.jquery.com/jQuery.extend/) to extend javascript widget functionality similar to modules (prototypical inheritance). 
+There are many other powerful javascript libraries out there (fx Base2, Prototype.js, JS.Class) that can be used to great effect for OOP javascript with inheritance etc. 
+
+```javascript
+$.extend(Widget.admin.TopBar, Widget.TopBar);
+```
+
+Here we extended the `admin.TopBar` with base functionality from `TopBar` :)
+
+Also see the Coffeescript section below to see how to use namespaces.
+
+== Using Coffeescript
+
+Coffeescript has built in [class structure](http://coffeescript.org/#classes).
+and [namespaces](http://spin.atomicobject.com/2011/04/01/namespace-a-coffeescript-nugget/). 
+
+Please also see:
+
+* [namespaced classes](http://stackoverflow.com/questions/8730859/classes-within-coffeescript-namespace)
+* [namespace.coffee](https://github.com/CodeCatalyst/namespace.coffee) 
+* [oop coffee](http://www.gridlinked.info/oop-with-coffeescript-javascript/)
+
+Here an appetizer :) replace animals with widgets and you get the idea...
+
+```coffeescript
+namespace "samples.coffeescript.oop.abstract"
+    Animal :
+        class Animal
+            constructor : (@species, @isMammal=false) ->
+                return this
+ 
+# NOTE: Animal must be defined BEFORE Dog 
+#
+namespace "samples.coffeescript.oop.pets"
+    Dog :
+        class Dog extends samples.coffeescript.oop.abstract.Animal
+            constructor : (@name) ->
+```            
+
+You should first require `namespaces`:
+
+```
+//= require apotomo/namespaces.min
+```
+
+When you generate a widget, the coffescript file for it should look like this:
+
+`rails g apotomo:widget TopBar show -e haml`
+
+```coffeescript
+namespace "Widget"
+  TopBar :
+    class TopBar
+      constructor : (@widget_id = widget_id) ->
+
+      toggleActive: (options) ->
+```
+
+```coffeescript
+namespace "Widget"
+  TopBar :
+    class TopBar
+      constructor : (@widget_id = widget_id) ->
+
+      toggleActive: (options) ->
+        item = options.item
+        jQuery(@widget_id).find(item).toggleClass 'active'
+```
+
+`rails g apotomo:widget TopBar::SuperThang show -e haml`
+
+```coffeescript
+namespace "Widget.topBar"
+  SuperThang :
+    class SuperThang extends Widget.TopBar
+        constructor : (@widget_id = widget_id) ->
+
+        createBottomBar : (widget_id) -> new BottomBar(widget_id)
+        createFooter : (widget_id) -> new Footer(widget_id)
+
+    # private variable declarations (aliases)
+    #
+    BottomBar = Widget.BottomBar
+    Footer = Widget.Footer
+```
+
+=== Browser Widget instances
+
+For an Ajax enabled page, you can create javascript widget instances in the `Widgets` namespace.
+
+```coffeescript
+Widgets.thang = new Widget.topBar.SuperThang
+``
+
+Then you can update an existing widget instance from your Widget (controller) using `call_widget` as follows:
+
+```ruby
+call_widget :thang, :toggleActive, item: ".item:first"
+```
+
+Which will result in the statement:
+
+```javascript
+Widgets.thang.toggleActive('action': ".item:first");
+```
+
+== Render buffer
+
+A render buffer can be used for the views like this:
+
+  render_buffer do |b|
+    b.replace "##{widget_id}", :view => :display if invitation
+    b.replace "section#invite", :text => ""
+  end
+
+== Rendering global partials from within a widget
+
+Sometimes you need to render a global partial from app/views within a cell. For instance, the `gmaps4rails` helper depends on a global partial. While this breaks encapsulation it’s still possible in cells - just add the global view path to the widget. To add the view path to a group of widgets, simply add it to their shared base widget.
+
+  class MyWidget < Apotomo::Widget 
+    append_view_path "app/views"
 
 == Testing
 
@@ -179,6 +539,40 @@ Apotomo comes with its own test case and assertions to <b>build rock-solid web c
   end
 
 You can render your widgets, spec the markup, trigger events and assert the event responses, so far. If you need more, let us know!
+
+Alternatively, to use Rspec use {rspec-apotomo}[https://github.com/apotonick/rspec-apotomo]
+
+  group :test do
+    gem 'rspec-apotomo'
+  end
+
+See the *Generator configuration* for how to configure generator defaults.
+
+When you run your widget generator, it will generate spec stubs `*_specs.rb` in the `spec/widgets` folder.
+
+Specs should be in the `spec/widgets` directory
+
+  describe CommentsWidget do
+    has_widgets do |root|
+      root << widget(:comments)
+    end
+
+    it 'renders properly' do
+      render_widget(:comments).should == "<h1>No Comment!</h1>"
+    end
+
+    it 'responds to :post events' do
+      trigger(:post, :comments, :text => "I like you!").should == ["Thanks!"]
+    end
+  end
+
+Run your examples with:
+
+  rake spec:widgets
+
+Or...
+
+  bundle exec rspec spec/widgets
 
 == More features
 
