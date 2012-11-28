@@ -110,7 +110,7 @@ class WidgetTest < ActiveSupport::TestCase
     end
     
     should "respond to .view_paths" do
-      if Cells.rails3_2_or_more?
+      if Cell.rails3_2_or_more?
         assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]).paths, Apotomo::Widget.view_paths.paths
       else
         assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]), Apotomo::Widget.view_paths
@@ -124,7 +124,7 @@ class WidgetTest < ActiveSupport::TestCase
     # internal_methods:
     should "not list internal methods in action_methods" do
       # FIXME: puts "WTF is wrong again with AC.action_methods godamn, I HATE this magic shit!"
-      unless Cells.rails3_1_or_more?
+      unless Cell.rails3_1_or_more?
         assert_equal [], Class.new(Apotomo::Widget).action_methods
       end
     end
