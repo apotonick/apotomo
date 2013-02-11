@@ -15,7 +15,7 @@ module Apotomo
       source_root File.expand_path('../../templates', __FILE__)
       
       hook_for(:template_engine)
-      hook_for(:test_framework)  # TODO: implement rspec-apotomo.
+      hook_for(:test_framework)
       
       check_class_collision :suffix => "Widget"
       
