@@ -79,7 +79,7 @@ module Apotomo
     def initialize(parent, id, options={})
       super(parent)  # TODO: do that as long as cells do need a parent_controller.
       @options      = options
-      @name         = id
+      @name         = id.to_s
       @visible      = true
       
       setup_tree_node(parent)
@@ -125,7 +125,7 @@ module Apotomo
     
     # Returns the widget named +widget_id+ if it's a descendent or self.
     def find_widget(widget_id)
-      find {|node| node.name.to_s == widget_id.to_s}
+      find {|node| node.name == widget_id.to_s}
     end
     
     def address_for_event(type, options={})
