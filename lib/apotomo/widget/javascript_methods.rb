@@ -1,48 +1,35 @@
 module Apotomo
   module JavascriptMethods
+    # If you call a method corresponding to JavaScript action (#replace, #update, etc.),
+    # it calls the corresponding +JavascriptGenerator+ method with rendered content.
+    # The same options as #render plus an optional +selector+ to change the selector are supposed.
+    #
+    # If you call a method corresponding to JavaScript stuff (start with +javascript_+),
+    # it calls the corresponding +JavascriptGenerator+ method with the same arguments.
+
     # Returns the escaped script.
     def escape_js(script)
       Apotomo.js_generator.escape(script)
     end
-    
-    # Wraps the rendered content in a replace statement according to your +Apotomo.js_framework+ setting.
-    # Received the same options as #render plus an optional +selector+ to change the selector.
-    #
-    # Example (with <tt>Apotomo.js_framework = :jquery</tt>):
-    #
-    #   def hungry
-    #     replace 
-    #
-    # will render the current state's view and wrap it like
-    #
-    #   "jQuery(\"#mouse\").replaceWith(\"<div id=\\\"mouse\\\">hungry!<\\/div>\")"
-    #
-    # You may pass a selector and pass options to render here, as well.
-    #
-    #     replace "#jerry h1", :view => :squeak 
-    #     #=> "jQuery(\"#jerry h1\").replaceWith(\"<div id=\\\"mouse\\\">squeak!<\\/div>\")"
-    def replace(*args)
-      wrap_in_javascript_for(:replace, *args)
+
+    # - selector, method_name, render_args
+    # - method_name, render_args
+    # - nil, method_name, render_args
+    # - method_name
+    # - nil, method_name
+    def widget_call(*args)
+      selector, method_name, method_args = Apotomo.js_generator.extract_args(3, args)
+      Apotomo.js_generator.javascript_element_call(name, selector, method_name, Array.wrap(method_args))
     end
-    
-    # Same as #replace except that the content is wrapped in an update statement.
-    #
-    # Example for +:jquery+:
-    #
-    #   update :view => :peek
-    #   #=> "jQuery(\"#mouse\").html(\"looking...")"
-    def update(*args)
-      wrap_in_javascript_for(:update, *args)
-    end
-    
-  private
-    def wrap_in_javascript_for(mode, *args)
-      selector  = args.first.is_a?(String) ? args.shift : false
-      content   = render(*args)
-      
-      selector ? 
-        Apotomo.js_generator.send(mode, selector, content) :    # replace(:twitter)
-        Apotomo.js_generator.send("#{mode}_id", name, content)  # replace_id(:twitter)
+
+    [:update, :replace, :update_text, :append, :prepend, :after, :before, :wrap, :wrap_inner, :wrap_all].each do |helper_name|
+      define_method helper_name do |*args, &block|
+        selector = args.first.is_a?(String) ? args.shift : nil
+        content = render(*args, &block)
+
+        args = selector ? [nil, selector, [content]] : [name, nil, [content]]
+        Apotomo.js_generator.send("javascript_#{helper_name}", *args)
+      end
     end
   end
 end
