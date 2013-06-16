@@ -109,6 +109,7 @@ class ControllerMethodsTest < ActionController::TestCase
       end
     end
     
+    ### FIXME: could somebody get that working?
     ### DISCUSS: needed?
     context "in event mode" do
       should_eventually "set the MIME type to text/javascript" do

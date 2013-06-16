@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency "onfire",  "~> 0.2.0"
   s.add_dependency "hooks",   "~> 0.2.0"
 
-  s.add_development_dependency "shoulda"
+  s.add_development_dependency "shoulda", "~> 2.11.3" # version is needed for Ruby 1.8
   s.add_development_dependency "rake"
   s.add_development_dependency "slim"
   s.add_development_dependency "haml"
