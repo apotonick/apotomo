@@ -117,7 +117,7 @@ class ControllerMethodsTest < ActionController::TestCase
         get :render_event_response, :source => :kid, :type => :doorSlam
         
         assert_equal Mime::JS, @response.content_type
-        assert_equal "$(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\n$(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
+        assert_equal "jQuery(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\njQuery(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
       end
     end
   end
