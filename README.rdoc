@@ -45,11 +45,9 @@ Let's wrap that comments block in a widget.
 Go and generate a widget stub.
 
   $ rails generate apotomo:widget Comments display write -e haml
-    create  app/cells/
-    create  app/cells/comments_widget
-    create  app/cells/comments_widget.rb
-    create  app/cells/comments_widget/display.html.haml
-    create  app/cells/comments_widget/write.html.haml
+    create  app/widgets/comments_widget.rb
+    create  app/widgets/comments/display.html.haml
+    create  app/widgets/comments/write.html.haml
     create  test/widgets/comments_widget_test.rb
 
 Nothing special.
