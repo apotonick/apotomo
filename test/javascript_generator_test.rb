@@ -18,19 +18,19 @@ class JavascriptGeneratorTest < Test::Unit::TestCase
       end
       
       should "respond to replace" do
-        assert_equal "$(\"drinks\").replace(\"EMPTY!\");", @gen.replace(:drinks, 'EMPTY!')
+        assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace(:drinks, 'EMPTY!')
       end
       
       should "respond to replace_id" do
-        assert_equal "$(\"drinks\").replace(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
       end
       
       should "respond to update" do
-        assert_equal "$(\"drinks\").update(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update(:drinks, '<li id="beer"></li>')
+        assert_equal "jQuery(\"drinks\").update(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update(:drinks, '<li id="beer"></li>')
       end
       
       should "respond to update_id" do
-        assert_equal "$(\"drinks\").update(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"drinks\").update(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
     end
     
@@ -44,45 +44,45 @@ class JavascriptGeneratorTest < Test::Unit::TestCase
       end
       
       should "respond to replace" do
-        assert_equal "$(\"drinks\").replace(\"EMPTY!\");", @gen.replace(:drinks, 'EMPTY!')
+        assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace(:drinks, 'EMPTY!')
       end
       
       should "respond to replace_id" do
-        assert_equal "$(\"drinks\").replace(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
       end
       
       should "respond to update" do
-        assert_equal "$(\"drinks\").update(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update(:drinks, '<li id="beer"></li>')
+        assert_equal "jQuery(\"drinks\").update(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update(:drinks, '<li id="beer"></li>')
       end
       
       should "respond to update_id" do
-        assert_equal "$(\"drinks\").update(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"drinks\").update(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
     end
     
-    context "in jquery mode" do
+    context "in jQuery mode" do
       setup do
-        @gen = Apotomo::JavascriptGenerator.new(:jquery)
+        @gen = Apotomo::JavascriptGenerator.new(:jQuery)
       end
       
-      should "respond to jquery" do
-        assert_respond_to @gen, :jquery
+      should "respond to jQuery" do
+        assert_respond_to @gen, :jQuery
       end
     
       should "respond to replace" do
-        assert_equal "$(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace("#drinks", 'EMPTY!')
+        assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace("#drinks", 'EMPTY!')
       end
       
       should "respond to replace_id" do
-        assert_equal "$(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
       end
       
       should "respond to update" do
-        assert_equal "$(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update("#drinks", '<li id="beer"></li>')
+        assert_equal "jQuery(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update("#drinks", '<li id="beer"></li>')
       end
       
       should "respond to update_id" do
-        assert_equal "$(\"#drinks\").html(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
+        assert_equal "jQuery(\"#drinks\").html(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
     end
   end
