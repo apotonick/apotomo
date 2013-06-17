@@ -8,29 +8,29 @@ module Apotomo
     # Wraps the rendered content in a replace statement according to your +Apotomo.js_framework+ setting.
     # Received the same options as #render plus an optional +selector+ to change the selector.
     #
-    # Example (with <tt>Apotomo.js_framework = :jquery</tt>):
+    # Example (with <tt>Apotomo.js_framework = :jQuery</tt>):
     #
     #   def hungry
     #     replace 
     #
     # will render the current state's view and wrap it like
     #
-    #   "$(\"#mouse\").replaceWith(\"<div id=\\\"mouse\\\">hungry!<\\/div>\")"
+    #   "jQuery(\"#mouse\").replaceWith(\"<div id=\\\"mouse\\\">hungry!<\\/div>\")"
     #
     # You may pass a selector and pass options to render here, as well.
     #
     #     replace "#jerry h1", :view => :squeak 
-    #     #=> "$(\"#jerry h1\").replaceWith(\"<div id=\\\"mouse\\\">squeak!<\\/div>\")"
+    #     #=> "jQuery(\"#jerry h1\").replaceWith(\"<div id=\\\"mouse\\\">squeak!<\\/div>\")"
     def replace(*args)
       wrap_in_javascript_for(:replace, *args)
     end
     
     # Same as #replace except that the content is wrapped in an update statement.
     #
-    # Example for +:jquery+:
+    # Example for +:jQuery+:
     #
     #   update :view => :peek
-    #   #=> "$(\"#mouse\").html(\"looking...")"
+    #   #=> "jQuery(\"#mouse\").html(\"looking...")"
     def update(*args)
       wrap_in_javascript_for(:update, *args)
     end

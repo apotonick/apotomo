@@ -19,7 +19,7 @@ module Apotomo
   #
   #     it "should redraw on :update" do
   #       trigger :update
-  #       assert_response "$(\"post-comments\").update ..."
+  #       assert_response "jQuery(\"post-comments\").update ..."
   #     end
   #
   # For unit testing, you can grab an instance of your tested widget.
@@ -98,7 +98,7 @@ module Apotomo
     # Example:
     #
     #   trigger :submit, :source => "post-comments"
-    #   assert_response "alert(\":submit clicked!\")", /\$\("post-comments"\).update/
+    #   assert_response "alert(\":submit clicked!\")", /\jQuery\("post-comments"\).update/
     def assert_response(*content)
       updates = root.page_updates
 
