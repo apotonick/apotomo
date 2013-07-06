@@ -8,7 +8,7 @@ module Apotomo
     # Wraps the rendered content in a replace statement according to your +Apotomo.js_framework+ setting.
     # Received the same options as #render plus an optional +selector+ to change the selector.
     #
-    # Example (with <tt>Apotomo.js_framework = :jQuery</tt>):
+    # Example (with <tt>Apotomo.js_framework = :jquery</tt>):
     #
     #   def hungry
     #     replace 
@@ -27,7 +27,7 @@ module Apotomo
     
     # Same as #replace except that the content is wrapped in an update statement.
     #
-    # Example for +:jQuery+:
+    # Example for +:jquery+:
     #
     #   update :view => :peek
     #   #=> "jQuery(\"#mouse\").html(\"looking...")"
