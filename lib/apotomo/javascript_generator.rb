@@ -40,8 +40,8 @@ module Apotomo
       def replace_id(id, markup); replace(id, markup); end
     end
     
-    module jQuery
-      def jQuery;                 end
+    module Jquery
+      def jquery;                 end
       def element(id);            "jQuery(\"#{id}\")"; end
       def update(id, markup);     element(id) + '.html("'+escape(markup)+'");'; end
       def replace(id, markup);    element(id) + '.replaceWith("'+escape(markup)+'");'; end
