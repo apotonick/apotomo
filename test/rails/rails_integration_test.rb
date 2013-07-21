@@ -33,7 +33,9 @@ class RailsIntegrationTest < ActionController::TestCase
     end
     
     def squeak(evt) 
-      render :text => evt.data
+      # can't do evt.data.to_s because of differences between Ruby 1.9 and 1.8
+      # DISCUSS make better?
+      render :text => evt.data.keys.map(&:to_s).sort.join(',') + ';' + evt.data.values.map(&:to_s).sort.join(',')
     end
     
     def sniff(evt)
@@ -78,7 +80,7 @@ class RailsIntegrationTest < ActionController::TestCase
     
     should "pass the event with all params data as state-args" do
       get 'render_event_response', :source => 'mum', :type => :squeak, :pitch => :high
-      assert_equal "{\"source\"=>\"mum\", \"type\"=>\"squeak\", \"pitch\"=>\"high\", \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}\nsqueak!", @response.body
+      assert_equal "action,controller,pitch,source,type;barn,high,mum,render_event_response,squeak\nsqueak!", @response.body
     end
     
     should "render updates to the parent window for an iframe request" do
@@ -129,7 +131,7 @@ class IncludingApotomoSupportTest < ActiveSupport::TestCase
     
     should "respond to .has_widgets only" do
       assert_respond_to @class, :has_widgets
-      assert_not_respond_to @class, :apotomo_request_processor
+      assert_not @class.respond_to?(:apotomo_request_processor)
     end
     
     should "mixin all methods after first use of .has_widgets" do

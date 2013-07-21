@@ -90,10 +90,14 @@ class RequestProcessorTest < ActiveSupport::TestCase
     
     should "append the params hash to the triggered event" do
       KidWidget.class_eval do
-        def squeak(evt); render :text => evt.data.inspect; end
+        def squeak(evt)
+          # can't do evt.data.to_s because of differences between Ruby 1.9 and 1.8
+          # DISCUSS make better?
+          render :text => evt.data.keys.map(&:to_s).sort.join(',') + ';' + evt.data.values.map(&:to_s).sort.join(',')
+        end
       end
       
-      assert_equal ["away from here!", "{:type=>:doorSlam, :source=>\"kid\"}"], @processor.process_for({:type => :doorSlam, :source => 'kid'})
+      assert_equal ["away from here!", "source,type;doorSlam,kid"], @processor.process_for({:type => :doorSlam, :source => 'kid'})
     end
     
     should "raise an exception when :source is unknown" do
