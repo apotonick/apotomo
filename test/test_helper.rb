@@ -1,9 +1,4 @@
-# wycats says...
-require 'rubygems'
-require 'bundler'
-Bundler.setup
-
-require 'shoulda'
+require 'minitest/autorun'
 
 ENV['RAILS_ENV'] = 'test'
 require "dummy/config/environment"
@@ -18,10 +13,10 @@ Apotomo::Widget.append_view_path(File.expand_path(File.dirname(__FILE__) + "/wid
 require "test_case_methods"
 
 
-Test::Unit::TestCase.class_eval do
+MiniTest::Spec.class_eval do
   include Apotomo::WidgetShortcuts
   include Apotomo::TestCaseMethods
-  
+
   def assert_not(assertion)
     assert !assertion
   end
@@ -30,7 +25,7 @@ end
 class ApotomoController < ActionController::Base
   include Apotomo::Rails::ControllerMethods
   include Rails.application.routes.url_helpers
-  
+
   def mum
   end
 end
@@ -50,7 +45,7 @@ class MouseWidget < Apotomo::Widget
   def eat
     render
   end
-  
+
   def display
   end
 end

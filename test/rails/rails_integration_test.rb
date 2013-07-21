@@ -46,8 +46,8 @@ class RailsIntegrationTest < ActionController::TestCase
   end
 
 
-  context "ActionController" do
-    setup do
+  describe "ActionController" do
+    before do
       @controller.class.has_widgets do |root|
         MumWidget.new(root, 'mum')
       end
@@ -59,29 +59,29 @@ class RailsIntegrationTest < ActionController::TestCase
       end
     end
 
-    should "provide the rails view helpers in state views" do
+    it "provide the rails view helpers in state views" do
       get 'mum', :state => :make_me_squeak
       assert_select "a", "mum"
     end
 
-    context "nested widgets" do
-      should "render" do
+    describe "nested widgets" do
+      it "render" do
         get 'mum', :state => :child
         assert_equal "/barn/render_event_response?source=kid&amp;type=click\n", @response.body
       end
 
-      should "process events" do
+      it "process events" do
         get 'render_event_response', :source => 'root', :type => :squeak
         assert_equal "squeak!", @response.body
       end
     end
 
-    should "pass the event with all params data as state-args" do
+    it "pass the event with all params data as state-args" do
       get 'render_event_response', :source => "mum", :type => "squeak", :pitch => "high"
       assert_equal "{\"source\"=>\"mum\", \"type\"=>\"squeak\", \"pitch\"=>\"high\", \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}\nsqueak!", @response.body
     end
 
-    should "render updates to the parent window for an iframe request" do
+    it "render updates to the parent window for an iframe request" do
       get 'render_event_response', :source => 'mum', :type => :sniff, :apotomo_iframe => true
 
       assert_response :success
@@ -90,8 +90,8 @@ class RailsIntegrationTest < ActionController::TestCase
     end
 
 
-    context "ActionView" do
-      setup do
+    describe "ActionView" do
+      before do
         @controller.instance_eval do
           def mum
             render :inline => "<%= render_widget 'mum', :eat %>"
@@ -99,12 +99,12 @@ class RailsIntegrationTest < ActionController::TestCase
         end
       end
 
-      should "respond to #render_widget" do
+      it "respond to #render_widget" do
         get :mum
         assert_select "#mum", "burp!"
       end
 
-      should "respond to #url_for_event" do
+      it "respond to #url_for_event" do
         @controller.instance_eval do
           def mum
             render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
@@ -120,19 +120,19 @@ end
 
 
 class IncludingApotomoSupportTest < ActiveSupport::TestCase
-  context "A controller not including ControllerMethods explicitely" do
-    setup do
+  describe "A controller not including ControllerMethods explicitely" do
+    before do
       @class      = Class.new(ActionController::Base)
       @controller = @class.new
       @controller.request = ActionController::TestRequest.new
     end
 
-    should "respond to .has_widgets only" do
+    it "respond to .has_widgets only" do
       assert_respond_to @class, :has_widgets
       assert_not_respond_to @class, :apotomo_request_processor
     end
 
-    should "mixin all methods after first use of .has_widgets" do
+    it "mixin all methods after first use of .has_widgets" do
       @class.has_widgets do |root|
       end
 

@@ -1,21 +1,21 @@
 require 'test_helper'
- 
-class OnfireIntegrationTest < Test::Unit::TestCase
+
+class OnfireIntegrationTest < MiniTest::Spec
   include Apotomo::TestCaseMethods::TestController
-  
-  context "including Onfire into the StatefulWidget it" do
-    setup do
+
+  describe "including Onfire into the StatefulWidget it" do
+    before do
       @mum = mouse('mum')
       @mum << mouse_mock(:kid)
       @kid = @mum[:kid]
     end
-    
-    should "respond to #root" do
+
+    it "respond to #root" do
       assert @mum.root?
       assert ! @kid.root?
     end
-    
-    should "respond to #parent" do
+
+    it "respond to #parent" do
       assert_equal @mum, @kid.parent
     end
   end
