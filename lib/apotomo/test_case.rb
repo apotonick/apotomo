@@ -35,12 +35,12 @@ module Apotomo
       extend ActiveSupport::Concern
 
       include Cell::TestCase::CommonTestMethods
-      
+
       attr_reader :view_assigns
-      
+
       def setup
         super # defined in Cell::TestCase::CommonTestMethods.
-        
+
         @controller.instance_eval do
           def controller_path
             'barn'
@@ -48,13 +48,14 @@ module Apotomo
         end
         @controller.extend Apotomo::Rails::ControllerMethods
       end
-      
+
       # Renders the widget +name+.
       def render_widget(*args)
         @view_assigns = extract_state_ivars_for(root[args.first]) do
           @last_invoke = root.render_widget(*args)
         end
-        
+        cleanup_assigns!(@view_assigns)
+
         @last_invoke
       end
 
@@ -76,9 +77,14 @@ module Apotomo
            self.instance_exec(root, &blk)
         end
       end
-      
+
       def parent_controller
         @controller
+      end
+
+    private
+      def cleanup_assigns!(assigns)
+        assigns.delete(:lookup_context) # dirty but it works.
       end
 
       module ClassMethods

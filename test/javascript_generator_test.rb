@@ -62,7 +62,7 @@ class JavascriptGeneratorTest < Test::Unit::TestCase
 
     context "in jQuery mode" do
       setup do
-        @gen = Apotomo::JavascriptGenerator.new(:jQuery)
+        @gen = Apotomo::JavascriptGenerator.new(:Jquery)
       end
 
       should "respond to jQuery" do
