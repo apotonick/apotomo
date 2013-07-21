@@ -106,9 +106,7 @@ module Apotomo
     # a state method.
     #
     # ==== Options
-    # * <tt>:view</tt> - Renders +view+. Defaults to the current state name.
-    # * <tt>:state</tt> - Invokes the +state+ method and returns whatever the state returns.
-    # * See http://rdoc.info/gems/cells/3.5.4/Cell/Rails#render-instance_method
+    # * See http://rdoc.info/gems/cells/Cell/Rails:render
     #
     # Example:
     #  class MouseWidget < Apotomo::Widget
