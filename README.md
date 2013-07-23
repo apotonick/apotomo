@@ -180,6 +180,19 @@ end
 
 Apotomo doesn't depend on _any_ JS framework - you choose!
 
+## Render buffer
+
+You can render multiple using `render_buffer` method:
+
+```ruby
+render_buffer do |buf|
+  buf.replace("##{widget_id}", :view => :display) if invitation
+  buf << replace("section#invite", :text => "")
+end
+```
+
+So, you have a concatenation of two `replace`s here.
+
 ## Testing
 
 Apotomo comes with its own test case and assertions to <b>build rock-solid web components</b>.

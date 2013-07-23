@@ -86,7 +86,29 @@ module Apotomo
       
       run_hook :after_initialize, self
     end
-    
+
+    # Returns concatenation of render strings.
+    #
+    # You can render multiple using a proxy <tt>buf</tt>.
+    # If you do <tt>buf << some_string</tt> then <tt>some_string</tt> is concatenated to buffer.
+    # And <tt>buf.some_method(...)</tt> is equivalent to <tt>buf << self.some_method(...)</tt>.
+    #
+    # Example:
+    #
+    #   render_buffer do |buf|
+    #     buf.replace("##{widget_id}", :view => :display)
+    #     buf << replace("section#invite", :text => "")
+    #   end
+    #
+    # is equivalent to
+    #
+    #   replace("##{widget_id}", :view => :display) + replace("section#invite", :text => "")
+    def render_buffer
+      buffer = RenderBuffer.new(self)
+      yield buffer
+      buffer.to_s
+    end    
+
     def parent_controller
       # i hope we'll get rid of any parent_controller dependency, soon.
       root? ? @parent_controller : root.parent_controller
