@@ -27,5 +27,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "slim"
   s.add_development_dependency "haml"
   s.add_development_dependency "tzinfo"
-  s.add_development_dependency "minitest", "~> 4.0"
+  s.add_development_dependency "minitest", "~> 4.7.5"
 end
