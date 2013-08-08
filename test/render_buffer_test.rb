@@ -6,6 +6,9 @@ class RenderTest < MiniTest::Spec
   describe "#render_buffer" do
     before do
       @mum = mouse('mum')
+      @mum.class_eval do
+        include Apotomo::RenderBuffer
+      end
     end
 
     describe "via 'buf << method_call'" do
