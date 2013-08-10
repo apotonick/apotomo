@@ -7,9 +7,14 @@ module Apotomo
     # If you call a method corresponding to JavaScript stuff (start with +javascript_+),
     # it calls the corresponding +JavascriptGenerator+ method with the same arguments.
 
+    # Returns the JavascriptGenerator object.
+    def js_generator
+      Apotomo.js_generator
+    end
+
     # Returns the escaped script.
     def escape_js(script)
-      Apotomo.js_generator.escape(script)
+      js_generator.escape(script)
     end
 
     # - selector, method_name, render_args

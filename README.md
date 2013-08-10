@@ -168,6 +168,20 @@ Look, `replace` basically generates
 jQuery("comments").replaceWith(<the rendered view>);
 ```
 
+Other available helpers:
+
+* `update(selector, render_args)`
+* `replace(selector, render_args)`
+* `update_text(selector, render_args)`
+* `append(selector, render_args)`
+* `prepend(selector, render_args)`
+* `after(selector, render_args)`
+* `before(selector, render_args)`
+* `wrap(selector, render_args)`
+* `wrap_inner(selector, render_args)`
+* `wrap_all(selector, render_args)`
+
+Note: The first argument `selector` is always optional or can be `nil`.
 If that's not what you want, do
 
 ```ruby
@@ -182,9 +196,11 @@ Apotomo doesn't depend on _any_ JS framework - you choose!
 
 Note: Let's explain `widget_call`!
 
-## jQuery helpers
+## JavaScript Generator Helpers
 
-Available helpers to get elements and call JavaScript code on them:
+You can use `js_generator` object to access cool JavaScript helpers in a state.
+
+Available helpers (of `js_generator` object) to get elements and call JavaScript code on them:
 
 * `javascript_find_element_by_selector(selector)`
 * `javascript_find_element_by_id(id)`
@@ -229,23 +245,9 @@ Helpers to call elements' methods:
 
 Note: The first argument `id` is always optional or can be `nil`.
 
-Helpers for current widget (content will be `render(render_args)`):
-
-* `update(selector, render_args)`
-* `replace(selector, render_args)`
-* `update_text(selector, render_args)`
-* `append(selector, render_args)`
-* `prepend(selector, render_args)`
-* `after(selector, render_args)`
-* `before(selector, render_args)`
-* `wrap(selector, render_args)`
-* `wrap_inner(selector, render_args)`
-* `wrap_all(selector, render_args)`
-
-Note: The first argument `selector` is always optional or can be `nil`.
-
 Other JavaScript stuff:
 
+* `escape(javascript)`
 * `javascript_selector_by_id(id)`
 * `javascript_camelize(str)`
 * `javascript_underscore(str)`
