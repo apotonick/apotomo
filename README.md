@@ -202,64 +202,64 @@ You can use `js_generator` object to access cool JavaScript helpers in a state.
 
 Available helpers (of `js_generator` object) to get elements and call JavaScript code on them:
 
-* `javascript_find_element_by_selector(selector)`
-* `javascript_find_element_by_id(id)`
-* `javascript_element(id)`
-* `javascript_find_element_selector(id, selector)`
-* `javascript_find_element_selector(nil, selector)`
-* `javascript_find_element_selector(id, nil)`
-* `javascript_element_action(id, selector, action)`
-* `javascript_element_action(selector, action)`
-* `javascript_element_action(nil, selector, action)`
-* `javascript_element_call(id, selector, method_name, method_args)`
-* `javascript_element_call(selector, method_name, method_args)`
-* `javascript_element_call(nil, selector, method_name, method_args)`
-* `javascript_element_call(method_name, method_args)`
-* `javascript_element_call(nil, nil, selector, method_name, method_args)
+* `find_element_by_selector(selector)`
+* `find_element_by_id(id)`
+* `element(id)`
+* `find_element_selector(id, selector)`
+* `find_element_selector(nil, selector)`
+* `find_element_selector(id, nil)`
+* `element_action(id, selector, action)`
+* `element_action(selector, action)`
+* `element_action(nil, selector, action)`
+* `element_call(id, selector, method_name, method_args)`
+* `element_call(selector, method_name, method_args)`
+* `element_call(nil, selector, method_name, method_args)`
+* `element_call(method_name, method_args)`
+* `element_call(nil, nil, selector, method_name, method_args)
 
 Helpers to call elements' methods:
 
-* `javascript_update(id, selector, markup)`
-* `javascript_replace(id, selector, markup)`
-* `javascript_update_text(id, selector, markup)`
-* `javascript_append(id, selector, markup)`
-* `javascript_prepend(id, selector, markup)`
-* `javascript_after(id, selector, markup)`
-* `javascript_before(id, selector, markup)`
-* `javascript_wrap(id, selector, markup)`
-* `javascript_wrap_inner(id, selector, markup)`
-* `javascript_wrap_all(id, selector, markup)`
-* `javascript_unwrap(id, selector)`
-* `javascript_remove(id, selector)`
-* `javascript_remove_class(id, selector, *classes)`
-* `javascript_remove_classes(id, selector, *classes)`
-* `javascript_add_class(id, selector, *classes)`
-* `javascript_add_classes(id, selector, *classes)`
-* `javascript_toggle_class(id, selector, *classes)`
-* `javascript_toggle_classes(id, selector, *classes)`
-* `javascript_attr(id, selector, name)`
-* `javascript_prop(id, selector, name)`
-* `javascript_val(id, selector)`
-* `javascript_html(id, selector)`
-* `javascript_empty(id, selector)`
+* `update(id, selector, markup)`
+* `replace(id, selector, markup)`
+* `update_text(id, selector, markup)`
+* `append(id, selector, markup)`
+* `prepend(id, selector, markup)`
+* `after(id, selector, markup)`
+* `before(id, selector, markup)`
+* `wrap(id, selector, markup)`
+* `wrap_inner(id, selector, markup)`
+* `wrap_all(id, selector, markup)`
+* `unwrap(id, selector)`
+* `remove(id, selector)`
+* `remove_class(id, selector, *classes)`
+* `remove_classes(id, selector, *classes)`
+* `add_class(id, selector, *classes)`
+* `add_classes(id, selector, *classes)`
+* `toggle_class(id, selector, *classes)`
+* `toggle_classes(id, selector, *classes)`
+* `attr(id, selector, name)`
+* `prop(id, selector, name)`
+* `val(id, selector)`
+* `html(id, selector)`
+* `empty(id, selector)`
 
 Note: The first argument `id` is always optional or can be `nil`.
 
 Other JavaScript stuff:
 
 * `escape(javascript)`
-* `javascript_selector_by_id(id)`
-* `javascript_camelize(str)`
-* `javascript_underscore(str)`
-* `javascript_represent(arg)`
-* `javascript_represent_as_string(arg)`
-* `javascript_represent_as_number(arg)`
-* `javascript_represent_as_literal(arg)`
-* `javascript_represent_as_array(arg)`
-* `javascript_represent_as_hash(arg)`
-* `javascript_represent_as_arguments_list(*args)`
-* `javascript_action(action)`
-* `javascript_call(method_name, *args)
+* `selector_by_id(id)`
+* `camelize(str)`
+* `underscore(str)`
+* `represent(arg)`
+* `represent_as_string(arg)`
+* `represent_as_number(arg)`
+* `represent_as_literal(arg)`
+* `represent_as_array(arg)`
+* `represent_as_hash(arg)`
+* `represent_as_arguments_list(*args)`
+* `action(action)`
+* `call(method_name, *args)
 
 ## Testing
 

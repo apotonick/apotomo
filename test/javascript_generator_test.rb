@@ -54,11 +54,11 @@ class JavascriptGeneratorTest < MiniTest::Spec
       end
 
       it "respond to replace" do
-        assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.javascript_replace("#drinks", 'EMPTY!')
+        assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace("#drinks", 'EMPTY!')
       end
 
       it "respond to update" do
-        assert_equal "jQuery(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.javascript_update("#drinks", '<li id="beer"></li>')
+        assert_equal "jQuery(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update("#drinks", '<li id="beer"></li>')
       end
     end
   end
