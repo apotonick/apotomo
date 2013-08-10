@@ -168,7 +168,7 @@ Look, `replace` basically generates
 jQuery("comments").replaceWith(<the rendered view>);
 ```
 
-Other available helpers:
+All these available helpers are:
 
 * `update(selector, render_args)`
 * `replace(selector, render_args)`
@@ -182,6 +182,7 @@ Other available helpers:
 * `wrap_all(selector, render_args)`
 
 Note: The first argument `selector` is always optional or can be `nil`.
+
 If that's not what you want, do
 
 ```ruby

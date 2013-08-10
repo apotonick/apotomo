@@ -1,12 +1,5 @@
 module Apotomo
   module JavascriptMethods
-    # If you call a method corresponding to JavaScript action (#replace, #update, etc.),
-    # it calls the corresponding +JavascriptGenerator+ method with rendered content.
-    # The same options as #render plus an optional +selector+ to change the selector are supposed.
-    #
-    # If you call a method corresponding to JavaScript stuff (start with ++),
-    # it calls the corresponding +JavascriptGenerator+ method with the same arguments.
-
     # Returns the JavascriptGenerator object.
     def js_generator
       Apotomo.js_generator
@@ -27,6 +20,9 @@ module Apotomo
       Apotomo.js_generator.element_call(name, selector, method_name, Array.wrap(method_args))
     end
 
+    # If you call a method corresponding to JavaScript action (#replace, #update, etc.),
+    # it calls the corresponding +JavascriptGenerator+ method with rendered content.
+    # The same options as #render plus an optional +selector+ to change the selector are supposed.
     [:update, :replace, :update_text, :append, :prepend, :after, :before, :wrap, :wrap_inner, :wrap_all].each do |helper_name|
       define_method helper_name do |*args, &block|
         selector = args.first.is_a?(String) ? args.shift : nil
