@@ -22,6 +22,8 @@ class ViewHelperTest < Apotomo::TestCase
       Apotomo.js_framework = :prototype
     end
 
+    ### DISCUSS: needed?
+    ### FIXME: could somebody get that working?
     # it_eventually "respond to #multipart_form_to_event" do
     #   assert_dom_equal( "<iframe id=\"apotomo_iframe\" name=\"apotomo_iframe\" style=\"display: none;\"></iframe><form accept-charset=\"UTF-8\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" enctype=\"multipart/form-data\" method=\"post\" target=\"apotomo_iframe\"><div style=\"margin:0;padding:0;display:inline\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" /></div></form>",
     #   in_view(MouseWidget) do

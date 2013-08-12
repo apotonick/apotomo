@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TreeNodeTest < ActiveSupport::TestCase
+class TreeNodeTest < MiniTest::Spec
   describe "initialization" do
     it "return true for #root? without parent" do
       assert MouseWidget.new(nil, :mum).root?
