@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class WidgetTest < ActiveSupport::TestCase
+class WidgetTest < MiniTest::Spec
   include Apotomo::TestCaseMethods::TestController
 
   describe "The constructor" do

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ControllerMethodsTest < ActionController::TestCase
+class ControllerMethodsTest < MiniTest::Spec
   include Apotomo::TestCaseMethods::TestController
 
   describe "A Rails controller" do
@@ -110,25 +110,26 @@ class ControllerMethodsTest < ActionController::TestCase
     end
 
     ### DISCUSS: needed?
+    ### FIXME: could somebody get that working?
     describe "in event mode" do
-      it_eventually "set the MIME type to text/javascript" do
-        @controller.apotomo_root << @mum
-
-        get :render_event_response, :source => :kid, :type => :doorSlam
-
-        assert_equal Mime::JS, @response.content_type
-        assert_equal "jQuery(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\njQuery(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
-      end
+      # it_eventually "set the MIME type to text/javascript" do
+      #   @controller.apotomo_root << @mum
+      #
+      #   get :render_event_response, :source => :kid, :type => :doorSlam
+      #
+      #   assert_equal Mime::JS, @response.content_type
+      #   assert_equal "jQuery(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\njQuery(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
+      # end
     end
   end
 
   ### FIXME: could somebody get that working?
   describe "Routing" do
-    it_eventually "generate routes to the render_event_response action" do
-      assert_generates "/barn/render_event_response?type=squeak", { :controller => "barn", :action => "render_event_response", :type => "squeak" }
-
-      assert_recognizes({ :controller => "apotomo", :action => "render_event_response", :type => "squeak" }, "/apotomo/render_event_response?type=squeak")
-    end
+    # it_eventually "generate routes to the render_event_response action" do
+    #   assert_generates "/barn/render_event_response?type=squeak", { :controller => "barn", :action => "render_event_response", :type => "squeak" }
+    #
+    #   assert_recognizes({ :controller => "apotomo", :action => "render_event_response", :type => "squeak" }, "/apotomo/render_event_response?type=squeak")
+    # end
   end
 
 end
