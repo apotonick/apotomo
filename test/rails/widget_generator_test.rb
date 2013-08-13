@@ -6,9 +6,9 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
   setup :prepare_destination
   tests ::Apotomo::Generators::WidgetGenerator
 
-  describe "Running rails g apotomo::widget" do
-    describe "Gerbil squeak snuggle" do
-      it "create the standard assets" do
+  # describe "Running rails g apotomo::widget" do
+  #   describe "Gerbil squeak snuggle" do
+      test "create the standard assets" do
 
         run_generator %w(Gerbil squeak snuggle -t test_unit)
 
@@ -23,7 +23,7 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "test/widgets/gerbil_widget_test.rb", %r(widget\(:gerbil\))
       end
 
-      it "create haml assets with -e haml" do
+      test "create haml assets with -e haml" do
         run_generator %w(Gerbil squeak snuggle -e haml -t test_unit)
 
         assert_file "app/widgets/gerbil_widget.rb", /class GerbilWidget < Apotomo::Widget/
@@ -35,7 +35,7 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "test/widgets/gerbil_widget_test.rb"
       end
 
-      it "create slim assets with -e slim" do
+      test "create slim assets with -e slim" do
         run_generator %w(Gerbil squeak snuggle -e slim -t test_unit)
 
         assert_file "app/widgets/gerbil_widget.rb", /class GerbilWidget < Apotomo::Widget/
@@ -47,7 +47,7 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "test/widgets/gerbil_widget_test.rb"
       end
 
-      it "work with namespaces" do
+      test "work with namespaces" do
         run_generator %w(Gerbil::Mouse squeak -t test_unit)
 
         assert_file "app/widgets/gerbil/mouse_widget.rb", /class Gerbil::MouseWidget < Apotomo::Widget/
@@ -56,6 +56,6 @@ class WidgetGeneratorTest < Rails::Generators::TestCase
         assert_file "test/widgets/gerbil/mouse_widget_test.rb"
       end
 
-    end
-  end
+    # end
+  # end
 end
