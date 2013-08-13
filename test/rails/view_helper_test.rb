@@ -2,6 +2,7 @@ require 'test_helper'
 require 'action_view/test_case'
 
 class ViewHelperTest < Apotomo::TestCase
+  include Apotomo::TestCaseMethods::TestController
   include ActionDispatch::Assertions::DomAssertions
 
   # TODO: use Cell::TestCase#in_view here.
@@ -17,55 +18,56 @@ class ViewHelperTest < Apotomo::TestCase
   end
 
 
-  describe "A widget state view" do
-    after do
+  # describe "A widget state view" do
+    ### DISCUSS: what is this for?
+    teardown do
       Apotomo.js_framework = :prototype
     end
 
     ### DISCUSS: needed?
     ### FIXME: could somebody get that working?
-    # it_eventually "respond to #multipart_form_to_event" do
+    # test "respond to #multipart_form_to_event" do
     #   assert_dom_equal( "<iframe id=\"apotomo_iframe\" name=\"apotomo_iframe\" style=\"display: none;\"></iframe><form accept-charset=\"UTF-8\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" enctype=\"multipart/form-data\" method=\"post\" target=\"apotomo_iframe\"><div style=\"margin:0;padding:0;display:inline\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" /></div></form>",
     #   in_view(MouseWidget) do
     #     multipart_form_to_event(:footsteps)
     #   end)
     # end
 
-    it "respond to #url_for_event" do
+    test "respond to #url_for_event" do
       assert_equal("/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) do
         url_for_event(:footsteps)
       end)
     end
 
-    it "respond to #url_for_event with a namespaced controller" do
+    test "respond to #url_for_event with a namespaced controller" do
       @controller = namespaced_controller
       assert_equal("/farm/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) do
         url_for_event(:footsteps)
       end)
     end
 
-    it "respond to #widget_div" do
+    test "respond to #widget_div" do
       assert_equal('<div id="mum">squeak!</div>', in_view(MouseWidget) do widget_div { "squeak!" } end)
     end
 
-    it "respond to #widget_div with options" do
+    test "respond to #widget_div with options" do
       assert_equal('<div class="mouse" id="kid">squeak!</div>', in_view(MouseWidget) do
         widget_div(:id => 'kid', :class => "mouse") { "squeak!" }
       end)
     end
 
-    it "respond to #widget_id" do
+    test "respond to #widget_id" do
       assert_equal('mum', in_view(MouseWidget){ widget_id })
     end
 
-    it "respond to #render_widget" do
+    test "respond to #render_widget" do
       mum = mouse
       MouseWidget.new(mum, :kid)
 
       assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum){ render_widget 'kid', :eat })
     end
 
-    it "respond to #children" do
+    test "respond to #children" do
       mum = mouse
       MouseWidget.new(mum, :kid)
 
@@ -73,5 +75,5 @@ class ViewHelperTest < Apotomo::TestCase
         children.inject("") { |html, child| html += render_widget(child, :eat) }.html_safe
       end)
     end
-  end
+  # end
 end

@@ -22,6 +22,15 @@ MiniTest::Spec.class_eval do
   end
 end
 
+ActiveSupport::TestCase.class_eval do
+  include Apotomo::WidgetShortcuts
+  include Apotomo::TestCaseMethods
+
+  def assert_not(assertion)
+    assert !assertion
+  end
+end
+
 class ApotomoController < ActionController::Base
   include Apotomo::Rails::ControllerMethods
   include Rails.application.routes.url_helpers

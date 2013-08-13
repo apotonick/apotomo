@@ -94,8 +94,9 @@ class ControllerMethodsTest < MiniTest::Spec
 
   describe "processing an event request" do
     before do
-      @mum = mouse_mock('mum', :eating)
-      @mum << @kid = mouse_mock('kid', :squeak)
+      @mum = mouse
+        @mum << mouse_mock(:kid)
+      @kid = @mum[:kid]
 
       @kid.respond_to_event :doorSlam, :with => :eating, :on => 'mum'
       @kid.respond_to_event :doorSlam, :with => :squeak
@@ -112,24 +113,28 @@ class ControllerMethodsTest < MiniTest::Spec
     ### DISCUSS: needed?
     ### FIXME: could somebody get that working?
     describe "in event mode" do
-      # it_eventually "set the MIME type to text/javascript" do
-      #   @controller.apotomo_root << @mum
-      #
-      #   get :render_event_response, :source => :kid, :type => :doorSlam
-      #
-      #   assert_equal Mime::JS, @response.content_type
-      #   assert_equal "jQuery(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\njQuery(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
-      # end
+      it "set the MIME type to text/javascript" do
+        skip
+
+        @controller.apotomo_root << @mum
+
+        get :render_event_response, :source => :kid, :type => :doorSlam
+
+        assert_equal Mime::JS, @response.content_type
+        assert_equal "jQuery(\"mum\").replace(\"<div id=\\\"mum\\\">burp!<\\/div>\")\njQuery(\"kid\").update(\"squeak!\")\nsqueak();", @response.body
+      end
     end
   end
 
   ### FIXME: could somebody get that working?
   describe "Routing" do
-    # it_eventually "generate routes to the render_event_response action" do
-    #   assert_generates "/barn/render_event_response?type=squeak", { :controller => "barn", :action => "render_event_response", :type => "squeak" }
-    #
-    #   assert_recognizes({ :controller => "apotomo", :action => "render_event_response", :type => "squeak" }, "/apotomo/render_event_response?type=squeak")
-    # end
+    it "generate routes to the render_event_response action" do
+      skip
+
+      assert_generates "/barn/render_event_response?type=squeak", { :controller => "barn", :action => "render_event_response", :type => "squeak" }
+
+      assert_recognizes({ :controller => "apotomo", :action => "render_event_response", :type => "squeak" }, "/apotomo/render_event_response?type=squeak")
+    end
   end
 
 end
