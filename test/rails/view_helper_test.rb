@@ -26,12 +26,14 @@ class ViewHelperTest < Apotomo::TestCase
 
     ### DISCUSS: needed?
     ### FIXME: could somebody get that working?
-    # test "respond to #multipart_form_to_event" do
-    #   assert_dom_equal( "<iframe id=\"apotomo_iframe\" name=\"apotomo_iframe\" style=\"display: none;\"></iframe><form accept-charset=\"UTF-8\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" enctype=\"multipart/form-data\" method=\"post\" target=\"apotomo_iframe\"><div style=\"margin:0;padding:0;display:inline\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" /></div></form>",
-    #   in_view(MouseWidget) do
-    #     multipart_form_to_event(:footsteps)
-    #   end)
-    # end
+    test "respond to #multipart_form_to_event" do
+      skip
+
+      assert_dom_equal( "<iframe id=\"apotomo_iframe\" name=\"apotomo_iframe\" style=\"display: none;\"></iframe><form accept-charset=\"UTF-8\" action=\"/barn/render_event_response?apotomo_iframe=true&amp;source=mum&amp;type=footsteps\" enctype=\"multipart/form-data\" method=\"post\" target=\"apotomo_iframe\"><div style=\"margin:0;padding:0;display:inline\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" /></div></form>",
+      in_view(MouseWidget) do
+        multipart_form_to_event(:footsteps)
+      end)
+    end
 
     test "respond to #url_for_event" do
       assert_equal("/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) do

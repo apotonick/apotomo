@@ -68,7 +68,9 @@ module Apotomo
     abstract!
     undef :display  # We don't want #display to be listed in #internal_methods.
     
+    attr_reader :name
     alias_method :widget_id, :name
+
     attr_reader :options
     
     after_initialize do

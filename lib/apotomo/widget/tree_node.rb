@@ -3,7 +3,7 @@ module Apotomo
     include Enumerable
     include Apotomo::WidgetShortcuts::DSL
 
-    attr_reader :name, :childrenHash
+    attr_reader :childrenHash
     attr_accessor :parent
   
     def setup_tree_node(parent)
