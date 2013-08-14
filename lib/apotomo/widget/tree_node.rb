@@ -74,13 +74,15 @@ module Apotomo
     #
     # If the key is _numeric_, then the in-sequence array of
     # children is accessed (see Tree#children).
+    #
     # If the key is not _numeric_, then it is assumed to be
-    # the *name* of the child node to be returned.
+    # the *name* of the child node to be returned
+    # (after conversion to string).
     def [](name)
       if name.kind_of?(Integer)
         children[name]
       else
-        childrenHash[name]
+        childrenHash[name.to_s]
       end
     end
 
@@ -117,7 +119,7 @@ module Apotomo
       last      = nil # prevents self-finding loop.
       selector.to_s.split(/ /).each do |node_id|
         last = next_node = next_node.find {|n|
-          n.name.to_s == node_id.to_s and not n==last
+          n.name == node_id.to_s and not n==last
         }
       end
     

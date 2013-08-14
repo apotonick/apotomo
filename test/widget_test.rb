@@ -22,14 +22,20 @@ class WidgetTest < MiniTest::Spec
       @kid = Class.new(@mum.class).new(@controller, 'mum')
     end
 
-    it "before the widget family at creation time" do
+    it "increase children size" do
       assert_equal 1, @mum.children.size
+    end
+    
+    it "make child able by a symbol" do
       assert_kind_of MouseWidget, @mum[:baby]
     end
+    
+    it "make child able by a string" do
+      assert_kind_of MouseWidget, @mum['baby']
+    end
 
-    it "inherit trees for now" do
-      assert_equal 1, @mum.children.size
-      assert_kind_of MouseWidget, @mum[:baby]
+    it "treat 'id' and :id the same" do
+      assert_equal @mum['baby'], @mum[:baby]
     end
   end
 
@@ -73,16 +79,24 @@ class WidgetTest < MiniTest::Spec
       before do
         mum_and_kid!
       end
-
-      it "find itself" do
+      
+      it "find itself by a symbol" do
+        assert_equal @mum, @mum.find_widget(:mum)
+      end
+      
+      it "find itself by a string" do
         assert_equal @mum, @mum.find_widget('mum')
       end
 
       it "return nil for not-existant widgets" do
         assert_nil @mum.find_widget('pet')
       end
-
-      it "find children" do
+      
+      it "find children by a symbol" do
+        assert_equal @kid, @mum.find_widget(:kid)
+      end
+      
+      it "find children by a string" do
         assert_equal @kid, @mum.find_widget('kid')
       end
 

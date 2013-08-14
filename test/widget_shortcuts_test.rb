@@ -34,7 +34,7 @@ class WidgetShortcutsTest < MiniTest::Spec
           @root << proxy
 
           assert_kind_of MumWidget, @root[:mummy]
-          assert_equal :mummy, @root[:mummy].name
+          assert_equal 'mummy', @root[:mummy].name
           assert_equal({:color => "grey", :type => :hungry}, @root[:mummy].options)
         end
       end
@@ -44,7 +44,7 @@ class WidgetShortcutsTest < MiniTest::Spec
         @mum = @root[:mummy]
 
         assert_kind_of MumWidget, @mum
-        assert_equal :mummy, @mum.widget_id
+        assert_equal 'mummy', @mum.widget_id
         assert_equal({}, @mum.options)
       end
 
@@ -53,7 +53,7 @@ class WidgetShortcutsTest < MiniTest::Spec
         @mum = @root[:mum]
 
         assert_kind_of MumWidget, @mum
-        assert_equal :mum, @mum.name
+        assert_equal 'mum', @mum.name
         assert_equal({}, @mum.options)
       end
 
