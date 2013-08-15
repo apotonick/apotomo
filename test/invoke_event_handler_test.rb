@@ -3,55 +3,63 @@ require 'test_helper'
 class EventHandlerTest < MiniTest::Spec
   include Apotomo::TestCaseMethods::TestController
 
-  describe "InvokeEventHandler" do
+  describe "Apotomo::InvokeEventHandler" do
     describe "constructor" do
-      it "accept no arguments" do
-        h = Apotomo::InvokeEventHandler.new
-        assert_nil h.widget_id
-        assert_nil h.state
+      describe "without arguments" do
+        it "set parameters to nil" do
+          handler = Apotomo::InvokeEventHandler.new
+          assert_nil handler.widget_id
+          assert_nil handler.state
+        end
       end
 
-      it "accept options" do
-        h = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
-        assert_equal :widget, h.widget_id
-        assert_equal :state,  h.state
+      describe "with options" do
+        it "set parameters to options values" do
+          handler = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
+          assert_equal :widget, handler.widget_id
+          assert_equal :state,  handler.state
+        end
       end
     end
+
+    # TODO: test #process_event
 
     describe "equality methods" do
-      it "repond to #==" do
-        h1 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
-        h2 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
+      it "handlers with the same parameters are equal" do
+        handler1 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
+        handler2 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
 
-        assert h1 == h2
-        assert h2 == h1
+        assert handler1 == handler2
+        assert handler2 == handler1
       end
 
-      it "repond to #!=" do
-        h1 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
+      it "handlers with not the same parameters are not equal" do
+        handler1 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
 
-        h3 = Apotomo::InvokeEventHandler.new(:widget_id => :another_widget, :state => :state)
-        assert h1 != h3
-        assert h3 != h1
+        handler3 = Apotomo::InvokeEventHandler.new(:widget_id => :another_widget, :state => :state)
+        assert handler1 != handler3
+        assert handler3 != handler1
 
-        h4 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :another_state)
-        assert h1 != h4
-        assert h4 != h1
+        handler4 = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :another_state)
+        assert handler1 != handler4
+        assert handler4 != handler1
 
-        h5 = Apotomo::ProcEventHandler.new
-        assert h1 != h5
-        assert h5 != h1
+        handler5 = Apotomo::InvokeEventHandler.new
+        assert handler1 != handler5
+        assert handler5 != handler1
       end
+
+      # TODO: What about InvokeEventHandler == EventHandler ?
     end
 
-    it "respond to #to_s" do
-      h = Apotomo::InvokeEventHandler.new
-      h.widget_id = :widget_id
-      h.state     = :my_state
-      assert_equal "InvokeEventHandler:widget_id#my_state", h.to_s
+    describe "#to_s" do
+      it "return inspect of the handler" do
+        handler = Apotomo::InvokeEventHandler.new
+        handler.widget_id = :widget_id
+        handler.state     = :my_state
+        assert_equal "InvokeEventHandler:widget_id#my_state", handler.to_s
+      end
     end
   end
-
-  ### TODO: test #call
 
 end
