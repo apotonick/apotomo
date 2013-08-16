@@ -168,6 +168,21 @@ Look, `replace` basically generates
 jQuery("comments").replaceWith(<the rendered view>);
 ```
 
+All these available helpers are:
+
+* `update(selector, render_args)`
+* `replace(selector, render_args)`
+* `update_text(selector, render_args)`
+* `append(selector, render_args)`
+* `prepend(selector, render_args)`
+* `after(selector, render_args)`
+* `before(selector, render_args)`
+* `wrap(selector, render_args)`
+* `wrap_inner(selector, render_args)`
+* `wrap_all(selector, render_args)`
+
+Note: The first argument `selector` is always optional or can be `nil`.
+
 If that's not what you want, do
 
 ```ruby
@@ -179,6 +194,73 @@ end
 ```
 
 Apotomo doesn't depend on _any_ JS framework - you choose!
+
+Note: Let's explain `widget_call`!
+
+## JavaScript Generator Helpers
+
+You can use `js_generator` object to access cool JavaScript helpers in a state.
+
+Available helpers (of `js_generator` object) to get elements and call JavaScript code on them:
+
+* `find_element_by_selector(selector)`
+* `find_element_by_id(id)`
+* `element(id)`
+* `find_element_selector(id, selector)`
+* `find_element_selector(nil, selector)`
+* `find_element_selector(id, nil)`
+* `element_action(id, selector, action)`
+* `element_action(selector, action)`
+* `element_action(nil, selector, action)`
+* `element_call(id, selector, method_name, method_args)`
+* `element_call(selector, method_name, method_args)`
+* `element_call(nil, selector, method_name, method_args)`
+* `element_call(method_name, method_args)`
+* `element_call(nil, nil, selector, method_name, method_args)
+
+Helpers to call elements' methods:
+
+* `update(id, selector, markup)`
+* `replace(id, selector, markup)`
+* `update_text(id, selector, markup)`
+* `append(id, selector, markup)`
+* `prepend(id, selector, markup)`
+* `after(id, selector, markup)`
+* `before(id, selector, markup)`
+* `wrap(id, selector, markup)`
+* `wrap_inner(id, selector, markup)`
+* `wrap_all(id, selector, markup)`
+* `unwrap(id, selector)`
+* `remove(id, selector)`
+* `remove_class(id, selector, *classes)`
+* `remove_classes(id, selector, *classes)`
+* `add_class(id, selector, *classes)`
+* `add_classes(id, selector, *classes)`
+* `toggle_class(id, selector, *classes)`
+* `toggle_classes(id, selector, *classes)`
+* `attr(id, selector, name)`
+* `prop(id, selector, name)`
+* `val(id, selector)`
+* `html(id, selector)`
+* `empty(id, selector)`
+
+Note: The first argument `id` is always optional or can be `nil`.
+
+Other JavaScript stuff:
+
+* `escape(javascript)`
+* `selector_by_id(id)`
+* `camelize(str)`
+* `underscore(str)`
+* `represent(arg)`
+* `represent_as_string(arg)`
+* `represent_as_number(arg)`
+* `represent_as_literal(arg)`
+* `represent_as_array(arg)`
+* `represent_as_hash(arg)`
+* `represent_as_arguments_list(*args)`
+* `action(action)`
+* `call(method_name, *args)
 
 ## Testing
 

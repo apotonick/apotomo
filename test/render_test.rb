@@ -130,5 +130,11 @@ class RenderTest < MiniTest::Spec
         assert_equal "<div id=\\\"mum\\\">squeak!<\\/div>", @mum.escape_js('<div id="mum">squeak!</div>')
       end
     end
+
+    describe "#js_generator" do
+      it "return JavascriptGenerator object" do
+        assert_equal Apotomo.js_generator, @mum.js_generator
+      end
+    end
   end
 end

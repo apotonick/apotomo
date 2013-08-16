@@ -21,16 +21,8 @@ class JavascriptGeneratorTest < MiniTest::Spec
         assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace(:drinks, 'EMPTY!')
       end
 
-      it "respond to replace_id" do
-        assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
-      end
-
       it "respond to update" do
         assert_equal "jQuery(\"drinks\").update(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update(:drinks, '<li id="beer"></li>')
-      end
-
-      it "respond to update_id" do
-        assert_equal "jQuery(\"drinks\").update(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
     end
 
@@ -47,16 +39,8 @@ class JavascriptGeneratorTest < MiniTest::Spec
         assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace(:drinks, 'EMPTY!')
       end
 
-      it "respond to replace_id" do
-        assert_equal "jQuery(\"drinks\").replace(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
-      end
-
       it "respond to update" do
         assert_equal "jQuery(\"drinks\").update(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update(:drinks, '<li id="beer"></li>')
-      end
-
-      it "respond to update_id" do
-        assert_equal "jQuery(\"drinks\").update(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
     end
 
@@ -73,16 +57,8 @@ class JavascriptGeneratorTest < MiniTest::Spec
         assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace("#drinks", 'EMPTY!')
       end
 
-      it "respond to replace_id" do
-        assert_equal "jQuery(\"#drinks\").replaceWith(\"EMPTY!\");", @gen.replace_id("drinks", 'EMPTY!')
-      end
-
       it "respond to update" do
         assert_equal "jQuery(\"#drinks\").html(\"<li id=\\\"beer\\\"><\\/li>\");", @gen.update("#drinks", '<li id="beer"></li>')
-      end
-
-      it "respond to update_id" do
-        assert_equal "jQuery(\"#drinks\").html(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
     end
   end
