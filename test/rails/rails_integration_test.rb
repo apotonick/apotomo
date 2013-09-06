@@ -46,7 +46,7 @@ class RailsIntegrationTest < ActionController::TestCase
   end
 
 
-  # describe "ActionController" do
+  describe "ActionController" do
     setup do
       @controller.class.has_widgets do |root|
         MumWidget.new(root, 'mum')
@@ -115,7 +115,7 @@ class RailsIntegrationTest < ActionController::TestCase
         assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", @response.body
       end
     end
-  # end
+  end
 end
 
 
