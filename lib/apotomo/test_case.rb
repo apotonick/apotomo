@@ -24,8 +24,8 @@ module Apotomo
   #
   # For unit testing, you can grab an instance of your tested widget.
   #
-  #     it "should be visible" do
-  #       assert root['post-comments'].visible?
+  #     it "should not be root" do
+  #       assert !root['post-comments'].root?
   #     end
   #
   # See also in Cell::TestCase.

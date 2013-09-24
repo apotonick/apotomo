@@ -33,12 +33,7 @@ class TestCaseTest < MiniTest::Spec
 
         assert_equal "Please setup a widget tree using has_widgets()", exc.message
       end
-
-      it "memorize root" do
-        @test.root.visible=false
-        assert_equal false, @test.root.visible?
-      end
-
+      
       it "respond to #render_widget" do
         assert_equal "<div id=\"mum\">burp!</div>\n", @test.render_widget('mum', :eat)
         assert_equal "<div id=\"mum\">burp!</div>\n", @test.last_invoke
