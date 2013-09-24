@@ -3,19 +3,23 @@ module Apotomo
     include Enumerable
     include Apotomo::WidgetShortcuts::DSL
 
+    # DISCUSS: do we need it? we have []!
+    # DISCUSS: #children receives a block, but #childrenHash doesn't
     attr_reader :childrenHash
     attr_accessor :parent
   
-    def setup_tree_node(parent)
+    def setup_tree_node(parent) # DISCUSS: make private?
       @parent       = nil
       @childrenHash = {}
       @children     = []
       
+      # DISCUSS: and what if not a Widget?
       parent.add_widget(self) if parent.kind_of? Widget # TODO: as long as cells needs parent_controller.
     end
 
     # Print the string representation of this node.
     def to_s
+      # DISCUSS: why self.widget_id but parent.name ?
       "Node ID: #{widget_id} Parent: " + (root?  ? "ROOT" : "#{parent.name}") +
         " Children: #{children.length}" + " Total Nodes: #{size}"
     end
@@ -37,6 +41,7 @@ module Apotomo
     def remove!(child)
       @childrenHash.delete(child.name)
       @children.delete(child)
+      # DISCUSS: why `unless child == nil`? if child is nil, an exception has been raised two locs above!
       child.root! unless child == nil
       child
     end
@@ -105,6 +110,8 @@ module Apotomo
     # Provides a comparision operation for the nodes. Comparision
     # is based on the natural character-set ordering for the
     # node names.
+    # DUISCUSS: useful?
+    # DUISCUSS: <, >, etc., operators doesn't work because of Comparable isn't included
     def <=>(other)
       return +1 if other == nil
       self.name <=> other.name
