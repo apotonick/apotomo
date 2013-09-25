@@ -38,9 +38,11 @@ class EventHandlerTest < MiniTest::Spec
         assert h1 != h4
         assert h4 != h1
 
-        h5 = Apotomo::ProcEventHandler.new
+        h5 = Apotomo::InvokeEventHandler.new
         assert h1 != h5
         assert h5 != h1
+
+        # TODO: test InvokeEventHandler == EventHandler
       end
     end
 
@@ -52,6 +54,6 @@ class EventHandlerTest < MiniTest::Spec
     end
   end
 
-  ### TODO: test #call
+  ### TODO: test #process_event
 
 end
