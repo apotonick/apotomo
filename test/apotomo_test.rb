@@ -16,12 +16,14 @@ class ApotomoTest < MiniTest::Spec
       end
 
       it "include correct javascript framework module" do
+        assert Apotomo.js_generator.is_a?(Apotomo::JavascriptGenerator::Jquery)
         assert_respond_to Apotomo.js_generator, :jquery
       end
     end
 
     it "respond to #setup" do
       Apotomo.setup { |config| config.js_framework = :jquery }
+      # TODO: Apotomo expect #js_framework
       assert_respond_to Apotomo.js_generator, :jquery
     end
   end
