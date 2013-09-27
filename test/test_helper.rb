@@ -9,9 +9,7 @@ require 'apotomo'
 
 Apotomo::Widget.append_view_path(File.expand_path(File.dirname(__FILE__) + "/widgets"))
 
-# Load test support files.
-require "test_case_methods"
-
+require "test_case_methods" # Load test support files.
 
 MiniTest::Spec.class_eval do
   include Apotomo::WidgetShortcuts
@@ -48,9 +46,11 @@ class MouseWidget < Apotomo::Widget
   def squeak
     render :text => "squeak!"
   end
+
   def eating
     render
   end
+
   def eat
     render
   end
