@@ -1,3 +1,7 @@
+h2. 1.2.4
+
+* Make it work with Rails 4.
+
 h2. 1.2.3
 
 * Maintenance release to make happy people happy.
@@ -10,7 +14,7 @@ h2. 1.2.1
 
 h3. Changes
   * Save the <code>@options</code> hash in the constructor since we cannot rely on cells anymore.
-  
+
 h2. 1.2.0
 
 h3. Changes
@@ -21,7 +25,7 @@ h3. Changes
   * Removed @#param@ in favor of @#options@.
   * Removed @#emit@ in favor of @#render@.
   * Removed @#remove_all!@ and @#remove_from_parent!@. Did you ever use these?
-  
+
 h2. 1.1.4
 
 h3. Changes
@@ -33,7 +37,7 @@ h2. 1.1.1
 h3. Additions
   * You can now attach event handlers to other widgets simply by using the @:passing@ option: @responds_to_event :click, :passing => :root@.
   * If you want to debug events, just include the (WIP) @apotomo/debugging@ file and watch your server output on the console.
-  
+
 h3. Changes
   * @Widget.responds_to_event@ is inheritable now.
   * The generator now places namespaced widgets into the correct sub-directories.
@@ -68,7 +72,7 @@ h3. Removals
   * Removed #cell, #container and #section widget shortcuts.
   * Removed @rendered_children@ local in views. Use #render_widget.
   * Removed ContainerWidget, nobody needs it.
-  
+
 h3. Bugfixes
   * Widget.responds_to_event no longer shares its options with multiple widget instances of the same class.
 
@@ -94,7 +98,7 @@ h2. 1.0.2
 
 h3. Changes
   * removals from ViewHelper: #trigger_event, #form_to_event and friends as they use deprecated Rails helpers.
-  
+
 h3. Bugfixes
   * Widget#fire now accepts payload data for the fired event.
   * triggered states now receive the event object if they expect one argument.
