@@ -112,6 +112,8 @@ class WidgetTest < MiniTest::Spec
     it "respond to .view_paths" do
       if Cell.rails3_2_or_more?
         assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]).paths, Apotomo::Widget.view_paths.paths
+      elsif Cell.rails4_0_or_more?
+        Apotomo::Widget.view_paths.paths.to_s.must_match("app/widgets")
       else
         assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]), Apotomo::Widget.view_paths
       end
@@ -125,7 +127,7 @@ class WidgetTest < MiniTest::Spec
     it "not list internal methods in action_methods" do
       # FIXME: puts "WTF is wrong again with AC.action_methods godamn, I HATE this magic shit!"
       unless Cell.rails3_1_or_more?
-        assert_equal [], Class.new(Apotomo::Widget).action_methods
+        assert Class.new(Apotomo::Widget).action_methods.empty?
       end
     end
 
