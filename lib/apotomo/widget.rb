@@ -66,7 +66,7 @@ module Apotomo
     helper Apotomo::Rails::ActionViewMethods
     
     abstract!
-    undef :display  # We don't want #display to be listed in #internal_methods.
+    undef :display  # We don't want #display to be listed in #internal_methods. # DISCUSS: why?
     
     attr_reader :name
     alias_method :widget_id, :name
@@ -82,7 +82,7 @@ module Apotomo
       super(parent)  # TODO: do that as long as cells do need a parent_controller.
       @options      = options
       @name         = id
-      @visible      = true
+      @visible      = true # DISCUSS: do we need it?
       
       setup_tree_node(parent)
       
@@ -94,7 +94,7 @@ module Apotomo
       root? ? @parent_controller : root.parent_controller
     end
     
-    def visible?
+    def visible? # DISCUSS: do we need it?
       @visible
     end
     
@@ -126,13 +126,13 @@ module Apotomo
     end
     
     # Returns the widget named +widget_id+ if it's a descendent or self.
-    def find_widget(widget_id)
+    def find_widget(widget_id) # DISCUSS: treat a Symbol as a String?
       find {|node| node.name.to_s == widget_id.to_s}
     end
     
-    def address_for_event(type, options={})
+    def address_for_event(type, options={}) # DISCUSS: remove/make private/rename?
       options.reverse_merge!  :source     => name,
-                              :type       => type,
+                              :type       => type, # DISCUSS: need? type is a required option
                               :controller => parent_controller.controller_path  # DISCUSS: dependency to parent_controller.  
     end
     

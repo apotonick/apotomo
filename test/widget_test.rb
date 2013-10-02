@@ -1,65 +1,67 @@
 require 'test_helper'
 
+# TODO: there are things aren't tested here
+
 class WidgetTest < MiniTest::Spec
   include Apotomo::TestCaseMethods::TestController
 
-  describe "The constructor" do
-    it "accept the parent_controller as first arg" do
-      assert_kind_of ActionController::Base, @controller
-      @mum = Apotomo::Widget.new(@controller, 'mum', :squeak)
-    end
-  end
-
-  describe "Widget.has_widgets" do
+  describe "::has_widgets" do
     before do
       @mum = Class.new(MouseWidget) do
         has_widgets do |me|
           me << widget(:mouse, :baby)
-          #MouseWidget.new(me, :baby) # this is also possible.
+          # MouseWidget.new(me, :baby) # this is also possible.
         end
       end.new(@controller, 'mum')
 
       @kid = Class.new(@mum.class).new(@controller, 'mum')
     end
 
-    it "before the widget family at creation time" do
-      assert_equal 1, @mum.children.size
-      assert_kind_of MouseWidget, @mum[:baby]
-    end
+    # TODO: check when hook is called
 
-    it "inherit trees for now" do
+    # TODO: check if block yielded
+    # TODO: what block gets
+
+    it "inherit tree" do
       assert_equal 1, @mum.children.size
       assert_kind_of MouseWidget, @mum[:baby]
     end
   end
 
-
-  describe "A widget" do
+  describe "Widget" do
     before do
       @mum = Apotomo::Widget.new(@controller, 'mum', :squeak)
     end
 
-    describe "responding to #address_for_event" do
+    describe "#address_for_event" do
       it "accept an event :type" do
         assert_equal({:source=>"mum", :type=>:squeak, :controller=>"barn"}, @mum.address_for_event(:squeak))
       end
 
-      it "accept a :source" do
+      it "accept a :source option" do
         assert_equal({:source=>"kid", :type=>:squeak, :controller=>"barn"}, @mum.address_for_event(:squeak, :source => 'kid'))
+      end
+
+      it "accept a :type option" do
+        assert_equal({:source=>"mum", :type=>:eating, :controller=>"barn"}, @mum.address_for_event(:squeak, :type => :eating))
+      end
+
+      it "accept a :controller option" do
+        assert_equal({:source=>"mum", :type=>:squeak, :controller=>"farm/barn"}, @mum.address_for_event(:squeak, :controller => "farm/barn"))
       end
 
       it "accept arbitrary options" do
         assert_equal({:volume=>"loud", :source=>"mum", :type=>:squeak, :controller=>"barn"}, @mum.address_for_event(:squeak, :volume => 'loud'))
       end
 
-      it "work with controller namespaces" do
+      it "work with a namespaced controller" do
         @mum = Apotomo::Widget.new(namespaced_controller, 'mum', :squeak)
         assert_equal({:source=>"mum", :type=>:squeak, :controller=>"farm/barn"}, @mum.address_for_event(:squeak))
       end
     end
 
-    describe "implementing visibility" do
-      it "per default respond to #visible?" do
+    describe "visibility" do
+      it "it respond to #visible? and per default is visible" do
         assert @mum.visible?
       end
 
@@ -74,16 +76,15 @@ class WidgetTest < MiniTest::Spec
         mum_and_kid!
       end
 
-      it "find itself" do
+      it "find existant widgets" do
         assert_equal @mum, @mum.find_widget('mum')
+        assert_equal @kid, @mum.find_widget('kid')
+        # TODO: find grandchild
+        # TODO: find foreign widgets (i.e. brother)
       end
 
       it "return nil for not-existant widgets" do
         assert_nil @mum.find_widget('pet')
-      end
-
-      it "find children" do
-        assert_equal @kid, @mum.find_widget('kid')
       end
 
       it "find treat 'id' and :id the same" do
@@ -91,11 +92,7 @@ class WidgetTest < MiniTest::Spec
       end
     end
 
-    it "respond to the WidgetShortcuts methods, like #widget" do
-      assert_respond_to @mum, :widget
-    end
-
-    it "respond to #parent_controller and return the AC in root" do
+    it "respond to #parent_controller" do
       @mum << mouse_mock(:kid)
       assert_equal @controller, @mum.parent_controller
       assert_equal @controller, @mum[:kid].parent_controller
@@ -105,25 +102,18 @@ class WidgetTest < MiniTest::Spec
       assert_equal @mum.name, @mum.widget_id
     end
 
-    it "respond to DEFAULT_VIEW_PATHS" do
+    it "respond to #DEFAULT_VIEW_PATHS" do
       assert_equal ["app/widgets"], Apotomo::Widget::DEFAULT_VIEW_PATHS
     end
 
-    it "respond to .view_paths" do
+    it "respond to #view_paths" do # DISCUSS: why we test it?
       if Cell.rails3_2_or_more?
         assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]).paths, Apotomo::Widget.view_paths.paths
-      elsif Cell.rails4_0_or_more?
-        Apotomo::Widget.view_paths.paths.to_s.must_match("app/widgets")
       else
         assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]), Apotomo::Widget.view_paths
       end
     end
 
-    it "respond to .controller_path" do
-      assert_equal "mouse", MouseWidget.controller_path
-    end
-
-    # internal_methods:
     it "not list internal methods in action_methods" do
       # FIXME: puts "WTF is wrong again with AC.action_methods godamn, I HATE this magic shit!"
       unless Cell.rails3_1_or_more?
@@ -131,20 +121,15 @@ class WidgetTest < MiniTest::Spec
       end
     end
 
-    it "list both local and inherited states in Widget.action_methods" do
-      assert MouseWidget.action_methods.collect{ |m| m.to_s }.include?("squeak")
-      assert Class.new(MouseWidget).action_methods.collect{ |m| m.to_s }.include?("squeak")
+    it "list both local and inherited states in #action_methods" do
+      assert MouseWidget.action_methods.collect(&:to_s).include?("squeak")
+      assert Class.new(MouseWidget).action_methods.collect(&:to_s).include?("squeak")
     end
 
-    it "not list #display in internal_methods although it's defined in Object" do
+    it "not list #display in #internal_methods although it's defined in Object" do
       assert_not Apotomo::Widget.internal_methods.include?(:display)
     end
   end
-end
-
-
-class RenderWidgetTest < ActiveSupport::TestCase
-  include Apotomo::TestCaseMethods::TestController
 
   describe "#render_widget" do
     it "allow passing widget id" do
@@ -180,11 +165,11 @@ class RenderWidgetTest < ActiveSupport::TestCase
         end
       end
 
-      assert_equal("I'm grey", mouse.render_widget(mum), "default value in state-arg didn't work")
-      assert_equal("I'm black", mouse.render_widget(mum, :display, "black"))
+      assert_equal "I'm grey", mouse.render_widget(mum)
+      assert_equal "I'm black", mouse.render_widget(mum, :display, "black")
     end
 
-    it "use #find_widget from self to find the passed widget id" do
+    it "treat widget id as a descedant's id" do
       mum = mouse << mouse_mock(:kid)
 
       assert_equal "<div id=\"kid\">burp!</div>\n", mum.render_widget(:kid, :eat)
