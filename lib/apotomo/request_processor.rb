@@ -41,7 +41,7 @@ module Apotomo
     
     # Computes the address hash for a +:source+ widget and an event +:type+.
     # Additional parameters will be merged.
-    def address_for(options)
+    def address_for(options) # DISCUSS: remove/make private/rename?
       raise "You forgot to provide :source or :type" unless options.has_key?(:source) and options.has_key?(:type)
       options
     end
