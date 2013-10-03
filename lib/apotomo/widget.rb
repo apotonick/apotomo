@@ -51,9 +51,7 @@ module Apotomo
     #     end
     define_hook :after_initialize
     define_hook :has_widgets
-    
-    attr_writer :visible
-    
+        
     include TreeNode
     
     include Onfire
@@ -82,7 +80,6 @@ module Apotomo
       super(parent)  # TODO: do that as long as cells do need a parent_controller.
       @options      = options
       @name         = id
-      @visible      = true
       
       setup_tree_node(parent)
       
@@ -92,10 +89,6 @@ module Apotomo
     def parent_controller
       # i hope we'll get rid of any parent_controller dependency, soon.
       root? ? @parent_controller : root.parent_controller
-    end
-    
-    def visible?
-      @visible
     end
     
     # Invokes +state+ and hopefully returns the rendered content.

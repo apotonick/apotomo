@@ -58,17 +58,6 @@ class WidgetTest < MiniTest::Spec
       end
     end
 
-    describe "implementing visibility" do
-      it "per default respond to #visible?" do
-        assert @mum.visible?
-      end
-
-      it "expose a setter therefore" do
-        @mum.visible = false
-        assert_not @mum.visible?
-      end
-    end
-
     describe "#find_widget" do
       before do
         mum_and_kid!
