@@ -10,9 +10,7 @@ class EventHandlerTest < MiniTest::Spec
     end
 
     it "respond to #process_event" do
-      h = Apotomo::EventHandler.new
-      e = Apotomo::Event.new(:squeak, @mum)
-      assert_equal nil, h.process_event(e)
+      assert_respond_to Apotomo::EventHandler.new, :process_event
     end
 
     describe "#call" do 

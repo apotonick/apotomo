@@ -5,14 +5,16 @@ class EventHandlerTest < MiniTest::Spec
 
   describe "InvokeEventHandler" do
     describe "constructor" do
-      it "accept no arguments" do
+      it "accept no arguments and create clean instance" do
         h = Apotomo::InvokeEventHandler.new
+
         assert_nil h.widget_id
         assert_nil h.state
       end
 
-      it "accept options" do
+      it "accept options and set them" do
         h = Apotomo::InvokeEventHandler.new(:widget_id => :widget, :state => :state)
+
         assert_equal :widget, h.widget_id
         assert_equal :state,  h.state
       end
@@ -50,6 +52,7 @@ class EventHandlerTest < MiniTest::Spec
       h = Apotomo::InvokeEventHandler.new
       h.widget_id = :widget_id
       h.state     = :my_state
+
       assert_equal "InvokeEventHandler:widget_id#my_state", h.to_s
     end
   end
