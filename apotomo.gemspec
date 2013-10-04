@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/apotonick/apotomo"
   s.summary     = %q{Web components for Rails.}
   s.description = %q{Web component framework for Rails providing widgets that trigger events and know when and how to update themselves with AJAX.}
+  spec.license  = 'MIT'
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
