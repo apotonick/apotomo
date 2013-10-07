@@ -11,19 +11,8 @@ class ViewHelperTest < Apotomo::TestCase
     setup_test_states_in(subject)
     subject.invoke(:in_view, block)
   end
-  def mouse_mock(id='mum', opts={}, &block)
-    mouse = MouseWidget.new(parent_controller, id, opts)
-    mouse.instance_eval &block if block_given?
-    mouse
-  end
 
-
-  # describe "A widget state view" do
-    ### DISCUSS: what is this for?
-    teardown do
-      Apotomo.js_framework = :prototype
-    end
-
+  # describe "Rails::ViewHelper" do
     ### DISCUSS: needed?
     ### FIXME: could somebody get that working?
     test "respond to #multipart_form_to_event" do
@@ -36,25 +25,27 @@ class ViewHelperTest < Apotomo::TestCase
     end
 
     test "respond to #url_for_event" do
-      assert_equal("/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) do
-        url_for_event(:footsteps)
-      end)
+      assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) { url_for_event(:footsteps) }
     end
 
     test "respond to #url_for_event with a namespaced controller" do
       @controller = namespaced_controller
-      assert_equal("/farm/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) do
-        url_for_event(:footsteps)
-      end)
+      assert_equal "/farm/barn/render_event_response?source=mum&amp;type=footsteps", in_view(MouseWidget) { url_for_event(:footsteps) }
     end
 
     test "respond to #widget_tag" do
-      assert_equal('<span id="mum">squeak!</span>', in_view(MouseWidget) do widget_tag(:span) { "squeak!" } end)
+      assert_equal('<span id="mum">squeak!</span>', in_view(MouseWidget) do
+        widget_tag(:span) do
+          "squeak!"
+        end
+      end)
     end
 
     test "respond to #widget_tag with options" do
       assert_equal('<span class="mouse" id="kid">squeak!</span>', in_view(MouseWidget) do
-        widget_tag(:span, :id => 'kid', :class => "mouse") { "squeak!" }
+        widget_tag(:span, :id => 'kid', :class => "mouse") do
+          "squeak!"
+        end
       end)
     end
 
@@ -63,14 +54,16 @@ class ViewHelperTest < Apotomo::TestCase
     end
 
     test "respond to #widget_id" do
-      assert_equal('mum', in_view(MouseWidget){ widget_id })
+      assert_equal 'mum', in_view(MouseWidget) { widget_id }
     end
 
     test "respond to #render_widget" do
       mum = mouse
       MouseWidget.new(mum, :kid)
 
-      assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum){ render_widget 'kid', :eat })
+      assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum) do
+        render_widget('kid', :eat)
+      end)
     end
 
     test "respond to #children" do
@@ -78,8 +71,15 @@ class ViewHelperTest < Apotomo::TestCase
       MouseWidget.new(mum, :kid)
 
       assert_equal("<div id=\"kid\">burp!</div>\n", in_view(mum) do
-        children.inject("") { |html, child| html += render_widget(child, :eat) }.html_safe
+        children.collect do |child|
+          render_widget(child, :eat)
+        end.join.html_safe
       end)
     end
+
+    # TODO: test #js_generator
+
+    # TODO: test instance variables access
+
   # end
 end
