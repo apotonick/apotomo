@@ -9,7 +9,7 @@ module Apotomo
     def setup_tree_node(parent)
       @parent       = nil
       @childrenHash = {}
-      @children     = []
+      @children     = [] # TODO: order of widgets in this variable isn't tested anywhere!!!
       
       parent.add_widget(self) if parent.kind_of? Widget # TODO: as long as cells needs parent_controller.
     end

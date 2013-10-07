@@ -1,5 +1,7 @@
 require 'test_helper'
 
+# TODO: there are *many* things in Apotomo::Widget *isn't* tested here
+
 class WidgetTest < MiniTest::Spec
   include Apotomo::TestCaseMethods::TestController
 
