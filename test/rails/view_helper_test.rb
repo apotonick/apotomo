@@ -48,6 +48,16 @@ class ViewHelperTest < Apotomo::TestCase
       end)
     end
 
+    test "respond to #widget_tag" do
+      assert_equal('<span id="mum">squeak!</span>', in_view(MouseWidget) do widget_tag(:span) { "squeak!" } end)
+    end
+
+    test "respond to #widget_tag with options" do
+      assert_equal('<span class="mouse" id="kid">squeak!</span>', in_view(MouseWidget) do
+        widget_tag(:span, :id => 'kid', :class => "mouse") { "squeak!" }
+      end)
+    end
+
     test "respond to #widget_div" do
       assert_equal('<div id="mum">squeak!</div>', in_view(MouseWidget) do widget_div { "squeak!" } end)
     end
