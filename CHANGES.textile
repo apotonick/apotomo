@@ -1,3 +1,7 @@
+h2. 1.2.5
+
+* Introduce @#widget_tag@ helper allowing you to wrap widget content in an arbitrary tag. Extends @#widget_div@.
+
 h2. 1.2.4
 
 * Make it work with Rails 4.

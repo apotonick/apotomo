@@ -62,12 +62,6 @@ class ViewHelperTest < Apotomo::TestCase
       assert_equal('<div id="mum">squeak!</div>', in_view(MouseWidget) do widget_div { "squeak!" } end)
     end
 
-    test "respond to #widget_div with options" do
-      assert_equal('<div class="mouse" id="kid">squeak!</div>', in_view(MouseWidget) do
-        widget_div(:id => 'kid', :class => "mouse") { "squeak!" }
-      end)
-    end
-
     test "respond to #widget_id" do
       assert_equal('mum', in_view(MouseWidget){ widget_id })
     end
