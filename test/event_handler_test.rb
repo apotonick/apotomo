@@ -10,10 +10,12 @@ class EventHandlerTest < MiniTest::Spec
     end
 
     it "respond to #process_event" do
-      assert_respond_to Apotomo::EventHandler.new, :process_event
+      h = Apotomo::EventHandler.new
+      e = Apotomo::Event.new(:squeak, @mum)
+      assert_equal nil, h.process_event(e)
     end
 
-    describe "#call" do 
+    describe "#call" do
       it "push #process_events' results ordered to root's #page_updates" do
         [@mum, @mum[:kid], @mum].each_with_index do |source, i|
           e = Apotomo::Event.new(:squeak, source)
