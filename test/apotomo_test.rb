@@ -7,17 +7,13 @@ class ApotomoTest < MiniTest::Spec
         Apotomo.js_framework = :jquery
       end
 
-      it "respond to #js_framework" do
+      it "respond to #js_framework and return javascript framework's name" do
         assert_equal :jquery, Apotomo.js_framework
       end
 
-      it "respond to #js_generator" do
+      it "respond to #js_generator and return an correct instance" do
         assert_kind_of Apotomo::JavascriptGenerator, Apotomo.js_generator
-      end
-
-      it "include correct javascript framework module" do
-        assert Apotomo.js_generator.is_a?(Apotomo::JavascriptGenerator::Jquery)
-        assert_respond_to Apotomo.js_generator, :jquery
+        assert_kind_of Apotomo::JavascriptGenerator::Jquery, Apotomo.js_generator
       end
     end
 
@@ -28,4 +24,3 @@ class ApotomoTest < MiniTest::Spec
     end
   end
 end
-

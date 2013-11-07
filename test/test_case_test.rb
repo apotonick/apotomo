@@ -1,41 +1,41 @@
 require 'test_helper'
 require 'apotomo/test_case'
 
+class CommentsWidget < Apotomo::Widget
+end
+
+class CommentsWidgetTest < Apotomo::TestCase
+end
+
+class MouseWidgetTest < Apotomo::TestCase
+end
+
 class TestCaseTest < MiniTest::Spec
-
-  class CommentsWidgetTest < Apotomo::TestCase
-  end
-
-  class CommentsWidget < Apotomo::Widget
-  end
-
   describe "TestCase" do
-
     describe "responding to #root" do
-      class MouseWidgetTest < Apotomo::TestCase
-      end
-
       before do
         @klass = MouseWidgetTest
-        @test = @klass.new(:widget).tap{ |t| t.setup }
-        @klass.has_widgets { |r| r << widget(:mouse, 'mum', :eating) }
+        @test = @klass.new(:widget).tap { |t| t.setup }
+        @klass.has_widgets do |root|
+          root << widget(:mouse, 'mum', :eating)
+        end
       end
 
       it "respond to #root" do
-        assert_equal ['root', 'mum'], @test.root.collect { |w| w.name }
+        assert_equal ['root', 'mum'], @test.root.collect(&:name)
       end
 
       it "raise an error if no has_widgets block given" do
         exc = assert_raises RuntimeError do
-          @test = Class.new(Apotomo::TestCase).new(:widget).tap{ |t| t.setup }
+          @test = Class.new(Apotomo::TestCase).new(:widget).tap { |t| t.setup }
           @test.root
         end
-
         assert_equal "Please setup a widget tree using has_widgets()", exc.message
       end
 
+      # TODO: needed? why root but not self?
       it "memorize root" do
-        @test.root.visible=false
+        @test.root.visible = false
         assert_equal false, @test.root.visible?
       end
 
@@ -46,11 +46,11 @@ class TestCaseTest < MiniTest::Spec
 
       it "respond to #assert_select" do
         @test.render_widget('mum', :eat)
-
         @test.assert_select("div#mum", "burp!")
-
-        exc = assert_raises( MiniTest::Assertion){  @test.assert_select("div#mummy", "burp!"); }
-        assert_match /Expected at least 1 element matching "div#mummy", found 0/, exc.message
+        exc = assert_raises MiniTest::Assertion do
+          @test.assert_select("div#mummy", "burp!")
+        end
+        assert_equal "Expected at least 1 element matching \"div#mummy\", found 0.", exc.message
       end
 
       describe "using events" do
@@ -59,7 +59,7 @@ class TestCaseTest < MiniTest::Spec
           @mum.respond_to_event :footsteps, :with => :squeak
           @mum.instance_eval do
             def squeak(evt)
-              render :text => evt.data  # this usually leads to "{}".
+              render :text => evt.data
             end
           end
         end
