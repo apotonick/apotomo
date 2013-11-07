@@ -10,13 +10,8 @@ module Apotomo
       end
     end
     
-    
-    # Provides a ready-to-use mouse widget instance.
     def mouse_mock(id='mouse', opts={}, &block)
-      #mouse = MouseWidget.new(parent_controller, id, opts)
-      #mouse.instance_eval &block if block_given?
       widget(:mouse, id, opts)
-      #mouse
     end
     
     def mouse_class_mock(&block)
@@ -29,17 +24,14 @@ module Apotomo
       @mum = mouse('mum')
         @kid = MouseWidget.new(@mum, 'kid')
       
-      
       @mum.respond_to_event :squeak, :with => :answer_squeak
       @mum.respond_to_event :squeak, :from => 'kid', :with => :alert
       @mum.respond_to_event :footsteps, :with => :escape
       
       @kid.respond_to_event :footsteps, :with => :peek
       
-      
       @mum.instance_eval do
         def list; @list ||= []; end
-        
         def answer_squeak;  self.list << 'answer squeak'; render :text => "squeak", :render_children => false; end
         def alert;          self.list << 'be alerted';    render :text => "alert!", :render_children => false; end
         def escape;         self.list << 'escape';        render :text => "escape", :render_children => false; end
@@ -54,14 +46,14 @@ module Apotomo
     
     def barn_controller!
       @controller = Class.new(ActionController::Base) do
-        def self.default_url_options; {:controller => :barn}; end
+        def self.default_url_options
+          { :controller => :barn }
+        end
       end.new
-      @controller.extend ActionController::UrlWriter
-      @controller.params  = {}
+      @controller.extend(ActionController::UrlWriter)
+      @controller.params = {}
     end
-    
-
-    
+        
     module TestController
       def setup
         barn_controller!
@@ -76,9 +68,13 @@ module Apotomo
             self.request = ActionController::TestRequest.new
           end
           
-          def self.name; "BarnController"; end
+          def self.name
+            "BarnController"
+          end
           
-          def self.default_url_options; {:controller => :barn}; end
+          def self.default_url_options
+            { :controller => :barn }
+          end
         end.new
       end
       
@@ -90,8 +86,7 @@ module Apotomo
         controller = Farm::BarnController.new
         controller.request = ActionController::TestRequest.new
         controller
-      end
-      
+      end   
     end
   end
 end
