@@ -50,7 +50,7 @@ class TestCaseTest < MiniTest::Spec
         exc = assert_raises MiniTest::Assertion do
           @test.assert_select("div#mummy", "burp!")
         end
-        assert_equal "Expected at least 1 element matching \"div#mummy\", found 0.", exc.message
+        assert_match "Expected at least 1 element matching \"div#mummy\", found 0.", exc.message
       end
 
       describe "using events" do
