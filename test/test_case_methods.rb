@@ -44,6 +44,13 @@ module Apotomo
       @mum
     end
     
+    def root_mum_and_kid!
+      mum_and_kid!
+
+      @root = Apotomo::Widget.new(parent_controller, 'root', :display)
+      @root << @mum
+    end
+
     def barn_controller!
       @controller = Class.new(ActionController::Base) do
         def self.default_url_options
