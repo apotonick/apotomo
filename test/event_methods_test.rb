@@ -7,7 +7,6 @@ class EventMethodsTest < MiniTest::Spec
     Apotomo::InvokeEventHandler.new(:widget_id => id, :state => state)
   end
 
-
   describe "#respond_to_event and #fire" do
     before do
       mum_and_kid!
@@ -15,18 +14,20 @@ class EventMethodsTest < MiniTest::Spec
 
     it "alert @mum first, then make her squeak when @kid squeaks" do
       @kid.fire :squeak
+
       assert_equal ['be alerted', 'answer squeak'], @mum.list
     end
 
     it "make @mum just squeak back when jerry squeaks" do
       @mum << mouse_mock(:jerry)
       @mum[:jerry].fire :squeak
+
       assert_equal ['answer squeak'], @mum.list
     end
 
-
     it "make @mum run away while @kid keeps watching" do
       @kid.fire :footsteps
+
       assert_equal ['peek', 'escape'], @mum.list
     end
 
@@ -34,6 +35,7 @@ class EventMethodsTest < MiniTest::Spec
       @mum.respond_to_event :peep, :with => :answer_squeak
       @mum.respond_to_event :peep, :with => :answer_squeak
       @mum.fire :peep
+
       assert_equal ['answer squeak'], @mum.list
     end
 
@@ -41,12 +43,14 @@ class EventMethodsTest < MiniTest::Spec
       @mum.respond_to_event :peep, :with => :answer_squeak
       @mum.respond_to_event :peep, :with => :answer_squeak, :once => false
       @mum.fire :peep
+
       assert_equal ['answer squeak', 'answer squeak'], @mum.list
     end
 
     it "also accept an event argument only" do
       @mum.respond_to_event :answer_squeak
       @mum.fire :answer_squeak
+
       assert_equal ['answer squeak'], @mum.list
     end
 
@@ -60,6 +64,7 @@ class EventMethodsTest < MiniTest::Spec
       end
 
       @mum.trigger :footsteps, "near"
+
       assert_kind_of Apotomo::Event, @mum.list.last
     end
 
@@ -72,6 +77,7 @@ class EventMethodsTest < MiniTest::Spec
       end
 
       @mum.fire :answer_squeak, :volume => 9
+
       assert_equal [{:volume => 9}], @mum.list
     end
 
@@ -103,6 +109,7 @@ class EventMethodsTest < MiniTest::Spec
       class AdultMouse < Apotomo::Widget
         responds_to_event :peep, :with => :answer_squeak
       end
+
       class BabyMouse < AdultMouse
         responds_to_event :peep
         responds_to_event :footsteps, :with => :squeak
@@ -123,7 +130,6 @@ class EventMethodsTest < MiniTest::Spec
 
       it "not share responds_to_event options between different instances" do
         assert_equal [handler('mum', :answer_squeak)], @mum.event_table.all_handlers_for(:peep, 'mum')
-
         assert_equal [handler('dad', :answer_squeak)], AdultMouse.new(parent_controller, 'dad', :show).event_table.all_handlers_for(:peep, 'dad')
       end
     end
@@ -131,10 +137,10 @@ class EventMethodsTest < MiniTest::Spec
     describe "#trigger" do
       it "be an alias for #fire" do
         @kid.trigger :footsteps
+
         assert_equal ['peek', 'escape'], @mum.list
       end
     end
-
 
     describe "page_updates" do
       it "expose a simple Array for now" do
@@ -144,9 +150,9 @@ class EventMethodsTest < MiniTest::Spec
 
       it "be queued in root#page_updates after #fire" do
         @mum.fire :footsteps
+
         assert_equal ["escape"], @mum.page_updates
       end
     end
-
   end
 end

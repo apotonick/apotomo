@@ -64,11 +64,11 @@ class JavascriptGeneratorTest < MiniTest::Spec
       it "respond to #update_id" do
         assert_equal "jQuery(\"#drinks\").html(\"EMPTY!\");", @gen.update_id("drinks", 'EMPTY!')
       end
-
-      # TODO: Prototype mode
-
-      # TODO: Right mode
-
     end
+
+    # TODO: Prototype mode
+
+    # TODO: Right mode
+
   end
 end

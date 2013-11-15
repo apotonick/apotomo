@@ -46,11 +46,12 @@ class TestCaseTest < MiniTest::Spec
 
       it "respond to #assert_select" do
         @test.render_widget('mum', :eat)
+
         @test.assert_select("div#mum", "burp!")
         exc = assert_raises MiniTest::Assertion do
           @test.assert_select("div#mummy", "burp!")
         end
-        assert_match "Expected at least 1 element matching \"div#mummy\", found 0.", exc.message
+        assert_match "Expected at least 1 element matching \"div#mummy\", found 0", exc.message
       end
 
       describe "using events" do
@@ -74,6 +75,7 @@ class TestCaseTest < MiniTest::Spec
 
         it "respond to #assert_response" do
           @test.trigger(:footsteps, 'mum')
+
           assert @test.assert_response("{}")
         end
       end
@@ -81,6 +83,7 @@ class TestCaseTest < MiniTest::Spec
       describe "#view_assigns" do
         it "be emtpy when nothing was set" do
           @test.render_widget('mum')
+
           assert_equal({}, @test.view_assigns)
         end
 
@@ -92,23 +95,17 @@ class TestCaseTest < MiniTest::Spec
             end
           end
           @test.render_widget('mum', :sleep)
+
           assert_equal({:duration => "8h"}, @test.view_assigns)
         end
       end
     end
 
-    describe "responding to parent_controller" do
-      before do
-        @test = Apotomo::TestCase.new(:widget).tap{ |t| t.setup }
-      end
+    it "respond to #parent_controller and return a controller with correct #controller_path" do
+      @test = Apotomo::TestCase.new(:widget).tap { |t| t.setup }
 
-      it "provide a test controller" do
-        assert_kind_of ActionController::Base, @test.parent_controller
-      end
-
-      it "respond to #controller_path" do
-        assert_equal "barn", @test.parent_controller.controller_path
-      end
+      assert_kind_of ActionController::Base, @test.parent_controller
+      assert_equal "barn", @test.parent_controller.controller_path
     end
   end
 end

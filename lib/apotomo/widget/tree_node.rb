@@ -11,7 +11,7 @@ module Apotomo
     def setup_tree_node(parent) # DISCUSS: make private?
       @parent       = nil
       @childrenHash = {}
-      @children     = []
+      @children     = [] # TODO: order of widgets in this variable isn't tested anywhere!!!
       
       # DISCUSS: and what if not a Widget?
       parent.add_widget(self) if parent.kind_of? Widget # TODO: as long as cells needs parent_controller.
