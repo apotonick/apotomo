@@ -192,6 +192,8 @@ end
 
 You can render your widgets, spec the markup, trigger events and assert the event responses, so far. If you need more, let us know!
 
+**Using rspec?** please check out [rspec-apotomo].
+
 ## Bubbling events
 
 Note: Let's write this paragraph!
@@ -209,3 +211,5 @@ If you wanna be cool, subscribe to our [feed](http://feeds.feedburner.com/Apotom
 Copyright (c) 2007-2013 Nick Sutterer <apotonick@gmail.com>
 
 Released under the MIT License.
+
+  [rspec-apotomo]: https://github.com/apotonick/rspec-apotomo "apotonick/rspec-apotomo"
