@@ -88,7 +88,7 @@ module Apotomo
       
       run_hook :after_initialize, self
     end
-    
+
     def parent_controller
       # i hope we'll get rid of any parent_controller dependency, soon.
       root? ? @parent_controller : root.parent_controller

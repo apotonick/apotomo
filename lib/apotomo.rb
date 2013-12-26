@@ -25,6 +25,7 @@ require 'apotomo/railtie'
 require 'apotomo/widget_shortcuts'
 require 'apotomo/rails/controller_methods'
 require 'apotomo/javascript_generator'
+require 'apotomo/render_buffer'
 require 'apotomo/test_case' if Rails.env == "test"
 
 Apotomo.js_framework = :jquery ### DISCUSS: move to rails.rb
