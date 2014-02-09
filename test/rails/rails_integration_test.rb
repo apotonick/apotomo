@@ -46,75 +46,77 @@ class RailsIntegrationTest < ActionController::TestCase
   end
 
 
-  describe "ActionController" do
-    setup do
-      @controller.class.has_widgets do |root|
-        MumWidget.new(root, 'mum')
-      end
+  def setup
+    super
 
-      @controller.instance_eval do
-        def mum
-          render :text => render_widget('mum', params[:state])
-        end
+    @controller.class.has_widgets do |root|
+      MumWidget.new(root, 'mum')
+    end
+
+    @controller.instance_eval do
+      def mum
+        render :text => render_widget('mum', params[:state])
+      end
+    end
+  end
+
+  test "provide the rails view helpers in state views" do
+    get 'mum', :state => :make_me_squeak
+    assert_select "a", "mum"
+  end
+
+  test "render" do
+    get 'mum', :state => :child
+    puts "-"
+    assert_equal "/barn/render_event_response?source=kid&amp;type=click\n", @response.body
+  end
+
+  test "process events" do
+    get 'render_event_response', :source => 'root', :type => :squeak
+    assert_equal "squeak!", @response.body
+  end
+
+  test "#page_updates is populated with event responses" do
+    get 'render_event_response', :source => 'root', :type => :squeak
+
+    assert_equal ["squeak!"], @controller.apotomo_root.page_updates
+  end
+
+  test "pass the event with all params data as state-args" do
+    get 'render_event_response', :source => "mum", :type => "squeak", :pitch => "high"
+    assert_equal "{\"source\"=>\"mum\", \"type\"=>\"squeak\", \"pitch\"=>\"high\", \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}\nsqueak!", @response.body
+  end
+
+  test "render updates to the parent window for an iframe request" do
+    get 'render_event_response', :source => 'mum', :type => :sniff, :apotomo_iframe => true
+
+    assert_response :success
+    assert_equal 'text/html', @response.content_type
+    assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<b>sniff sniff<\\/b>'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
+  end
+
+
+  # describe "ActionView" do
+  test "respond to #render_widget" do
+    @controller.instance_eval do
+      def mum
+        render :inline => "<%= render_widget 'mum', :eat %>"
       end
     end
 
-    test "provide the rails view helpers in state views" do
-      get 'mum', :state => :make_me_squeak
-      assert_select "a", "mum"
-    end
+    get :mum
+    assert_select "#mum", "burp!"
+  end
 
-    # describe "nested widgets" do
-      test "render" do
-        get 'mum', :state => :child
-        assert_equal "/barn/render_event_response?source=kid&amp;type=click\n", @response.body
-      end
-
-      test "process events" do
-        get 'render_event_response', :source => 'root', :type => :squeak
-        assert_equal "squeak!", @response.body
-      end
-    # end
-
-    test "pass the event with all params data as state-args" do
-      get 'render_event_response', :source => "mum", :type => "squeak", :pitch => "high"
-      assert_equal "{\"source\"=>\"mum\", \"type\"=>\"squeak\", \"pitch\"=>\"high\", \"controller\"=>\"barn\", \"action\"=>\"render_event_response\"}\nsqueak!", @response.body
-    end
-
-    test "render updates to the parent window for an iframe request" do
-      get 'render_event_response', :source => 'mum', :type => :sniff, :apotomo_iframe => true
-
-      assert_response :success
-      assert_equal 'text/html', @response.content_type
-      assert_equal "<html><body><script type='text/javascript' charset='utf-8'>\nvar loc = document.location;\nwith(window.parent) { setTimeout(function() { window.eval('<b>sniff sniff<\\/b>'); window.loc && loc.replace('about:blank'); }, 1) }\n</script></body></html>", @response.body
-    # end
-
-
-    # describe "ActionView" do
-      before do
-        @controller.instance_eval do
-          def mum
-            render :inline => "<%= render_widget 'mum', :eat %>"
-          end
-        end
-      end
-
-      test "respond to #render_widget" do
-        get :mum
-        assert_select "#mum", "burp!"
-      end
-
-      test "respond to #url_for_event" do
-        @controller.instance_eval do
-          def mum
-            render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
-          end
-        end
-
-        get :mum
-        assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", @response.body
+  test "respond to #url_for_event" do
+    @controller.instance_eval do
+      def mum
+        render :inline => "<%= url_for_event :footsteps, :source => 'mum' %>"
       end
     end
+
+    get :mum
+    assert_equal "/barn/render_event_response?source=mum&amp;type=footsteps", @response.body
   end
 end
 
