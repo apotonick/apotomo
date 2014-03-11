@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "cells",   ">= 3.6.7"
   s.add_dependency "onfire",  "~> 0.2.0"
-  s.add_dependency "hooks",   "~> 0.3.0"
+  s.add_dependency "hooks",   "~> 0.4.0" # brings us uber.
 
   s.add_development_dependency "rake"
   s.add_development_dependency "slim"
