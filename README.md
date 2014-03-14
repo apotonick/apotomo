@@ -2,7 +2,6 @@
 
 **Web Components for Rails.**
 
-[![TravisCI Build Status](https://secure.travis-ci.org/apotonick/apotomo.png)](http://travis-ci.org/apotonick/apotomo)
 
 ## Overview
 
@@ -10,7 +9,7 @@ Do you need an _interactive user interface_ for your Rails application? A cool R
 
 Is your controller gettin' fat? And your partial-helper-AJAX pile is getting out of control?
 
-Do you want a framework to make the implementation easier? _You want Apotomo._ 
+Do you want a framework to make the implementation easier? _You want Apotomo._
 
 **Apotomo** is based on [Cells](http://github.com/apotonick/cells), the popular View Components framework for Rails.
 
@@ -60,7 +59,7 @@ You now tell your controller about the new widget.
 
 ```ruby
 class PostsController < ApplicationController
-  
+
   has_widgets do |root|
     root << widget(:comments, :post => @post)
   end
@@ -77,7 +76,7 @@ Rendering usually happens in your controller view, `app/views/posts/show.html.ha
 %p
   = @post.body
 %p
-  = render_widget :comments
+  = render_widget :comments, post: @post
 ```
 
 ## Write the widget
@@ -87,7 +86,7 @@ A widget is like a cell which is like a mini-controller.
 ```ruby
 class CommentsWidget < Apotomo::Widget
   responds_to_event :post
-  
+
   def display(args)
     @comments = args[:post].comments # the parameter from outside.
 
@@ -97,13 +96,13 @@ class CommentsWidget < Apotomo::Widget
 
 Having `display` as the default state when rendering, this method collects comments to show and renders its view.
 
-And look at line 2 - if encountering a `:post` event we invoke `#post`, which is simply another state. How cool is that? 
+And look at line 2 - if encountering a `:post` event we invoke `#post`, which is simply another state. How cool is that?
 
 ```ruby
   def post(event)
     @comment = Comment.new :post_id => event[:post_id]
     @comment.update_attributes event[:comment] # a bit like params[].
-    
+
     update :state => :display
   end
 end
@@ -128,7 +127,7 @@ Take a look at the widget's view `display.html.haml`.
   %ul
     - for comment in @comments
       %li= comment.text
-  
+
   = form_for :comment, :url => url_for_event(:post), :remote => true do |f|
     = f.text_field :text
     = f.submit
@@ -179,11 +178,11 @@ class CommentsWidgetTest < Apotomo::TestCase
   has_widgets do |root|
     root << widget(:comments, :post => @pervert_post)
   end
-  
+
   def test_render
     render_widget :comments
     assert_select "li#me"
-    
+
     trigger :post, :comment => {:text => "Sex on the beach"}
     assert_response 'alert("Hey, you wanted to submit a pervert comment!");'
   end
