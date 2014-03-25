@@ -22,7 +22,7 @@ Easy as hell. You just need Ruby 1.9.3/2.0.0 and Rails 3/4.
 Add Apotomo to your `Gemfile`:
 
 ```ruby
-gem `apotomo`
+gem 'apotomo'
 ```
 
 ## Example
