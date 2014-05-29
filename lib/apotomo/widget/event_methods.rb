@@ -8,7 +8,7 @@ module Apotomo
     included do
       after_initialize do
         self.class.responds_to_event_options.each do |args|
-          type, options = args[0], args[1] || {}
+          type, options = args[0], (args[1] || {}).clone
           target = self
           
           if target_id = options[:passing]
