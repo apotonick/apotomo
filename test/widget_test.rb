@@ -114,7 +114,7 @@ class WidgetTest < MiniTest::Spec
     # internal_methods:
     it "not list internal methods in action_methods" do
       # FIXME: puts "WTF is wrong again with AC.action_methods godamn, I HATE this magic shit!"
-      unless Cell.rails3_1_or_more?
+      unless Cell.rails_version >= 3.1
         assert Class.new(Apotomo::Widget).action_methods.empty?
       end
     end
