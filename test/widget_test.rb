@@ -107,20 +107,6 @@ class WidgetTest < MiniTest::Spec
       assert_equal @mum.name, @mum.widget_id
     end
 
-    it "respond to DEFAULT_VIEW_PATHS" do
-      assert_equal ["app/widgets"], Apotomo::Widget::DEFAULT_VIEW_PATHS
-    end
-
-    it "respond to .view_paths" do
-      if Cell.rails3_2_or_more?
-        assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]).paths, Apotomo::Widget.view_paths.paths
-      elsif Cell.rails4_0? or Cell.rails4_1_or_more?
-        Apotomo::Widget.view_paths.paths.to_s.must_match("app/widgets")
-      else
-        assert_equal ActionView::PathSet.new(Apotomo::Widget::DEFAULT_VIEW_PATHS + ["test/widgets"]), Apotomo::Widget.view_paths
-      end
-    end
-
     it "respond to .controller_path" do
       assert_equal "mouse", MouseWidget.controller_path
     end
