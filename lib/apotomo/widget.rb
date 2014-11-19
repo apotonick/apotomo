@@ -30,16 +30,16 @@ module Apotomo
   #   def display
   #     @cheese = options[:favorites].first
   #
-  # 2. Request data from forms etc. is available through <tt>event.data</tt> in the triggered states. 
+  # 2. Request data from forms etc. is available through <tt>event.data</tt> in the triggered states.
   # Use the <tt>#[]</tt> shortcut to access values directly.
   #
   #   def update(evt)
   #     @cheese = Cheese.find evt[:cheese_id]
   class Widget < Cell::Rails
-    DEFAULT_VIEW_PATHS = [File.join('app', 'widgets')]
-    
+    self.view_paths = "app/widgets"
+
     include Hooks
-    
+
     # Use this for setup code you're calling in every state. Almost like a +before_filter+ except that it's
     # invoked after the initialization in #has_widgets.
     #
@@ -51,60 +51,60 @@ module Apotomo
     #     end
     define_hook :after_initialize
     define_hook :has_widgets
-    
+
     attr_writer :visible
-    
+
     include TreeNode
-    
+
     include Onfire
-    
+
     include EventMethods
     include WidgetShortcuts
     include JavascriptMethods
-    
+
     helper Apotomo::Rails::ViewHelper
     helper Apotomo::Rails::ActionViewMethods
-    
+
     abstract!
     undef :display  # We don't want #display to be listed in #internal_methods.
-    
+
     attr_reader :name
     alias_method :widget_id, :name
 
     attr_reader :options
-    
+
     after_initialize do
       run_hook :has_widgets, self
     end
-    
-    
+
+
     def initialize(parent, id, options={})
       super(parent)  # TODO: do that as long as cells do need a parent_controller.
       @options      = options
       @name         = id
       @visible      = true
-      
+
       setup_tree_node(parent)
-      
+
       run_hook :after_initialize, self
     end
-    
+
     def parent_controller
       # i hope we'll get rid of any parent_controller dependency, soon.
       root? ? @parent_controller : root.parent_controller
     end
-    
+
     def visible?
       @visible
     end
-    
+
     # Invokes +state+ and hopefully returns the rendered content.
     def invoke(state, *args)
-      return render_state(state, *args) if method(state).arity != 0 # TODO: remove check and make trigger states receive the evt default. 
+      return render_state(state, *args) if method(state).arity != 0 # TODO: remove check and make trigger states receive the evt default.
       render_state(state)
     end
-    
-    # Renders and returns a view for the current state. That's why it is usually called at the end of 
+
+    # Renders and returns a view for the current state. That's why it is usually called at the end of
     # a state method.
     #
     # ==== Options
@@ -113,7 +113,7 @@ module Apotomo
     # Example:
     #  class MouseWidget < Apotomo::Widget
     #    def eat
-    #      render 
+    #      render
     #    end
     #
     # render the view <tt>eat.haml</tt>.
@@ -124,27 +124,27 @@ module Apotomo
     def render(*args, &block)
       super
     end
-    
+
     # Returns the widget named +widget_id+ if it's a descendent or self.
     def find_widget(widget_id)
       find {|node| node.name.to_s == widget_id.to_s}
     end
-    
+
     def address_for_event(type, options={})
       options.reverse_merge!  :source     => name,
                               :type       => type,
-                              :controller => parent_controller.controller_path  # DISCUSS: dependency to parent_controller.  
+                              :controller => parent_controller.controller_path  # DISCUSS: dependency to parent_controller.
     end
-    
+
     def url_for_event(type, options={})
-      apotomo_event_path address_for_event(type, options) 
+      apotomo_event_path address_for_event(type, options)
     end
-    
-    
+
+
     def self.controller_path
       @controller_path ||= name.sub(/Widget$/, '').underscore unless anonymous?
     end
-    
+
     # Renders the +widget+ (instance or id).
     def render_widget(widget_id, state=:display, *args)
       if widget_id.kind_of?(Widget)
@@ -152,9 +152,9 @@ module Apotomo
       else
         widget = find_widget(widget_id) or raise "Couldn't render non-existent widget `#{widget_id}`"
       end
-      
+
       widget.invoke(state, *args)
     end
   end
 end
- 
+
