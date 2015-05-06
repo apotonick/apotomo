@@ -4,12 +4,12 @@ require 'uber/inheritable_attr'
 module Apotomo
   module Rails
     # Lazy-loads Apotomo support into controllers when needed.
-    # module ControllerMethodsLoader
-    #   def has_widgets(*args, &block)
-    #     include ControllerMethods
-    #     has_widgets(*args, &block)
-    #   end
-    # end
+    module ControllerMethodsLoader
+      def has_widgets(*args, &block)
+        include ControllerMethods
+        has_widgets(*args, &block)
+      end
+    end
 
 
     module ActionViewMethods
