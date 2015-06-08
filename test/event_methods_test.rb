@@ -103,6 +103,15 @@ class EventMethodsTest < MiniTest::Spec
         assert_equal [handler('jerry', :squeak)], @root.event_table.all_handlers_for(:squeak, 'jerry')
       end
 
+      it "preserves options when called with :passing" do
+        AdolescentMouse.new(@root, 'jerry')
+
+        AdolescentMouse.responds_to_event_options.each do |event, options|
+          if event == :squeak
+            assert_equal({ :passing => :root }, options)
+          end
+        end
+      end
     end
 
     describe "#responds_to_event in class context" do
