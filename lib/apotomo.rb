@@ -1,4 +1,6 @@
 module Apotomo
+  autoload :TestCase, 'apotomo/test_case'
+
   class << self
     def js_framework=(js_framework)
       @js_framework = js_framework
