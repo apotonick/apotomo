@@ -13,6 +13,7 @@ module Apotomo
     end
 
     # Include a lazy loader via has_widgets.
+    # comment out .... explicitly include in controllers that need it
     initializer 'apotomo.add_has_widgets' do |app|
       ActionController::Base.extend Apotomo::Rails::ControllerMethodsLoader
     end
