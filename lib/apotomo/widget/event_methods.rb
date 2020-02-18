@@ -13,7 +13,7 @@ module Apotomo
           
           if target_id = options[:passing]
              target = root.find_widget(target_id)
-             options[:on] ||= widget_id
+             options = options.reverse_merge(on: widget_id)
           end
           
           target.respond_to_event(type, options)
